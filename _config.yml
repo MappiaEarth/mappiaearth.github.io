@@ -1,12 +1,12 @@
 # SITE CONFIGURATION
-title: Sleek # your site title
-author: GitHub User # You :P
+title: CSR Maps Documentation
+author: CSR
 description: > # Meta description of Homepage
   Write an awesome description for your new site here. You can edit this
   line in _config.yml. It will appear in your document head meta (for
   Google search results) and in your feed.xml site description.
-baseurl: "/sleek" # the subpath of your site, e.g. /blog
-url: "https://janczizikow.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/"
+url: "https://csrmaps.github.io/"
 
 # SEO PLUGIN
 social:
@@ -32,12 +32,12 @@ hero_img: posts/sleek_lg.jpg # Main background image: use the path from /assets/
 
 email: your-email@domain.com # email for form submission
 
-twitter_username: jan_czizikow # replace with your_twitter_username or comment to remove link from footer
-github_username:  janczizikow # replace with your_github_username or comment to remove link from footer
-instagram_username: shanlongjj # replace with your_instagram_username or comment to remove link from footer
+twitter_username: null
+github_username: CSRMaps
+instagram_username: null
 
 disqus:
-  shortname: janczizikow # to enable comments replace with your_disqus_shortname
+  shortname: null # to enable comments replace with your_disqus_shortname
 
 # google_tag_manager: GTM-XXXXXXX # Uncomment to enable GTM. Replace GTM-XXXXXXX with your GTM container ID
 
@@ -58,7 +58,6 @@ exclude:
   - vendor
   - npm-debug.log
   - gulpfile.js
-  - sleek.jpg
 
 include: ['_pages']
 permalink: /:title/
