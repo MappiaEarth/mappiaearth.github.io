@@ -1,7 +1,7 @@
 {
-  "name": "sleek",
-  "version": "1.0.0",
-  "description": "Sleek is a modern Jekyll theme focused on speed performance & SEO best practices.",
+  "name": "CSR Maps Documentation",
+  "version": "0.1.0",
+  "description": "",
   "main": "gulpfile.js",
   "dependencies": {
     "fg-loadcss": "^1.3.1",
@@ -46,13 +46,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/janczizikow/sleek.git"
+    "url": "git+https://github.com/CSRMaps/csrmaps.github.io.git"
   },
   "keywords": [],
-  "author": "Jan Czizikow",
+  "author": "CSR",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/janczizikow/sleek/issues"
+    "url": "https://github.com/CSRMaps/csrmaps.github.io/issues"
   },
-  "homepage": "https://github.com/janczizikow/sleek#readme"
+  "homepage": "https://csrmaps.github.io/"
 }
