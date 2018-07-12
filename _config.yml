@@ -5,8 +5,8 @@ description: > # Meta description of Homepage
   Write an awesome description for your new site here. You can edit this
   line in _config.yml. It will appear in your document head meta (for
   Google search results) and in your feed.xml site description.
-baseurl: "/"
-url: "https://csrmaps.github.io/"
+baseurl: ""
+url: "http://localhost:3000"
 
 # SEO PLUGIN
 social:
@@ -26,11 +26,11 @@ navigation: # Navigation links
   - {name: 'Contact', link: '/contact'}
 
 tagline: >
-  Modern Jekyll theme focused on speed performance &amp; SEO best practices
+  Documentation for using CSR Maps
 
-hero_img: posts/sleek_lg.jpg # Main background image: use the path from /assets/img/ => This will output /assets/img/posts/sleek_lg.jpg
+hero_img: posts/CSR-Maps-bg.jpg # Main background image: use the path from /assets/img/ => This will output /assets/img/posts/sleek_lg.jpg
 
-email: your-email@domain.com # email for form submission
+email: null # email for form submission
 
 twitter_username: null
 github_username: CSRMaps
