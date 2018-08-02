@@ -10,14 +10,9 @@ url: "csrmaps.github.io"
 
 # SEO PLUGIN
 social:
-  name: Your Name
+  name: CSR
   links:
-    - https://twitter.com/BenBalter
-    - https://www.facebook.com/ben.balter
-    - https://www.linkedin.com/in/BenBalter
-    - https://plus.google.com/+BenBalter
-    - https://github.com/benbalter
-    - https://keybase.io/benbalter
+    - http://maps.csr.ufmg.br
 
 # THEME SETTINGS
 navigation: # Navigation links
