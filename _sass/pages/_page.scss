@@ -92,12 +92,16 @@
 }
 
 .post-list {
-  padding-top: 2.5em;
   display: flex;
   flex-wrap: wrap;
   flex: 1 0 auto;
+}
+
+.post-category {
+  padding-bottom: 0.5em;
+  padding-top: 1em;
 
   @include breakpoint($md) {
-    padding-top: 5em;
+    padding-top: 2em;
   }
 }

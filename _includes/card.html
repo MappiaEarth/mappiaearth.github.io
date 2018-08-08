@@ -3,7 +3,7 @@
     {% assign categories = post.categories %}
     <span class="post-card__label">
       {% for category in categories %}
-        <a href="{{site.baseurl}}/categories/#{{category|slugize}}" class="label"> {{ category }} </a>
+        <a href="{{site.baseurl}}/categories/#{{category|slugize}}_{{post.type}}" class="label"> {{ category }} </a>
         {% unless forloop.last %}&nbsp;{% endunless %}
       {% endfor %}
     </span>

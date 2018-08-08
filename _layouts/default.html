@@ -29,10 +29,25 @@ layout: compress
     <main class="site__content">
       <section class="blog">
         <div class="container">
+          <h2 class="post-category">Elements</h2>
           <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
 
             {% for post in site.posts %}
-              {% include card.html %}
+              {% if post.type == "Element" %}
+                {% include card.html %}
+              {% endif %}
+            {% endfor %}
+
+            <!-- {% include pagination.html %} -->
+          </div>
+
+          <h2 class="post-category">Examples</h2>
+          <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
+
+            {% for post in site.posts %}
+              {% if post.type == "Example" %}
+                {% include card.html %}
+              {% endif %}
             {% endfor %}
 
             <!-- {% include pagination.html %} -->
