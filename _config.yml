@@ -58,6 +58,11 @@ permalink: /:title/
 compress_html:
   clippings: all
 
+maps:
+  base: https://maps.csr.ufmg.br/?
+  calculator: https://maps.csr.ufmg.br/calculator/?
+  editor: https://maps.csr.ufmg.br/editor/?
+
 plugins:
   - jekyll-sitemap
   - jekyll-seo-tag

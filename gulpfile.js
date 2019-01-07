@@ -159,6 +159,7 @@ gulp.task('sw', function() {
 
   sw.write(`${rootDir}/sw.js`, {
     staticFileGlobs: [distDir + '/**/*.{js,html,css,png,jpg,svg}'],
+    maximumFileSizeToCacheInBytes:1,
     stripPrefix: distDir
   });
 });
