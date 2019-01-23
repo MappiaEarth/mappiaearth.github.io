@@ -2,7 +2,7 @@
 layout: post
 title: AMAZONES - Biodiversity
 summary: Compare deforestation in regions of different relevance.
-categories: [Legendhtml, Getid, LoadCsv, Slider, ChangeLayers, Label, Highcharts]
+categories: [Legendhtml, Getid, LoadCsv, Slider, RunOnceLayerVisible, ChangeLayers, Label, Highcharts]
 featured-img: amazones_biodiversity-Panel
 type: Example
 map-link: https://maps.csr.ufmg.br/calculator/?lang=eng&map=&queryid=5&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=-1

@@ -45,9 +45,21 @@ layout: compress
           <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
 
             {% for post in site.posts %}
-              {% if post.type == "Example" %}
-                {% include card.html %}
-              {% endif %}
+            {% if post.type == "Example" %}
+            {% include card.html %}
+            {% endif %}
+            {% endfor %}
+
+            <!-- {% include pagination.html %} -->
+          </div>
+
+          <h2 class="post-category">Raw Maps</h2>
+          <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
+
+            {% for post in site.posts %}
+            {% if post.type == "Raw" %}
+            {% include card.html %}
+            {% endif %}
             {% endfor %}
 
             <!-- {% include pagination.html %} -->
