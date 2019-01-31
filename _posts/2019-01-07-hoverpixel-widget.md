@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: element
 title: Hoverpixel
 summary: Hover map to inspect each exact pixel value.
 categories: [Hoverpixel, Functions, TooltipHelper, RawMap, GetCmp]

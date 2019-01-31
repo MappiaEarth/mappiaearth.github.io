@@ -1,6 +1,6 @@
-var DocUtils = {
+window.DocUtils = {
 
-    HOST: "//maps.csr.ufmg.br",
+    HOST: "https://maps.csr.ufmg.br",
 
     QUERY: {
         getQueryIdFromURL: function( requestedUrl ) {
@@ -30,6 +30,19 @@ var DocUtils = {
                 alert( "Request failed: " + textStatus );
             } );
 
+        },
+
+        /**
+         * Modifica o iframe e o header associado de um mapa para exibir outro link.
+         * @param {String} newURL Nova URL para exibição de outra query no iframe e nos botões.
+         * @param {String} newTitle Título a ser exibido acima do mapa.
+         */
+        changeIframeURL: function( newURL, newTitle ) {
+            document.getElementById("mapViewer").src = DocUtils.HOST + "/calculator/?" + newURL;
+            document.getElementById("openEditorMode").href = DocUtils.HOST + "/editor/?" + newURL;
+            document.getElementById("openCalculatorMode").href = DocUtils.HOST + "/calculator/?" + newURL;
+            document.getElementById("showQueryContent").href = "javascript:DocUtils.QUERY.showQueryContent('" + newURL +"')";
+            document.getElementById("mapTitle").innerHTML = newTitle;
         }
     },
 

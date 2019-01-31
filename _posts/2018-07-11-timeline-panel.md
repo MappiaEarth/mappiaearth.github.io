@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: element
 title: Timeline Panel
 summary: Learn how to create and use the Timeline Panel.
 categories: [Timeline]

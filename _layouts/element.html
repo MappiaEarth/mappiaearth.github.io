@@ -25,19 +25,17 @@ layout: compress
   <div class="hero--small dark-bg">
   {% endif %}
     <div class="hero__wrap">
-      {% if post.categories or page.categories %}
-        <div class="hero__categories">
-          {% if post %}
-            {% assign categories = post.categories %}
-          {% else %}
-            {% assign categories = page.categories %}
-          {% endif %}
-          {% for category in categories %}
-            <a class="label" href="{{site.baseurl}}/categories/#{{category|slugize}}">{{category}}</a>
-            {% unless forloop.last %}&nbsp;{% endunless %}
-          {% endfor %}
-        </div>
-      {% endif %}
+      <div class="hero__categories">
+        {% if post %}
+          {% assign categories = post.categories %}
+        {% else %}
+          {% assign categories = page.categories %}
+        {% endif %}
+        {% for category in categories %}
+          <a class="label" href="{{site.baseurl}}/categories/#{{category|slugize}}">{{category}}</a>
+          {% unless forloop.last %}&nbsp;{% endunless %}
+        {% endfor %}
+      </div>
       <h1 class="hero__title">{{ page.title }}</h1>
     </div>
   </div>
@@ -46,10 +44,25 @@ layout: compress
     <div class="container">
       <article class="post-content" itemprop="articleBody">
 
+        {% capture elementCategory %}{{ categories | first }}{% endcapture %}
+
+        {% assign examples = site.categories[elementCategory] | where_exp:"post", "post.type != 'Element'" %}
+        {% if examples != empty %}
+          {% assign post = examples[0] %}
+          {% include map.html %}
+          <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
+            {% if examples.size > 1 %}
+              {% for post in examples %}
+                {% include map-card.html %}
+              {% endfor %}
+            {% endif %}
+          </div>
+        {% endif %}
+
         {{ content }}
 
       </article>
-      
+
       {% include pagination-footer.html %}
     </div>
 

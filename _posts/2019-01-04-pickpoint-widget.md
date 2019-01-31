@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: element
 title: Pickpoint
 summary: Pick a point and use the feature information.
 categories: [Pickpoint, Highcharts]

@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: element
 title: Loadjson
 summary: Load a custom javascript object from third party source.
 categories: [Loadjson, HTML]

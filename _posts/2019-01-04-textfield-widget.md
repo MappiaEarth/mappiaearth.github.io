@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: element
 title: Textfield
 summary: Textfield to enter any input text or number assuring if the input is valid.
 categories: [Textfield, HideLegendButton]

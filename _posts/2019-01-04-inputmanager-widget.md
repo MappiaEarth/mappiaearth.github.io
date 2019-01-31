@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: element
 title: InputManager
 summary: Combobox to select one or multiple values from a list.
 categories: [Inputmanager, Highcharts, HTML]

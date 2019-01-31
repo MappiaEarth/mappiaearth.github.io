@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: element
 title: Combobox
 summary: Combobox to select one or multiple values from a list.
 categories: [Combobox, Opacity, Legendhtml]

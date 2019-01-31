@@ -34,7 +34,7 @@ const imagemin = require('gulp-imagemin');
 
 const src = {
   css: '_sass/jekyll-sleek.scss',
-  js: '_js/scripts.js',
+  js: ['_js/scripts.js', '_js/utils.js'],
 }
 const dist = {
   css: '_site/assets/css',

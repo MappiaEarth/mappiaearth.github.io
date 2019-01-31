@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: element
 title: Loadcsv
 summary: Using a scroll bar to switch between multiple values.
 categories: [Loadcsv, slider, label, Highcharts, HTML]

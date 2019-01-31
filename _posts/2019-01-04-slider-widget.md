@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: element
 title: Slider and Label
 summary: Using a scroll bar to switch between multiple values.
 categories: [Slider, Label]

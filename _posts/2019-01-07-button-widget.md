@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: element
 title: Button
 summary: Create a custom button to use within the query.
 categories: [Button, functions, Alertify]

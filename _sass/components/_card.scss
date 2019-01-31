@@ -70,6 +70,49 @@
   &__meta {
     font-size: 0.875rem;
   }
+
+  &-example__inner {
+    display: block;
+    position: relative;
+    padding: 1px 10px;
+    width: 100%;
+    color: $grey;
+    border-bottom: 0;
+
+    &:focus,
+    &:hover {
+      color: $grey;
+      border-bottom: 0;
+    }
+  }
+}
+
+.post-card.map-card {
+  min-height: 150px;
+
+  @include breakpoint($md) {
+    width: 31.25%;
+    margin-right: 3.125%;
+
+    &:last-of-type,
+    &:nth-child(3n+3) {
+      margin-right: 0;
+    }
+  }
+
+  @include breakpoint($xl) {
+    width: 22.65625%;
+    margin-right: 3.125%;
+    
+    &:nth-child(3n+3) {
+      margin-right: 3.125%;
+  }
+
+    &:last-of-type,
+    &:nth-child(4n+4) {
+      margin-right: 0;
+    }
+  }
 }
 
 .post-card__thumb {

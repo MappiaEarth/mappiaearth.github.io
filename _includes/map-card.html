@@ -1,0 +1,21 @@
+<div class="post-card map-card" itemprop="blogPosts" itemscope="" itemtype="http://schema.org/BlogPosting">
+  <a href="#mapTitle" onclick="DocUtils.QUERY.changeIframeURL('{{ post.map-link }}', '{{ post.title }}')">
+    {% if post.featured-img %}
+      <figure class="post-card__thumb">
+        <img
+          src="{{ site.url }}{{ site.baseurl }}/assets/img/posts/{{post.featured-img}}_placehold.jpg",
+          class="lazyload blur"
+          alt="{{post.title}}"
+        />
+        <noscript><img src="{{ site.url }}{{ site.baseurl }}/assets/img/posts/{{post.featured-img}}_placehold.jpg" alt="{{ post.title }}"></noscript>
+      </figure>
+    {% else %}
+      <figure class="post-card__thumb">
+        <div class="dark-bg"></div>
+      </figure>
+    {% endif %}
+    <div class="post-card-example__inner">
+      <h3>{{ post.title | strip_html | truncate: 50 }}</h3>
+    </div>
+  </a>
+</div>

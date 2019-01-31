@@ -1,0 +1,29 @@
+.post-map {
+  display: block;
+  padding-bottom: 2em;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+
+    a {
+      text-decoration: none;
+      font-weight:700; line-height:30px;
+      color:#808080;
+      font-size:15px;
+      font-family: 'Open Sans SemiBold', Arial, Helvetica, sans-serif;
+      border: none;
+    }
+
+    a + a:before {
+      content: "|";
+      padding: 0 3px;
+    }
+
+    div {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+  }
+}
