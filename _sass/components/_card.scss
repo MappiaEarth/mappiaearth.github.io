@@ -89,12 +89,21 @@
 
 .post-card.map-card {
   min-height: 150px;
+  width: 48.4375%;
+  margin-right: 3.125%;
+
+  &:last-of-type,
+  &:nth-child(2n+2) {
+    margin-right: 0;
+  }
 
   @include breakpoint($md) {
     width: 31.25%;
-    margin-right: 3.125%;
+    
+    &:nth-child(2n+2) {
+      margin-right: 3.125%;
+    }
 
-    &:last-of-type,
     &:nth-child(3n+3) {
       margin-right: 0;
     }
@@ -102,13 +111,11 @@
 
   @include breakpoint($xl) {
     width: 22.65625%;
-    margin-right: 3.125%;
     
     &:nth-child(3n+3) {
       margin-right: 3.125%;
-  }
+    }
 
-    &:last-of-type,
     &:nth-child(4n+4) {
       margin-right: 0;
     }
