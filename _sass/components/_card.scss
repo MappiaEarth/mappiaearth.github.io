@@ -15,6 +15,10 @@
   &:focus {
     border-bottom: 0;
     box-shadow: 0 2px 40px 0 hsla(232, 8%, 63%, .3);
+
+    h3 {
+      color: black;
+    }
   }
 
   @include breakpoint($md) {
@@ -65,6 +69,11 @@
 
   &__header {
     margin-bottom: 0.75rem;
+
+    h3 {
+      font-weight: 600;
+      color: #808080;
+    }
   }
 
   &__meta {

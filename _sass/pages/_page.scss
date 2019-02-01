@@ -91,6 +91,16 @@
   background-color: #f9f9f9;
 }
 
+.category-section {
+  &:nth-child(odd) {
+    background-color: #fff;
+  }
+
+  &:nth-child(even) {
+    background-color: #f7f7f7;
+  }
+}
+
 .post-list {
   display: flex;
   flex-wrap: wrap;
@@ -98,8 +108,11 @@
 }
 
 .post-category {
+  margin-bottom: 1em;
   padding-bottom: 0.5em;
   padding-top: 1em;
+  border-bottom: 2px solid #d4d4d4;
+  // box-shadow: 2px 4px #ddd;
 
   @include breakpoint($md) {
     padding-top: 2em;
