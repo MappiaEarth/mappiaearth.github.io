@@ -8,10 +8,10 @@ type: Element
 examples:
     - title: Hoverpixel - View pixel value on Hovering
       map-link: lang=eng&map=&queryid=118&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=custom
-      featured-img: as
+      featured-img: hoverpixel_hovering
     - title: Total burned area (ha)
       map-link: lang=eng&map=&queryid=101&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=custom
-      featured-img: z
+      featured-img: hoverpixel_total_burned_area
 ---
 
 funções:
