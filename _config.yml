@@ -55,6 +55,14 @@ exclude:
 include: ['_pages']
 permalink: /:title/
 
+collections:
+  examples:
+    output: true
+  elements:
+    output: true
+  raw_maps:
+    output: true
+
 compress_html:
   clippings: all
 

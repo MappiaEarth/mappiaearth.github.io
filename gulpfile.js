@@ -137,7 +137,7 @@ gulp.task('critical', function (cb) {
 
 gulp.task('watch', function() {
   gulp.watch('_sass/**/*.scss', ['sass']);
-  gulp.watch(['*.html', '_layouts/*.html', '_includes/*.html', '_posts/*.md',  'pages_/*.md', '_include/*html'], ['rebuild']);
+  gulp.watch(['*.html', '_layouts/*.html', '_includes/*.html', '_elements/*.md', '_examples/*.md', '_raw_maps/*.md', 'pages_/*.md', '_include/*html'], ['rebuild']);
   gulp.watch(src.js, ['js']);
 });
 
@@ -166,7 +166,7 @@ gulp.task('sw', function() {
 
 // Images
 gulp.task('img', function() {
-  return gulp.src('_img/posts/*.{png,jpg}')
+  return gulp.src('_img/**/*.{png,jpg}')
     .pipe($.responsive({
       // For all the images in the folder
       '*': [{

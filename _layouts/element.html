@@ -46,7 +46,7 @@ layout: compress
 
         {% capture elementCategory %}{{ categories | first }}{% endcapture %}
 
-        {% assign examples = site.categories[elementCategory] | where_exp:"post", "post.type != 'Element'" %}
+        {% assign examples = site.examples | concat: site.raw_maps | where_exp:"post", "post.categories contains elementCategory" %}
         {% if page.examples != empty %}
           {% assign examples = page.examples | concat: examples %}
         {% endif %}

@@ -2,7 +2,7 @@
 layout: element
 title: Combobox
 summary: Combobox to select one or multiple values from a list.
-categories: [Combobox, Opacity, Legendhtml]
+categories: [Combobox, Opacity, LegendHtml]
 featured-img: loadcsv-widget
 type: Element
 examples:

@@ -33,10 +33,9 @@ layout: compress
             <h2 class="post-category">Examples</h2>
             <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
 
-              {% for post in site.posts %}
-              {% if post.type == "Example" %}
-              {% include card.html %}
-              {% endif %}
+              {% assign sortedExamples = site.examples | sort: 'title' %}
+              {% for post in sortedExamples %}
+                {% include card.html %}
               {% endfor %}
 
               <!-- {% include pagination.html %} -->
@@ -49,10 +48,9 @@ layout: compress
             <h2 class="post-category">Elements</h2>
             <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
 
-              {% for post in site.posts %}
-                {% if post.type == "Element" %}
-                  {% include card.html %}
-                {% endif %}
+              {% assign sortedElements = site.elements | sort: 'title' %}
+              {% for post in sortedElements %}
+                {% include card.html %}
               {% endfor %}
 
               <!-- {% include pagination.html %} -->
@@ -65,10 +63,9 @@ layout: compress
             <h2 class="post-category">Raw Maps</h2>
             <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
 
-              {% for post in site.posts %}
-              {% if post.type == "Raw" %}
-              {% include card.html %}
-              {% endif %}
+              {% assign sortedRawMaps = site.raw_maps | sort: 'title' %}
+              {% for post in sortedRawMaps %}
+                {% include card.html %}
               {% endfor %}
 
               <!-- {% include pagination.html %} -->
