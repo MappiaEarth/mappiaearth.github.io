@@ -1,0 +1,17 @@
+{% if page.api %}
+  {% assign api = page.api %}
+  {% for category in api %}
+    {% assign tags = site.data.api[category.key] %}
+    {% if category.tags %}
+      {% assign tags = tags | where_exp: "tag", "category.tags contains tag.key" %}
+    {% endif %}
+    {% for tag in tags %}
+      <hr>
+      <div class="property">
+        <h2 class="property__title">{{ tag.key }}: {{ tag.type }}</h2>
+        <p>{{ tag.description }}</p>
+        <span>Defaults to <code>{{ tag.default | default: "undefined" }}</code></span>
+      </div>
+    {% endfor %}
+  {% endfor %}
+{% endif %}

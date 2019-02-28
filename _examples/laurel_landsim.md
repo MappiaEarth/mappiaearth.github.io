@@ -6,6 +6,10 @@ categories: [Timeline, AssociatedButtonID, InputManager, ChangeLayers, UpdateAut
 featured-img: laurel_landsim
 type: Example
 map-link: lang=eng&map=&queryid=68&extent=&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened&visiblelayers=custom
+api: 
+    - key: first
+      tags: [secondSub]
+    - key: second
 ---
 LANDSIM: https://localhost/calculator/?lang=eng&map=&queryid=68&extent=&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened&visiblelayers=custom
 				Timeline: Já aberto. (talvez por pra carregar todos os layers de uma vez.)

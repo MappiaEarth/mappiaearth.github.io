@@ -1,0 +1,35 @@
+{
+  "first": [
+    {
+      "key": "firstSub",
+      "description": "Lorem ipsum",
+      "type": "boolean",
+      "default": "false"
+    },
+    {
+      "key": "secondSub",
+      "description": "Dolor sit amet",
+      "type": "string",
+      "default": "null"
+    }
+  ],
+  "second": [
+    {
+      "key": "firstSub",
+      "description": "Consectetur adipiscing elit",
+      "type": "function",
+      "default": "null"
+    },
+    {
+      "key": "secondSub",
+      "description": "Sed ac imperdiet sapien",
+      "type": "boolean"
+    },
+    {
+      "key": "thirdSub",
+      "description": "Quisque bibendum nisi eros",
+      "type": [],
+      "default": "null"
+    }
+  ]
+}
