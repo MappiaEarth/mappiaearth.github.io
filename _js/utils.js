@@ -55,5 +55,25 @@ window.DocUtils = {
         isString: function( arg ) {
             return typeof arg === "string" || arg instanceof String;
         }
+    },
+
+    API: {
+        /**
+         * Toggle na classe CSS "open" para abrir ou fechar os detalhes de uma
+         * propriedade na API.
+         * 
+         * @param {HTMLElement} element Elemento que foi clicado.
+         */
+        toggleOpenClass: function( element ) {
+            $(element).closest(".property").toggleClass("open");
+        },
+
+        /**
+         * Disabilita a seleção do título da propriedade ao apertar várias
+         * vezes rapidamente no nome.
+         */
+        disableClickSelection: function() {
+            console.log(arguments);
+        }
     }
 };
