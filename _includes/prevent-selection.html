@@ -1,0 +1,13 @@
+<script type="text/javascript">
+    /* Espera carregar os elementos da página. */
+    window.setTimeout(function() {
+        /* Colocar um eventListener de acordo com o seletor passado no include. */
+        $("{{ include.selector }}").mousedown(function(e) {
+            /* Caso haja mais de um clique, usa o preventDefault para impedir
+               a seleção do texto. */
+            if (e.detail > 1) {
+                e.preventDefault();
+            }
+        });
+    }, 500);
+</script>

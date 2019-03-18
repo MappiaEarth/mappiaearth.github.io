@@ -119,6 +119,7 @@
   }
 
   p {
+    height: 24px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -139,6 +140,7 @@
     }
 
     p {
+      height: auto;
       text-overflow: clip;
       white-space: normal;
       overflow: visible;
