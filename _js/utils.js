@@ -66,14 +66,6 @@ window.DocUtils = {
          */
         toggleOpenClass: function( element ) {
             $(element).closest(".property").toggleClass("open");
-        },
-
-        /**
-         * Disabilita a seleção do título da propriedade ao apertar várias
-         * vezes rapidamente no nome.
-         */
-        disableClickSelection: function() {
-            console.log(arguments);
         }
     }
 };
