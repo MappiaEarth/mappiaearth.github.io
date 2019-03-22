@@ -15,4 +15,4 @@ api:
   - key: ConfigLayer
     tags: ['priority', 'title', 'legendTitle']
 ---
-Shows the hydrological services dynamics in the Amazon Forest, this analysis is part of a bigger project {% extlink AmazonES https://csr.ufmg.br/amazones/ %}.
+Shows the hydrological services dynamics in the Amazon Forest, this analysis is part of a bigger project {{ site.data.urls.AMAZONES }}.

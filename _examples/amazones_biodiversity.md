@@ -19,4 +19,4 @@ api:
   - key: Label
   - key: Highcharts
 ---
-Shows the biodiversity dynamics and relative importance of each area of the Amazon Forest for the biodiversity conservation, this analysis is part of a bigger project {% extlink AmazonES https://csr.ufmg.br/amazones/ %}.
+Shows the biodiversity dynamics and relative importance of each area of the Amazon Forest for the biodiversity conservation, this analysis is part of a bigger project {{ site.data.urls.AMAZONES }}.
