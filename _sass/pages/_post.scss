@@ -65,11 +65,89 @@
   }
 }
 
+.properties-container {
+  hr {
+    margin: 0; 
+  }
+}
+
 .property {
-  padding: 30px 0px;
+  position: relative;
+  padding: 8px 22px;
+  margin: 2px 0px;
 
   &__title {
+    display: flex;
+    justify-content: space-between;
     font-size: 1.2em;
     font-family: "Courier New", Courier, monospace;
+
+    .property-key {
+      transition: all .2s linear;
+      
+      &:hover {
+        color: #277CEA;
+        cursor: pointer;
+      }
+    }
+
+    .property-required {
+      font-size: 0.8em;
+      color: #999999;
+    }
+  }
+
+  a {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #EEEEEE;
+    }
+
+    .expand-property {
+      margin-top: 4px;
+      width: 15px;
+      display: block;
+      transition: all .1s linear;
+      user-select: none;
+      background: url(/assets/img/icons/expand.png) no-repeat 2px 13px;
+    }
+  }
+
+  p {
+    height: 24px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-bottom: 13px;
+  }
+
+  .property__expanded {
+    display: none;
+  }
+
+  &.open {
+    a {
+      background-color: #EEEEEE;
+
+      .expand-property {
+        background: url(/assets/img/icons/collapse.png) no-repeat 2px 13px;
+      }
+    }
+
+    p {
+      height: auto;
+      text-overflow: clip;
+      white-space: normal;
+      overflow: visible;
+    }
+
+    .property__expanded {
+      display: block;
+    }
   }
 }
