@@ -38,11 +38,11 @@ window.DocUtils = {
          * @param {String} newTitle Título a ser exibido acima do mapa.
          */
         changeIframeURL: function( newURL, newTitle ) {
-            document.getElementById("mapViewer").src = DocUtils.HOST + "/calculator/?" + newURL;
-            document.getElementById("openEditorMode").href = DocUtils.HOST + "/editor/?" + newURL;
-            document.getElementById("openCalculatorMode").href = DocUtils.HOST + "/calculator/?" + newURL;
-            document.getElementById("showQueryContent").href = "javascript:DocUtils.QUERY.showQueryContent('" + newURL +"')";
-            document.getElementById("mapTitle").innerHTML = newTitle;
+            document.getElementById( "mapViewer" ).src = DocUtils.HOST + "/calculator/?" + newURL;
+            document.getElementById( "openEditorMode" ).href = DocUtils.HOST + "/editor/?" + newURL;
+            document.getElementById( "openCalculatorMode" ).href = DocUtils.HOST + "/calculator/?" + newURL;
+            document.getElementById( "showQueryContent" ).href = "javascript:DocUtils.QUERY.showQueryContent('" + newURL + "')";
+            document.getElementById( "mapTitle" ).innerHTML = newTitle;
         }
     },
 

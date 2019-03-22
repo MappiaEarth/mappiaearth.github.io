@@ -9,5 +9,12 @@ examples:
     - title: Filter Style
       map-link: lang=eng&map=&queryid=115&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=custom
       featured-img: combobox_filter
+api: 
+  - key: Combobox
+  - key: LegendHtml
+  - key: ConfigLayer
+    tags: ['opacity', '_completeAPI']
 ---
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac imperdiet sapien. Quisque bibendum nisi eros, sed eleifend orci eleifend nec. Cras elit magna, ornare ac hendrerit sit amet, pretium vitae ex. Aliquam erat volutpat. Donec vel accumsan tortor. Vestibulum vel mauris diam. Quisque eget purus ac nibh varius pretium a sit amet enim. In id eros vulputate, fermentum urna a, porttitor tortor. Suspendisse feugiat pellentesque enim in ullamcorper. Ut semper venenatis velit nec ornare. Morbi id eros sollicitudin augue sollicitudin interdum. Quisque maximus, libero id aliquam dapibus, sem ipsum efficitur odio, vel vulputate ligula felis eget dolor. Suspendisse faucibus, metus eu commodo gravida, elit turpis scelerisque mi, id blandit justo justo a libero.
+A component that combines a button or editable field and a drop-down list. The user can select a value from the drop-down list, which appears at the user's request. If you make the combo box editable, then the combo box includes an editable field into which the user can type a value.
+
+Usage: "\\\{\\\{combobox\|id=ANY_UNIQUE_ID\|data={Array}\\\}\\\}"
