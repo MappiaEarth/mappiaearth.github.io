@@ -290,7 +290,7 @@
     },
     {
       "key": "getId",
-      "description": "Returns the id of this component or automatically generates and returns an id if an id is not defined yet. <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.Component-method-getId' target='_blank'>getId</a>\nUsage: Ext.Component.getId()",
+      "description": "Returns the id of this component or automatically generates and returns an id if not defined yet <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.Component-method-getId' target='_blank'> view detailed documentation Ext.Component.getId()</a>.\nUsage: Ext.Component.getId()",
       "type": ["() => {String}"]
     }
   ],
@@ -438,6 +438,16 @@
       "type": ["{Numeric}"]
     },
     {
+      "key": "runOnDragEnd",
+      "description": "Declare a function to be called when the thumb drag end.\nUsage: |runOnDragEnd=function(slider, evt) {alert('aaa')}|",
+      "type": ["{Function}({{Slider}}, {{Evt}})"]
+    },
+    {
+      "key": "values",
+      "description": "Use slider with two or more thumbs, each value is the initial thumb value.\nUsage: |values=[0,100]|",
+      "type": ["{Array}"]
+    },
+    {
       "key": "backgroundColors",
       "description": "Array of colors of background slider values, to define background slider color based in slider value.\nThe values are defined from most to minimum with two properties each:\n  - color: {String} CSS color definition for the current interval. i.e. 'red','black','#FF0000', '#000000'.\n  - startValue: {Numeric} Initial value which above will apply this color.\n\nEx.:\n    backgroundColors: [\n        {\n            // Define background color to red when slider has value above 75.\n            color: \"red\",\n            startValue: 75\n        },\n        {\n            // Define background color starting from value 0.\n            // That results two intervals, from 0 to 75 as blue, and from 76 to 100 as red.\n            color: \"blue\",\n            startValue: 0\n        }\nUsage: |backgroundColors=[{color:'red',startValue:75},{color:'blue'}]|",
       "type": ["{String}"]
@@ -475,8 +485,13 @@
     {
       "key": "_information",
       "completeAPI": "This label is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.form.Label' target='_blank'>Ext.form.Label</a>.",
-      "description": "Create a simple label element to display some text.",
+      "description": "Create a simple label element to display some text.\nUsage: \\\\{\\\\{label|\\\\}\\\\}",
       "name": "Label element tool 'label'"
+    },
+    {
+      "key": "text",
+      "description": "The label text content.\nUsage: |text=content|",
+      "type": ["{String}"]
     }
   ],
   "HTML": [

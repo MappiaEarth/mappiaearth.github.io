@@ -1,0 +1,70 @@
+<div class="video_wrapper" style="padding-bottom: {{ include.height }}%">
+    <div class="video_content">
+
+{% if include.isHeader %}
+
+<script>
+
+    {% include fadeAnimation.js %}
+
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    var player;
+    window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady() {
+        player = new YT.Player('{{ include.videoid }}', {
+            videoId: '{{ include.videoid }}',
+            playerVars: {
+                modestbranding: 0,
+                autoplay: 1,
+                controls: 0,
+                showinfo: 0,
+                mute: 1,
+                wmode: 'opaque',
+                loop: 1,
+                branding: 0,
+                rel: 0,
+                autohide: 0,
+                origin: window.location.origin
+            },
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
+        }); 
+    };
+    function onPlayerReady(event) {
+        event.target.playVideo();
+
+        {% if include.loopMax and include.loopTo %}
+        setInterval(function (){
+            var current_time = event.target.getCurrentTime();
+            if (current_time > {{ include.loopMax }}) {
+                player.seekTo({{ include.loopTo }});
+                player.playVideo();
+            }
+        }, 10);
+        {% endif %}
+    }
+
+    function onPlayerStateChange(event) {
+        if(event.data === 1) {
+            if (this.wasLoad === undefined) {
+                fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);
+                this.wasLoad = true;
+            }
+        }
+    }
+</script>
+        <div id="{{ include.videoid }}" class="video_fullDiv"></div>
+        <div class="video_overlay" id="ol_{{ include.videoid }}" style="background-image: url('{{ site.url }}{{ site.baseurl }}/assets/img/{{ include.isHeader }}'"></div>
+{% else %}
+
+<iframe frameBorder="0" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/{{ include.videoid }}?version=3&showinfo=0&autoplay=1&loop=1&autopause=0&controls=0&mute=1&wmode=opaque&playlist={{ include.videoid }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+{% endif %}
+
+    </div>
+</div>

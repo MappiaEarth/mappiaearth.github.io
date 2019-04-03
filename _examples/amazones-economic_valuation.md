@@ -3,7 +3,7 @@ layout: example
 title: AMAZONES - Economic Valuation
 summary: Realtime analysis given any scenary selected by user showing the forest value.
 categories: [Slider, Label, Textfield, isNumeric, VisibleLayers, priority, LegendTitle, Title]
-featured-img: amazones-Panel
+featured-img: amazones-panel
 type: Example
 map-link: lang=eng&map=&queryid=19&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=-1
 api: 

@@ -20,7 +20,12 @@
     <span>&copy; {{ site.time | date: '%Y' }} {{ site.author | escape }}. All rights reserved.</span>
   </div>
 </footer>
-<script async src="{{ "/assets/js/bundle.js" | relative_url }}"></script>
+<script defer async id="scriptBundle" src="{{ "/assets/js/bundle.js" | relative_url }}"></script>
+<script defer async>
+document.getElementById('scriptBundle').addEventListener('load', function () {
+    {% include hoverswap.js %}
+});
+</script>
 {% if site.service_worker %}
 <script async>
   if ('serviceWorker' in navigator) {

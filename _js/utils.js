@@ -7,7 +7,11 @@ window.DocUtils = {
             return parseInt( requestedUrl.toLowerCase().split( "queryid=" )[1].split( "&" )[0] );
         },
 
-        //Danilo ou o URL ou diretamente a queryID (em number)
+        /**
+         * Show a query contents by its ID.
+         *
+         * @param queryID {Number} Queryid of the query.
+         */
         showQueryContent: function( queryID ) {
             if (DocUtils.TYPE.isString( queryID )) {
                 queryID = DocUtils.QUERY.getQueryIdFromURL( queryID );
@@ -21,8 +25,6 @@ window.DocUtils = {
             request.done( function( msg ) {
                 var queryDescription = eval(
                     "(function(){return (" + msg + ").description;})();" );
-
-                // $( "#log" ).html( queryDescription );
                 alert( queryDescription );
             } );
 
@@ -61,7 +63,7 @@ window.DocUtils = {
         /**
          * Toggle na classe CSS "open" para abrir ou fechar os detalhes de uma
          * propriedade na API.
-         * 
+         *
          * @param {HTMLElement} element Elemento que foi clicado.
          */
         toggleOpenClass: function( element ) {

@@ -1,0 +1,86 @@
+{
+  "interaction": [
+    {
+      "url": "",
+      "featured-img": ["/custom/composed1", "png"],
+      "hover-img": ["/custom/composed2", "png"],
+      "title": "Compose maps",
+      "content": "Set basemaps to lay behind another layers to improve pointing the main aspects."
+    },
+    {
+      "url": "",
+      "featured-img": ["/custom/inspectpixel1", "png"],
+      "hover-img": ["/custom/inspectpixel2", "png"],
+      "title": "Inspect values in realtime",
+      "content": "View each region CO² stock by passing mouse or even inspect the region heights at any point."
+    },
+    {
+      "url": "",
+      "featured-img": ["/custom/process1", "png"],
+      "hover-img": ["/custom/process2", "png"],
+      "title": "Simulate sceneries",
+      "content": "Apply simulations with maps values together with user input values."
+    },
+    {
+      "url": "",
+      "featured-img": ["/custom/filter1", "png"],
+      "hover-img": ["/custom/filter2", "png"],
+      "title": "Filter map to interest ranges",
+      "content": "Allows to dinamically limit range of values in each situation."
+    },
+    {
+      "url": "",
+      "featured-img": ["/custom/transition1", "png"],
+      "hover-img": ["/custom/transition2", "png"],
+      "title": "Show transitions",
+      "content": "Select a value or a transition and only show the changed regions between them."
+    },
+    {
+      "url": "",
+      "featured-img": ["/custom/timeline1", "png"],
+      "hover-img": ["/custom/timeline2", "png"],
+      "title": "View timeline",
+      "content": "Show map changes through time."
+    }
+  ],
+  "database": [
+    {
+      "url": "",
+      "featured-img": ["/custom/server", "jpg"],
+      "title": "CSRMaps database",
+      "content": "Use any of our maps in your exhibition."
+    },
+    {
+      "url": "",
+      "featured-img": ["/custom/homeserver", "png"],
+      "title": "Your database",
+      "content": "Use your own maps by configuring your WMS service."
+    },
+    {
+      "url": "",
+      "featured-img": ["/custom/integrate", "png"],
+      "title": "INTEGRATE SOURCES TOGETHER",
+      "content": "Use multiple data sources together."
+    }
+  ],
+  "license" : [
+    {
+      "url": "",
+      "featured-img": "/icons/icons8-classroom-30.png",
+      "title": "EDUCATIONAL",
+      "content": "Completely free to use for any educational purpose."
+    },
+    {
+      "url": "",
+      "featured-img": "/icons/icons8-factory-30.png",
+      "title": "PROFITABLE",
+      "content": "Free to use in any profitable project except highcharts. For charts have a limitation in <a target=\"_blank\" href=\"https://www.highcharts.com/\">highchart license</a> contact directly them."
+    },
+    {
+      "url": "",
+      "featured-img": "/icons/icons8-statistics-30.png",
+      "title": "RESEARCH",
+      "content": "Completely free to display any research project results."
+    }
+  ]
+}

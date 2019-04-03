@@ -1,0 +1,25 @@
+<div class="post-card" itemprop="blogPosts" itemscope="" itemtype="http://schema.org/BlogPosting">
+  {% if intro.url.empty? %}
+  <a href="{{ intro.url | relative_url }}">
+  {% endif %}
+    <figure class="post-card__thumb">
+      <img
+              src="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_placehold.{{intro.featured-img[1]}}",
+              data-srcset="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb.{{intro.featured-img[1]}}, {{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb@2x.{{intro.featured-img[1]}} 2x"
+              class="lazyload blur hoverswap" hoversrc="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.hover-img[0]}}_placehold.{{intro.hover-img[1]}}" hoversrcset="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.hover-img[0]}}_thumb.{{intro.hover-img[1]}}, {{ site.url }}{{ site.baseurl }}/assets/img/{{intro.hover-img[0]}}_thumb@2x.{{intro.hover-img[1]}} 2x"
+              alt="{{intro.title}}"
+      />
+      <noscript><img src="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb.{{intro.featured-img[1]}}" alt="{{ intro.title }}"></noscript>
+    </figure>
+    <div class="post-card__header">
+      <h3>{{ intro.title | strip_html | truncate: 50 }}</h3>
+      {% if intro.summary %}
+      <p>{{ intro.summary | strip_html | truncatewords: 40 }}</p>
+      {% else %}
+      <p>{{ intro.content | strip_html | truncatewords: 40 }}</p>
+      {% endif %}
+    </div>
+  {% if intro.url.empty? %}
+  </a>
+  {% endif %}
+</div>

@@ -1,0 +1,16 @@
+<div class="icon-card_container" itemprop="blogPosts" itemscope="" itemtype="http://schema.org/BlogPosting">
+  {% if intro.url.empty? %}
+  <a href="{{ intro.url | relative_url }}">
+  {% endif %}
+  <div class="icon-card_inner">
+    <figure class="icon-card_image" style="background-image: url('{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img}}')">
+    </figure>
+    <div class="icon-card_titlewrapper">
+      <h3 class="icon-card_title">{{ intro.title | strip_html }}</h3>
+      <p class="icon-card_text">{{ intro.content | strip_html }}</p>
+    </div>
+  {% if intro.url.empty? %}
+  </a>
+  {% endif %}
+  </div>
+</div>

@@ -15,4 +15,4 @@ api:
 ---
 The Slider Control is used to display a continuous or discrete range of valid numeric choices and allows the user to interact with the control. It is typically represented visually as having a "track" and a "knob" or "thumb" which is dragged within the track.
 
-Usage: \{\{slider|plugins=tip=Filter {0}% of total cells|width=200px|id=ANY_UNIQUE_ID|value=20|increment=5|keyincrement=5|minValue=0|maxValue=100\\\}\\\}
+Usage: \\\{\\\{slider\|plugins=tip=Filter {0}% of total cells\|width=200px\|id=ANY_UNIQUE_ID\|value=20\|increment=5\|keyincrement=5\|minValue=0\|maxValue=100\\\}\\\}

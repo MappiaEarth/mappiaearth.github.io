@@ -1,5 +1,6 @@
 {% if page.api %}
   {% include prevent-selection.html selector=".property-key" %}
+  <h2>CSRMaps API</h2>
   <div class="properties-container">
     {% assign api = page.api %}
     {% for category in api %}
@@ -10,17 +11,17 @@
       {% for tag in tags %}
         <hr>
         <div class="property">
-          <a onclick="DocUtils.API.toggleOpenClass(this)">
+          <a class="property__arrow" onclick="DocUtils.API.toggleOpenClass(this)">
             <span class="expand-property">&nbsp;</span>
           </a>
-          <h2 class="property__title">
+          <h3 class="property__title">
             <span>
               <span class="property-key" onclick="DocUtils.API.toggleOpenClass(this)">{{ tag.key }}</span>: {{ tag.type }}
             </span>
             {% if tag.required %}
             <span class="property-required">required</span>
             {% endif %}
-          </h2>
+          </h3>
           <p>{{ tag.description | newline_to_br }}</p>
           <div class="property__expanded">
             <span>Defaults to <code>{{ tag.default | default: "undefined" }}</code></span>
