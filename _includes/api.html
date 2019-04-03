@@ -1,5 +1,13 @@
 {% if page.api %}
   {% include prevent-selection.html selector=".property-key" %}
+
+  <div class="properties-toolbar">
+    <div class="properties-toolbar__left-panel"></div>
+    <div class="properties-toolbar__right-panel">
+      <span class="toggle-all-properties" onclick="DocUtils.API.toggleAllProperties(this)" title="Expand all properties">&nbsp;</span>
+    </div>
+  </div>
+
   <div class="properties-container">
     {% assign api = page.api %}
     {% for category in api %}

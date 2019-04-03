@@ -65,7 +65,36 @@
   }
 }
 
+.properties-toolbar {
+  padding: 8px 10px 5px;
+  background-color: #f7f7f7;
+  display: flex;
+  justify-content: space-between;
+
+  &__left-panel {
+
+  }
+
+  &__right-panel {
+    .toggle-all-properties {
+      display: block;
+      height: 22px;
+      width: 22px;
+      cursor: pointer;
+      user-select: none;
+      background: url(/assets/img/icons/plus.png) no-repeat;
+  
+      &.open {
+        background: url(/assets/img/icons/minus.png) no-repeat;
+      }
+    }
+  }
+}
+
 .properties-container {
+  height: 400px;
+  overflow: auto;
+
   hr {
     margin: 0; 
   }

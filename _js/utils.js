@@ -66,6 +66,25 @@ window.DocUtils = {
          */
         toggleOpenClass: function( element ) {
             $(element).closest(".property").toggleClass("open");
+        },
+        
+        /**
+         * Toggle na classe CSS "open" para abrir ou fechar os detalhes de uma
+         * propriedade na API.
+         * 
+         * @param {HTMLElement} element Elemento que foi clicado.
+         */
+        toggleAllProperties: function( toggleAllElement ) {
+            $(toggleAllElement).toggleClass("open")
+            var propertiesShouldOpen = $(toggleAllElement).hasClass("open");
+            var propertiesSelector = $(".properties-container").children(".property");
+            var title = propertiesShouldOpen ? "Collapse all properties" : "Expand all properties";
+            $(toggleAllElement).attr("title", title);
+            if (propertiesShouldOpen) {
+                propertiesSelector.addClass("open");
+            } else {
+                propertiesSelector.removeClass("open");
+            }
         }
     }
 };
