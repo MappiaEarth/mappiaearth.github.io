@@ -9,5 +9,10 @@ examples:
     - title: Losses of biodiversity filter
       map-link: lang=eng&map=&queryid=111&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=custom
       featured-img: slider_losses_filter
+api: 
+    - key: Slider
+    - key: Label
 ---
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac imperdiet sapien. Quisque bibendum nisi eros, sed eleifend orci eleifend nec. Cras elit magna, ornare ac hendrerit sit amet, pretium vitae ex. Aliquam erat volutpat. Donec vel accumsan tortor. Vestibulum vel mauris diam. Quisque eget purus ac nibh varius pretium a sit amet enim. In id eros vulputate, fermentum urna a, porttitor tortor. Suspendisse feugiat pellentesque enim in ullamcorper. Ut semper venenatis velit nec ornare. Morbi id eros sollicitudin augue sollicitudin interdum. Quisque maximus, libero id aliquam dapibus, sem ipsum efficitur odio, vel vulputate ligula felis eget dolor. Suspendisse faucibus, metus eu commodo gravida, elit turpis scelerisque mi, id blandit justo justo a libero.
+The Slider Control is used to display a continuous or discrete range of valid numeric choices and allows the user to interact with the control. It is typically represented visually as having a "track" and a "knob" or "thumb" which is dragged within the track.
+
+Usage: \{\{slider|plugins=tip=Filter {0}% of total cells|width=200px|id=ANY_UNIQUE_ID|value=20|increment=5|keyincrement=5|minValue=0|maxValue=100\\\}\\\}

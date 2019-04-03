@@ -4,12 +4,12 @@ window.DocUtils = {
 
     QUERY: {
         getQueryIdFromURL: function( requestedUrl ) {
-            return parseInt( requestedUrl.toLowerCase().split( "queryid=" )[1].split( "&" )[0] );
+            return parseInt( requestedUrl.toLowerCase().split( "queryid=" )[ 1 ].split( "&" )[ 0 ] );
         },
 
         //Danilo ou o URL ou diretamente a queryID (em number)
         showQueryContent: function( queryID ) {
-            if (DocUtils.TYPE.isString( queryID )) {
+            if ( DocUtils.TYPE.isString( queryID ) ) {
                 queryID = DocUtils.QUERY.getQueryIdFromURL( queryID );
             }
             var request = $.ajax( {
@@ -38,11 +38,11 @@ window.DocUtils = {
          * @param {String} newTitle Título a ser exibido acima do mapa.
          */
         changeIframeURL: function( newURL, newTitle ) {
-            document.getElementById("mapViewer").src = DocUtils.HOST + "/calculator/?" + newURL;
-            document.getElementById("openEditorMode").href = DocUtils.HOST + "/editor/?" + newURL;
-            document.getElementById("openCalculatorMode").href = DocUtils.HOST + "/calculator/?" + newURL;
-            document.getElementById("showQueryContent").href = "javascript:DocUtils.QUERY.showQueryContent('" + newURL +"')";
-            document.getElementById("mapTitle").innerHTML = newTitle;
+            document.getElementById( "mapViewer" ).src = DocUtils.HOST + "/calculator/?" + newURL;
+            document.getElementById( "openEditorMode" ).href = DocUtils.HOST + "/editor/?" + newURL;
+            document.getElementById( "openCalculatorMode" ).href = DocUtils.HOST + "/calculator/?" + newURL;
+            document.getElementById( "showQueryContent" ).href = "javascript:DocUtils.QUERY.showQueryContent('" + newURL + "')";
+            document.getElementById( "mapTitle" ).innerHTML = newTitle;
         }
     },
 
@@ -65,25 +65,25 @@ window.DocUtils = {
          * @param {HTMLElement} element Elemento que foi clicado.
          */
         toggleOpenClass: function( element ) {
-            $(element).closest(".property").toggleClass("open");
+            $( element ).closest( ".property" ).toggleClass( "open" );
         },
         
         /**
-         * Toggle na classe CSS "open" para abrir ou fechar os detalhes de uma
-         * propriedade na API.
+         * Expande ou recolhe todas as propriedades de uma vez.
          * 
-         * @param {HTMLElement} element Elemento que foi clicado.
+         * @param {HTMLElement} toggleAllElement Botão que abre ou fecha todas
+         * as propriedades.
          */
         toggleAllProperties: function( toggleAllElement ) {
-            $(toggleAllElement).toggleClass("open")
-            var propertiesShouldOpen = $(toggleAllElement).hasClass("open");
-            var propertiesSelector = $(".properties-container").children(".property");
-            var title = propertiesShouldOpen ? "Collapse all properties" : "Expand all properties";
-            $(toggleAllElement).attr("title", title);
-            if (propertiesShouldOpen) {
-                propertiesSelector.addClass("open");
+            $( toggleAllElement ).toggleClass( "open" )
+            var openAllProperties = $( toggleAllElement ).hasClass( "open" );
+            var propertiesSelector = $( ".properties-container" ).children( ".property" );
+            var title = openAllProperties ? "Collapse all properties" : "Expand all properties";
+            $( toggleAllElement ).attr( "title", title );
+            if ( openAllProperties ) {
+                propertiesSelector.addClass( "open" );
             } else {
-                propertiesSelector.removeClass("open");
+                propertiesSelector.removeClass( "open" );
             }
         }
     }
