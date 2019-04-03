@@ -1,12 +1,28 @@
 {% if page.api %}
   {% include prevent-selection.html selector=".property-key" %}
   <h2>CSRMaps API</h2>
+
+  <div class="properties-toolbar">
+    <div class="properties-toolbar__left-panel"></div>
+    <div class="properties-toolbar__right-panel">
+      <span class="toggle-all-properties" onclick="DocUtils.API.toggleAllProperties(this)" title="Expand all properties">&nbsp;</span>
+    </div>
+  </div>
+
   <div class="properties-container">
     {% assign api = page.api %}
     {% for category in api %}
       {% assign tags = site.data.api[category.key] %}
       {% if category.tags %}
         {% assign tags = tags | where_exp: "tag", "category.tags contains tag.key" %}
+      {% elsif category.exclude %}
+        {% assign filteredTags = '' | split: '' %}
+        {% for tag in tags %}
+          {% unless category.exclude contains tag.key %}
+            {% assign filteredTags = filteredTags | push: tag %}
+          {% endunless %}
+        {% endfor %}
+        {% assign tags = filteredTags %}
       {% endif %}
       {% for tag in tags %}
         <hr>

@@ -4,7 +4,7 @@ window.DocUtils = {
 
     QUERY: {
         getQueryIdFromURL: function( requestedUrl ) {
-            return parseInt( requestedUrl.toLowerCase().split( "queryid=" )[1].split( "&" )[0] );
+            return parseInt( requestedUrl.toLowerCase().split( "queryid=" )[ 1 ].split( "&" )[ 0 ] );
         },
 
         /**
@@ -13,7 +13,7 @@ window.DocUtils = {
          * @param queryID {Number} Queryid of the query.
          */
         showQueryContent: function( queryID ) {
-            if (DocUtils.TYPE.isString( queryID )) {
+            if ( DocUtils.TYPE.isString( queryID ) ) {
                 queryID = DocUtils.QUERY.getQueryIdFromURL( queryID );
             }
             var request = $.ajax( {
@@ -67,7 +67,26 @@ window.DocUtils = {
          * @param {HTMLElement} element Elemento que foi clicado.
          */
         toggleOpenClass: function( element ) {
-            $(element).closest(".property").toggleClass("open");
+            $( element ).closest( ".property" ).toggleClass( "open" );
+        },
+        
+        /**
+         * Expande ou recolhe todas as propriedades de uma vez.
+         * 
+         * @param {HTMLElement} toggleAllElement Botão que abre ou fecha todas
+         * as propriedades.
+         */
+        toggleAllProperties: function( toggleAllElement ) {
+            $( toggleAllElement ).toggleClass( "open" )
+            var openAllProperties = $( toggleAllElement ).hasClass( "open" );
+            var propertiesSelector = $( ".properties-container" ).children( ".property" );
+            var title = openAllProperties ? "Collapse all properties" : "Expand all properties";
+            $( toggleAllElement ).attr( "title", title );
+            if ( openAllProperties ) {
+                propertiesSelector.addClass( "open" );
+            } else {
+                propertiesSelector.removeClass( "open" );
+            }
         }
     }
 };
