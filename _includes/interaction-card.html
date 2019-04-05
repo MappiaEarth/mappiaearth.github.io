@@ -11,13 +11,15 @@
       />
       <noscript><img src="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb.{{intro.featured-img[1]}}" alt="{{ intro.title }}"></noscript>
     </figure>
-    <div class="post-card__header">
-      <h3>{{ intro.title | strip_html | truncate: 50 }}</h3>
-      {% if intro.summary %}
-      <p>{{ intro.summary | strip_html | truncatewords: 40 }}</p>
-      {% else %}
-      <p>{{ intro.content | strip_html | truncatewords: 40 }}</p>
-      {% endif %}
+    <div class="post-card__inner">
+      <div class="post-card__header">
+        <h3>{{ intro.title | strip_html | truncate: 50 }}</h3>
+        {% if intro.summary %}
+        <p>{{ intro.summary | strip_html | truncatewords: 40 }}</p>
+        {% else %}
+        <p>{{ intro.content | strip_html | truncatewords: 40 }}</p>
+        {% endif %}
+      </div>
     </div>
   {% if intro.url.empty? %}
   </a>

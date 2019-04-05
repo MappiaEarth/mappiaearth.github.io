@@ -30,33 +30,34 @@
                 origin: window.location.origin
             },
             events: {
-                'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange
+                onReady: function onPlayerReady(event) {
+                    event.target.playVideo();
+
+                    {% if include.loopMax and include.loopTo %}
+                    setInterval(function (){
+                        var current_time = event.target.getCurrentTime();
+                        if (current_time > {{ include.loopMax }}) {
+                            player.seekTo({{ include.loopTo }});
+                            player.playVideo();
+                        }
+                    }, 10);
+                    {% endif %}
+                },
+                onStateChange: function onPlayerStateChange(event) {
+                    if(event.data === 1) {
+                        if (this.wasLoad === undefined) {
+                            fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);
+                            this.wasLoad = true;
+                        }
+                    }
+                }
             }
-        }); 
+        });
     };
-    function onPlayerReady(event) {
-        event.target.playVideo();
 
-        {% if include.loopMax and include.loopTo %}
-        setInterval(function (){
-            var current_time = event.target.getCurrentTime();
-            if (current_time > {{ include.loopMax }}) {
-                player.seekTo({{ include.loopTo }});
-                player.playVideo();
-            }
-        }, 10);
-        {% endif %}
-    }
-
-    function onPlayerStateChange(event) {
-        if(event.data === 1) {
-            if (this.wasLoad === undefined) {
-                fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);
-                this.wasLoad = true;
-            }
-        }
-    }
+    setTimeout(function() {
+        fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);
+    }, 10000);
 </script>
         <div id="{{ include.videoid }}" class="video_fullDiv"></div>
         <div class="video_overlay" id="ol_{{ include.videoid }}" style="background-image: url('{{ site.url }}{{ site.baseurl }}/assets/img/{{ include.isHeader }}'"></div>
