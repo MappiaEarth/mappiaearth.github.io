@@ -56,7 +56,8 @@
     };
 
     setTimeout(function() {
-        fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);
+        if (document.getElementById('ol_{{ include.videoid }}').style.opacity == 1)
+            fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);
     }, 10000);
 </script>
         <div id="{{ include.videoid }}" class="video_fullDiv"></div>

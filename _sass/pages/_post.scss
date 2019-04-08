@@ -71,6 +71,7 @@
   &:hover {
     transition: all 0.5s ease-out;
     transform: scale(1.05);
+    z-index: 10;
   }
 }
 
@@ -310,5 +311,34 @@
     .property__expanded {
       display: block;
     }
+  }
+
+  &_param {
+    position: relative;
+    display: inline-block;
+    color: #7d7659;
+    border-bottom: 1px dotted black;
+
+    &:hover .property_tooltip {
+      visibility: visible;
+    }
+  }
+
+  &_tooltip {
+    visibility: hidden;
+    white-space: pre;
+    background-color: #ccc;
+    min-width: 100px;
+    color: #0a0a0a;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    top: -2em;
+    z-index: 1;
+  }
+
+  &_type {
+    color: #6258fd;
   }
 }

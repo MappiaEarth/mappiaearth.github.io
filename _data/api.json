@@ -220,7 +220,7 @@
     },
     {
       "key": "onSelect",
-      "description": "Fires when a list item is selected. \n{{element}}: This combobox.\n{{value}}: The record which was selected.\n{{index}}: Index of the selected item.\n\nUsage: |onSelect= function(e,v) {alert('Selected ' + v);}|",
+      "description": "Fires when a list item is selected. \n@param element {Element} This combobox.\n@param value {Record}: The record which was selected.\n@param index {Numeric} Index of the selected item.\n\nUsage: |onSelect= function(e,v) {alert('Selected ' + v);}|",
       "type": ["{Function}({{element}}, {{value}}, {{index}})\n"],
       "default": "undefined"
     },
@@ -397,16 +397,16 @@
     {
       "key": "columnNameToInd",
       "description": "Get the index of a column with the 'columnName' name.\n@param columnName {String} Column name to search for.\n@return {Number} When it exists returns the column index, otherwise -1.\nUsage: inputs.id['loadjson'](0,0)",
-      "type": ["({{column}}, {{line}}) => {Numeric}"]
+      "type": ["({{columnName}}) => {Numeric}"]
     },
     {
       "key": "setValue",
       "description": "Get the index of a column with the 'columnName' name.\n@param columnName {String} Column name to search for.\n@return {Number} When it exists returns the column index, otherwise -1.\nUsage: inputs.id['loadjson'].setValue(0,0)",
-      "type": ["({{column}}, {{line}})"]
+      "type": ["({{columnName}})"]
     },
     {
       "key": "getLines",
-      "description": "Return the lines that 'column' has the value equals 'value'.\n\nPS: To use the 'column' as index, it must be numeric and dont use text\nto avoid ambiguity.\n\n PS: The result is always a array even when getting one column and one value, the result is added to resulting array.\n PS: To filter multiple column each value and index one must be added to the 'columns' and 'values' arrays.\n Ex: ([1,4,2], [\"FIRST_COLUMN_VALUE\",\"FORTH_COLUMN_VALUE\", SECOND_COLUMN_VALUE])\n\n @param columns {Array} (Optional) Array of indexes/names of the filtered columns.\n @param values {Array} {Opcional) Array of values to match each column.\n @returns {Array} If exists 'column' and 'value' returns the filtered lines, otherwise\n  the matrix is not filtered and returns all lines.\nUsage: (inputs.id['id'].getLines([1,2,4], [20, 'blue', false], false);)",
+      "description": "Return the lines that 'column' has the value equals 'value'.\n\nPS: To use the 'column' as index, it must be numeric and dont use text\nto avoid ambiguity.\n\n PS: The result is always a array even when getting one column and one value, the result is added to resulting array.\n PS: To filter multiple column each value and index one must be added to the 'columns' and 'values' arrays.\n Ex: ([1,4,2], [\"FIRST_COLUMN_VALUE\",\"FORTH_COLUMN_VALUE\", SECOND_COLUMN_VALUE])\n\n @param columns {Array} (Optional) Array of indexes/names of the filtered columns.\n @param values {Array} {Opcional) Array of values to match each column.\n @param includeHeader {Boolean} True to include the table header line in response, false otherwise.\n @returns {Array} If exists 'column' and 'value' returns the filtered lines, otherwise\n  the matrix is not filtered and returns all lines.\nUsage: (inputs.id['id'].getLines([1,2,4], [20, 'blue', false], false);)",
       "type": ["({{columns}}, {{values}}, {{includeHeader}})"]
     }
   ],
