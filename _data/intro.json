@@ -65,25 +65,25 @@
   ],
   "license" : [
     {
-      "url": "",
+      "url": "/about#license",
       "featured-img": "/icons/icons8-classroom-30.png",
       "title": "EDUCATIONAL",
       "content": "Completely free to use for any educational purpose."
     },
     {
-      "url": "",
+      "url": "/about#license",
       "featured-img": "/icons/icons8-factory-30.png",
       "title": "PROFITABLE",
       "content": "Free to use in any profitable project except highcharts. For charts have a limitation in <a target=\"_blank\" href=\"https://www.highcharts.com/\">highchart license</a> contact directly them."
     },
     {
-      "url": "",
+      "url": "/about#license",
       "featured-img": "/icons/icons8-statistics-30.png",
       "title": "RESEARCH",
       "content": "Feel free to display any research project results even including the CSRMaps Database."
     },
     {
-      "url": "",
+      "url": "/documentation",
       "featured-img": "/icons/icons8-documents-30.png",
       "title": "DOCUMENTATION",
       "content": "View complete documentation with use cases."
@@ -95,7 +95,7 @@
       "content": "Some interesting examples created by comunity users."
     },
     {
-      "url": "",
+      "url": "/about#faq",
       "featured-img": "/icons/icons8-faq-30.png",
       "title": "FAQ",
       "content": "Frequently asked questions."

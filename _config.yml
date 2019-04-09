@@ -17,7 +17,6 @@ navigation: # Navigation links
   - {name: 'Home', link: '/'}
   - {name: 'Documentation', link: '/documentation'}
   - {name: 'About', link: '/about'}
-  - {name: 'Contact', link: '/contact'}
 
 tagline: >
   Documentation for using CSR Maps

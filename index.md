@@ -48,11 +48,3 @@ tagline: Addressing your needs.
 4: Falar da licença livre e tal e como instalar e preparar o ambiente. (Que ao clicar nessa referencia vai para a pagina com os detalhes)
     Publicação, tipos de mapas, limitações com cada tipo, RAW Maps, referencia para a API, Formato do SLD, Config e Config toml.
 
-
-Sleek is a modern Jekyll theme focused on speed performance & SEO best practices. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/) or simply read the guide on how to [get started](/getting-started)
-
-You can find the source code for the Jekyll new theme at:
-[sleek](https://github.com/janczizikow/sleek)
-
-You can find the source code for Jekyll at
-[jekyll](https://github.com/jekyll/jekyll)
