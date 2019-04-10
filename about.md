@@ -22,13 +22,13 @@ Just add a iframe to your site with the link to add your platform to your site.
 
    R: Yes.
 
-- I must submit my data to use your platform?
+- I need to send my data to use your platform?
  
-   R: No, all data is still yours and we do not store your data.
+   R: No data had to be sent you can configure your own server to use your data.
 
-- The data processing tool use our server infrastructure?
+- The data processing tool can cause server usage issues? It has usage limit?
  
-   R: No, all processing is done in client side, so no server additional usage.
+   R: No, all processing is done in user browser side so server usage is not an issue.
 
 - There is a simple tutorial to learn how to use?
  

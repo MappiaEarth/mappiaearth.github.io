@@ -29,7 +29,7 @@ layout: compress
     <main class="site__content">
       <section class="blog">
         <div class="category-section">
-          <div class="container">
+          <div id="examples" class="container">
             <h2 class="post-category">What can CSRMaps do?</h2>
             <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
 
@@ -44,7 +44,7 @@ layout: compress
         </div>
 
         <div class="category-section">
-          <div class="container">
+          <div id="elements" class="container">
             <h2 class="post-category">Available interaction tools</h2>
             <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
 
@@ -61,6 +61,23 @@ layout: compress
         <div class="category-section">
           <div class="container">
             <h2 class="post-category">Raw Maps</h2>
+            <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
+
+              <p>Soon</p>
+              <!--
+              {% assign sortedRawMaps = site.raw_maps | sort: 'title' %}
+              {% for post in sortedRawMaps %}
+                {% include card.html %}
+              {% endfor %}
+              -->
+              <!-- {% include pagination.html %} -->
+            </div>
+          </div>
+        </div>
+
+        <div class="category-section">
+          <div id="tutorial" class="container">
+            <h2 class="post-category">Tutorials</h2>
             <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
 
               <p>Soon</p>
