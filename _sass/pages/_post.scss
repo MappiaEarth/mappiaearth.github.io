@@ -128,42 +128,6 @@
   }
 }
 
-
-.properties-toolbar {
-  padding: 8px 10px 5px;
-  background-color: #f7f7f7;
-  display: flex;
-  justify-content: space-between;
-
-  &__left-panel {
-
-  }
-
-  &__right-panel {
-    .toggle-all-properties {
-      display: block;
-      height: 22px;
-      width: 22px;
-      cursor: pointer;
-      user-select: none;
-      background: url(/assets/img/icons/plus.png) no-repeat;
-
-      &.open {
-        background: url(/assets/img/icons/minus.png) no-repeat;
-      }
-    }
-  }
-}
-
-.properties-container {
-  height: 400px;
-  overflow: auto;
-
-  hr {
-    margin: 0;
-  }
-}
-
 .fillHeader {
   height:60px;
   width: 100%;
@@ -202,11 +166,148 @@
   }
 }
 
+.api-toolbar {
+  padding: 8px 10px 5px;
+  background-color: #f7f7f7;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &__left-panel {
+
+  }
+
+  &__right-panel {
+    .toggle-all-properties {
+      display: block;
+      height: 22px;
+      width: 22px;
+      cursor: pointer;
+      user-select: none;
+      background: url(/assets/img/icons/plus.png) no-repeat;
+
+      &.open {
+        background: url(/assets/img/icons/minus.png) no-repeat;
+      }
+    }
+  }
+}
+
+.api-container {
+  hr {
+    margin: 0;
+  }
+}
+
+.property-category {
+  position: relative;
+  border-top: 1px solid #ededed;
+
+  &__metadata {
+    position: relative;
+    padding: 2px 22px 0px;
+    margin: 2px 0px;
+
+    &__name {
+      user-select: none;
+      font-size: 1.17em;
+      font-weight: bold;
+      color: #3d4e8c;
+      transition: all .2s linear;
+
+      &:hover {
+        color: #277CEA;
+        cursor: pointer;
+      }
+    }
+
+    &__description {
+      margin: 5px 0px 5px;
+    }
+
+    &__completeAPI {
+      margin: 20px 0px 5px;
+      font-style: italic;
+      color: #666;
+    }
+  }
+
+  .left-anchor {
+    background-color: #f7f7f7;
+    border-right: 1px solid #e6e6e6;
+    position: absolute;
+    top: 0;
+    line-height: 1.5;
+    left: 0;
+    bottom: 0;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #EEEEEE;
+    }
+
+    .arrow {
+      margin-top: 0px;
+      width: 15px;
+      display: block;
+      transition: all .1s linear;
+      user-select: none;
+      background: url(/assets/img/icons/expand.png) no-repeat 2px 13px;
+    }
+  }
+
+  .property {
+    display: none;
+  }
+
+  &.open {
+    .property {
+      display: block;
+    }
+  }
+
+  .open {
+    .left-anchor {
+      background-color: #EEEEEE;
+
+      .arrow {
+        background: url(/assets/img/icons/collapse.png) no-repeat 2px 13px;
+      }
+    }
+  }
+}
+
 .property {
   position: relative;
-  padding: 2px 22px 0;
-  margin: 2px 0px;
+  padding: 2px 22px 0px 6px;
+  margin: 0px 0px 0px 32px;
   color: #838c8d;
+  border-top: 1px solid #ededed;
+
+  &::before {
+    content: " ";
+    position: absolute;
+    width: 2px;
+    background-color: #EEEEEE;
+    top: -6px;
+    bottom: -27px;
+    left: -27px;
+  }
+
+  &:last-child::before {
+    height: 26.5px;
+    bottom: 0;
+  }
+
+  &::after {
+    content: " ";
+    position: absolute;
+    left: -25px;
+    width: 10px;
+    height: 2px;
+    background-color: #EEEEEE;
+    top: 19px;
+  }
 
   &__title {
     display: inline;
@@ -231,28 +332,6 @@
     }
   }
 
-  &__arrow {
-    position: absolute;
-    top: 0;
-    line-height: 1.5;
-    left: 0;
-    bottom: 0;
-    cursor: pointer;
-
-    &:hover {
-      background-color: #EEEEEE;
-    }
-
-    .expand-property {
-      margin-top: 0px;
-      width: 15px;
-      display: block;
-      transition: all .1s linear;
-      user-select: none;
-      background: url(/assets/img/icons/expand.png) no-repeat 2px 13px;
-    }
-  }
-
   p {
     height: 24px;
     text-overflow: ellipsis;
@@ -265,15 +344,11 @@
     display: none;
   }
 
+  .left-anchor {
+    margin-left: -16px;
+  }
+
   &.open {
-    a {
-      background-color: #EEEEEE;
-
-      .expand-property {
-        background: url(/assets/img/icons/collapse.png) no-repeat 2px 13px;
-      }
-    }
-
     p {
       height: auto;
       text-overflow: clip;
@@ -282,6 +357,7 @@
 
     .property__expanded {
       display: block;
+      margin: 10px 0px 5px;
     }
   }
 }

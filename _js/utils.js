@@ -66,8 +66,19 @@ window.DocUtils = {
          *
          * @param {HTMLElement} element Elemento que foi clicado.
          */
-        toggleOpenClass: function( element ) {
+        togglePropertyOpen: function( element ) {
             $( element ).closest( ".property" ).toggleClass( "open" );
+        },
+
+        /**
+         * Toggle na classe CSS "open" de uma categoria para exibir ou esconder
+         * as propriedades pertencentes a ela.
+         *
+         * @param {HTMLElement} element Elemento que foi clicado.
+         */
+        toggleCategoryOpen: function( element ) {
+            $( element ).closest( ".property-category" ).toggleClass( "open" );
+            $( element ).closest( ".property-category__metadata" ).toggleClass( "open" );
         },
         
         /**
@@ -79,13 +90,13 @@ window.DocUtils = {
         toggleAllProperties: function( toggleAllElement ) {
             $( toggleAllElement ).toggleClass( "open" )
             var openAllProperties = $( toggleAllElement ).hasClass( "open" );
-            var propertiesSelector = $( ".properties-container" ).children( ".property" );
+            var childrenSelector = $( ".api-container" ).find( ".property, .property-category, .property-category__metadata" );
             var title = openAllProperties ? "Collapse all properties" : "Expand all properties";
             $( toggleAllElement ).attr( "title", title );
             if ( openAllProperties ) {
-                propertiesSelector.addClass( "open" );
+                childrenSelector.addClass( "open" );
             } else {
-                propertiesSelector.removeClass( "open" );
+                childrenSelector.removeClass( "open" );
             }
         }
     }
