@@ -30,36 +30,43 @@
                 origin: window.location.origin
             },
             events: {
-                'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange
+                onReady: function onPlayerReady(event) {
+                    event.target.playVideo();
+
+                    {% if include.loopMax and include.loopTo %}
+                    setInterval(function (){
+                        var current_time = event.target.getCurrentTime();
+                        if (current_time > {{ include.loopMax }}) {
+                            player.seekTo({{ include.loopTo }});
+                            player.playVideo();
+                        }
+                    }, 10);
+                    {% endif %}
+                },
+                onStateChange: function onPlayerStateChange(event) {
+                    if(event.data === 1) {
+                        if (this.wasLoad === undefined) {
+                            fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);
+                            this.wasLoad = true;
+                        }
+                    }
+                }
             }
-        }); 
+        });
     };
-    function onPlayerReady(event) {
-        event.target.playVideo();
 
-        {% if include.loopMax and include.loopTo %}
-        setInterval(function (){
-            var current_time = event.target.getCurrentTime();
-            if (current_time > {{ include.loopMax }}) {
-                player.seekTo({{ include.loopTo }});
-                player.playVideo();
-            }
-        }, 10);
-        {% endif %}
-    }
-
-    function onPlayerStateChange(event) {
-        if(event.data === 1) {
-            if (this.wasLoad === undefined) {
-                fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);
-                this.wasLoad = true;
-            }
-        }
-    }
+    setTimeout(function() {
+        if (document.getElementById('ol_{{ include.videoid }}').style.opacity == 1)
+            fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);
+    }, 10000);
 </script>
         <div id="{{ include.videoid }}" class="video_fullDiv"></div>
         <div class="video_overlay" id="ol_{{ include.videoid }}" style="background-image: url('{{ site.url }}{{ site.baseurl }}/assets/img/{{ include.isHeader }}'"></div>
+
+        <div class="video_btn_wrapper">
+            <a href="./documentation" class="video_btn_link"><div class="btn">Documentation</div></a>
+            <a href="//maps.csr.ufmg.br" target="_blank" class="video_btn_link"><div class="btn">Access CSRMaps</div></a>
+        </div>
 {% else %}
 
 <iframe frameBorder="0" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/{{ include.videoid }}?version=3&showinfo=0&autoplay=1&loop=1&autopause=0&controls=0&mute=1&wmode=opaque&playlist={{ include.videoid }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

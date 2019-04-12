@@ -47,40 +47,58 @@
     {
       "url": "",
       "featured-img": ["/custom/server", "jpg"],
-      "title": "CSRMaps database",
-      "content": "Use any of our maps in your exhibition."
+      "title": "CSR DATABASE",
+      "content": "Updated categorized and with metadata all CSR Maps are available to your project."
     },
     {
       "url": "",
       "featured-img": ["/custom/homeserver", "png"],
-      "title": "Your database",
-      "content": "Use your own maps by configuring your WMS service."
+      "title": "DISPLAY YOUR MAPS",
+      "content": "Easily configure a server to display your maps in CSRMaps or even in GIS software."
     },
     {
       "url": "",
       "featured-img": ["/custom/integrate", "png"],
-      "title": "INTEGRATE SOURCES TOGETHER",
-      "content": "Use multiple data sources together."
+      "title": "OTHERS SOURCES",
+      "content": "Use others services in your project: CSV, JSON or cloud storage services."
     }
   ],
   "license" : [
     {
-      "url": "",
+      "url": "/about#license",
       "featured-img": "/icons/icons8-classroom-30.png",
       "title": "EDUCATIONAL",
       "content": "Completely free to use for any educational purpose."
     },
     {
-      "url": "",
+      "url": "/about#license",
       "featured-img": "/icons/icons8-factory-30.png",
       "title": "PROFITABLE",
       "content": "Free to use in any profitable project except highcharts. For charts have a limitation in <a target=\"_blank\" href=\"https://www.highcharts.com/\">highchart license</a> contact directly them."
     },
     {
-      "url": "",
+      "url": "/about#license",
       "featured-img": "/icons/icons8-statistics-30.png",
       "title": "RESEARCH",
-      "content": "Completely free to display any research project results."
+      "content": "Feel free to display any research project results even including the CSRMaps Database."
+    },
+    {
+      "url": "/documentation",
+      "featured-img": "/icons/icons8-documents-30.png",
+      "title": "DOCUMENTATION",
+      "content": "View complete documentation with use cases."
+    },
+    {
+      "url": "",
+      "featured-img": "/icons/icons8-map-editing-30.png",
+      "title": "FEATURED EXAMPLES",
+      "content": "Some interesting examples created by comunity users."
+    },
+    {
+      "url": "/about#faq",
+      "featured-img": "/icons/icons8-faq-30.png",
+      "title": "FAQ",
+      "content": "Frequently asked questions."
     }
   ]
 }
