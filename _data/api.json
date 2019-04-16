@@ -587,5 +587,18 @@
       "description": "Sankey element is not avaiable yet.",
       "name": "Sankey transitions chart"
     }
+  ],
+  "SummedArea": [
+    {
+      "key": "_information",
+      "completeAPI": "",
+      "description": "Create an input of summatory in any arbitrary area.\n\nCallBack parameters (context {OpenLayers.Layer}, layersValues {Array[Number]}, inputs {[Object]}, feature {Geometry})\nrunOnClick {Function}  Callback called exactly after sum the map region.,\n\nPS: 'layersValues' return the sum of each internal layer and an adittional value which is the sum of all pixels of resulting layer.",
+      "name": "Summed Area tool"
+    },
+    {
+      "key": "value",
+      "description": "Initial latitude of the pickpoint pointer.\nUsage: |lat=10|",
+      "type": ["{Numeric}"]
+    }
   ]
 }

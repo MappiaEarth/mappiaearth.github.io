@@ -15,7 +15,7 @@
       "content": "View each region CO² stock by passing mouse or even inspect the region heights at any point."
     },
     {
-      "url": "",
+      "url": "/examples/amazones-economic_valuation/",
       "featured-img": ["/custom/process1", "png"],
       "hover-img": ["/custom/process2", "png"],
       "title": "Simulate sceneries",
@@ -29,14 +29,14 @@
       "content": "Allows to dinamically limit range of values in each situation."
     },
     {
-      "url": "",
+      "url": "/examples/opcoesdemitigacao/",
       "featured-img": ["/custom/transition1", "png"],
       "hover-img": ["/custom/transition2", "png"],
       "title": "Show transitions",
       "content": "Select a value or a transition and only show the changed regions between them."
     },
     {
-      "url": "",
+      "url": "/elements/timeline-panel/",
       "featured-img": ["/custom/timeline1", "png"],
       "hover-img": ["/custom/timeline2", "png"],
       "title": "View timeline",
@@ -45,19 +45,19 @@
   ],
   "database": [
     {
-      "url": "",
+      "url": "/documentation#tutorial",
       "featured-img": ["/custom/server", "jpg"],
       "title": "CSR DATABASE",
       "content": "Updated categorized and with metadata all CSR Maps are available to your project."
     },
     {
-      "url": "",
+      "url": "/documentation#tutorial",
       "featured-img": ["/custom/homeserver", "png"],
       "title": "DISPLAY YOUR MAPS",
       "content": "Easily configure a server to display your maps in CSRMaps or even in GIS software."
     },
     {
-      "url": "",
+      "url": "/documentation#tutorial",
       "featured-img": ["/custom/integrate", "png"],
       "title": "OTHERS SOURCES",
       "content": "Use others services in your project: CSV, JSON or cloud storage services."
@@ -89,10 +89,10 @@
       "content": "View complete documentation with use cases."
     },
     {
-      "url": "",
+      "url": "/documentation#examples",
       "featured-img": "/icons/icons8-map-editing-30.png",
       "title": "FEATURED EXAMPLES",
-      "content": "Some interesting examples created by comunity users."
+      "content": "Some research projects examples."
     },
     {
       "url": "/about#faq",
