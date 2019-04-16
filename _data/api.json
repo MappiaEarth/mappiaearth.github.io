@@ -29,12 +29,6 @@
       "default": ""
     },
     {
-      "key": "&queryid=",
-      "description": "Query content identifier.\nUsage: URL/?queryid=57",
-      "type": "{Numeric}",
-      "default": ""
-    },
-    {
       "key": "&extent=",
       "description": "If defined shows a given bounds defined in EPSG:4626|EPSG:900913 coordinate system, otherwise zoom to visible layers extents. The boundbox is defined as 'left, bottom,Right,top' coordinates.\nUsage: extent=-443.628,-16.847,-407.373,3.294",
       "type": "{String}"

@@ -12,7 +12,7 @@ examples:
 api: 
   - key: Button
   - key: ConfigLayer
-    tags: ['functions', '_completeAPI']
+    tags: ['functions']
   - key: Alertify
     tags: ['log']
     exclude: ['_completeAPI']
