@@ -74,30 +74,84 @@ window.DocUtils = {
          * Toggle na classe CSS "open" de uma categoria para exibir ou esconder
          * as propriedades pertencentes a ela.
          *
-         * @param {HTMLElement} element Elemento que foi clicado.
+         * @param {HTMLElement} element Elemento presente na árvore da 
+         *   categoria que se deseja alterar.
+         * @param {boolean} state Opcional. Caso seja definido, irá forçar 
+         *   a categoria a abrir ou fechar, conforme o valor. True para abrir e
+         *   false para fechar.
          */
-        toggleCategoryOpen: function( element ) {
-            $( element ).closest( ".property-category" ).toggleClass( "open" );
-            $( element ).closest( ".property-category__metadata" ).toggleClass( "open" );
+        toggleCategoryOpen: function( element, state ) {
+            $( element ).closest( ".property-category" ).toggleClass( "open", state );
+            $( element ).closest( ".property-category__metadata" ).toggleClass( "open", state );
         },
         
         /**
          * Expande ou recolhe todas as propriedades de uma vez.
          * 
-         * @param {HTMLElement} toggleAllElement Botão que abre ou fecha todas
-         * as propriedades.
+         * @param {boolean} state Opcional. Caso seja definido, irá forçar 
+         *   todas as propriedades a abrir ou fechar, conforme o valor. True para
+         *   abrir e false para fechar.
          */
-        toggleAllProperties: function( toggleAllElement ) {
-            $( toggleAllElement ).toggleClass( "open" )
-            var openAllProperties = $( toggleAllElement ).hasClass( "open" );
+        toggleAllProperties: function( state ) {
+            var toggleAllElement = $("#toggle-all-properties");
+            var openAllProperties = state !== undefined ? state : !toggleAllElement.hasClass( "open" );
             var childrenSelector = $( ".api-container" ).find( ".property, .property-category, .property-category__metadata" );
             var title = openAllProperties ? "Collapse all properties" : "Expand all properties";
-            $( toggleAllElement ).attr( "title", title );
+            toggleAllElement.toggleClass( "open", openAllProperties );
+            toggleAllElement.attr( "title", title );
             if ( openAllProperties ) {
                 childrenSelector.addClass( "open" );
             } else {
                 childrenSelector.removeClass( "open" );
             }
-        }
+        },
+
+        /**
+         * Filtra as propriedades visíveis conforme entrada do usuário no input
+         * de filtro. Exibe somente aquelas propriedades ou categorias que
+         * contenham a string inserida pelo usuário
+         */
+        filterVisibleProperties: function() {
+            var eventTimeout;
+            var propertySelector = $( ".api-container" ).find( ".property" );
+            var categorySelector = $( ".api-container" ).find( ".property-category" );
+            return function filterVisibleProperties() {
+                clearTimeout( eventTimeout );
+                eventTimeout = setTimeout( function() {
+                    propertySelector.removeClass( "lastVisible" );
+                    var filterText = $("#filter-members").val();
+                    if ( !filterText ) {
+                        // Close all properties and categories, so that there
+                        // isn't so much space being used when everything show
+                        // up again.
+                        DocUtils.API.toggleAllProperties( false );
+                        propertySelector.removeClass( "hidden" );
+                        categorySelector.removeClass( "hidden" );
+                    } else {
+                        var querySelector = "div:contains(" + filterText + ")";
+                        var filteredProperties = propertySelector.filter( querySelector );
+                        var filteredCategories = categorySelector.filter( querySelector );
+                        var propertiesToHide = propertySelector.not( filteredProperties );
+                        var categoriesToHide = categorySelector.not( filteredCategories );
+
+                        // Can't use "hide" and "show" methods here, as they overwrite
+                        // the "open" class funcionality.
+                        filteredProperties.removeClass( "hidden" );
+                        filteredCategories.removeClass( "hidden" );
+                        categoriesToHide.addClass( "hidden" );
+                        propertiesToHide.addClass( "hidden" );
+
+                        // Only add this when there is a filter, so the the CSS
+                        // selectors can get the last visible property by class.
+                        filteredCategories.find( ".property:not(.hidden):last" ).addClass( "lastVisible" );
+                        
+                        // Open parent categories to show the properties.
+                        filteredCategories.filter( ":not( .open )" ).each( function( index, element ) {
+                            DocUtils.API.toggleCategoryOpen( element, true );
+                        });
+                    }
+                }, 500 );
+            }
+        }()
     }
 };
