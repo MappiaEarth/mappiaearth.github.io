@@ -7,7 +7,8 @@
       <h2>CSRMaps API</h2>
     </div>
     <div class="api-toolbar__right-panel">
-      <span class="toggle-all-properties" onclick="DocUtils.API.toggleAllProperties(this)" title="Expand all properties">&nbsp;</span>
+      <input id="filter-memebers" class="filter-members" type="search" placeholder="Filter members" oninput="DocUtils.API.filterVisibleProperties(this)">
+      <span id="toggle-all-properties" class="toggle-all-properties" onclick="DocUtils.API.toggleAllProperties()" title="Expand all properties">&nbsp;</span>
     </div>
   </div>
 

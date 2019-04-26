@@ -22,6 +22,12 @@ $( window ).resize( function() {
     $( ".header__overlay" ).remove(); // Remove mobile navigation overlay in case it was opened
 } );
 
+$.expr[":"].contains = $.expr.createPseudo(function(arg) {
+    return function( elem ) {
+        return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+    };
+});
+
 /*-------------------------------------------------------------------------*/
 /* MOBILE NAVIGATION */
 /* -----------------------------------------------------------------------*/
