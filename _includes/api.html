@@ -17,6 +17,7 @@
       {% assign tags = site.data.api[key] %}
       {% assign informationData = site.data.api[key] | where: "key", "_information" | first %}
       {% assign informationTags = "_description, _name" | split: ", " %}
+      {% assign apiConfig = page.apiConfig | default: nil %}
 
       {% if category.tags or category.exclude %}
         {% assign hasIncompleteAPI = false %}
@@ -70,9 +71,8 @@
         {% endunless %}
       {% endfor %}
       {% assign tags = tagsWithoutMetadata | uniq %}
-
-      <div class="property-category" id="category_{{ key }}">
-        <div class="property-category__metadata">
+      <div class="property-category {% if apiConfig and apiConfig.startPropertiesOpen %}open{% endif %}" id="category_{{ key }}">
+        <div class="property-category__metadata {% if apiConfig and apiConfig.startPropertiesOpen %}open{% endif %}" >
           <a class="left-anchor" onclick="DocUtils.API.toggleCategoryOpen(this)">
             <span class="arrow">&nbsp;</span>
           </a>
