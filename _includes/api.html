@@ -13,6 +13,7 @@
   </div>
 
   <div class="api-container">
+    <div id="empty-filter-results" class="hidden">No results found.</div>
     {% for category in api %}
       {% assign key = category.key | default: category %}
       {% assign tags = site.data.api[key] %}

@@ -115,6 +115,7 @@ window.DocUtils = {
             var eventTimeout;
             var propertySelector = $( ".api-container" ).find( ".property" );
             var categorySelector = $( ".api-container" ).find( ".property-category" );
+            var emptyResultsElement = $( "#empty-filter-results" );
             return function filterVisibleProperties() {
                 clearTimeout( eventTimeout );
                 eventTimeout = setTimeout( function() {
@@ -125,6 +126,7 @@ window.DocUtils = {
                         // isn't so much space being used when everything show
                         // up again.
                         DocUtils.API.toggleAllProperties( false );
+                        emptyResultsElement.addClass( "hidden" );
                         propertySelector.removeClass( "hidden" );
                         categorySelector.removeClass( "hidden" );
                     } else {
@@ -133,6 +135,12 @@ window.DocUtils = {
                         var filteredCategories = categorySelector.filter( querySelector );
                         var propertiesToHide = propertySelector.not( filteredProperties );
                         var categoriesToHide = categorySelector.not( filteredCategories );
+
+                        if (filteredProperties.length === 0 && filteredCategories.length === 0) {
+                            emptyResultsElement.removeClass( "hidden" );
+                        } else {
+                            emptyResultsElement.addClass( "hidden" );
+                        }
 
                         // Can't use "hide" and "show" methods here, as they overwrite
                         // the "open" class funcionality.

@@ -269,8 +269,16 @@
     margin: 0;
   }
 
+  div {
+    transition: max-height 5s ease;
+  }
+
   .hidden {
     display: none;
+  }
+
+  #empty-filter-results {
+    margin: 5px 5px 50px;
   }
 }
 
