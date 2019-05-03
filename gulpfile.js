@@ -69,7 +69,7 @@ gulp.task('rebuild', ['jekyll-build'], function (done) {
 });
 
 // Serve after jekyll-build
-gulp.task('browser-sync', ['sass', 'js', 'sw', 'jekyll-build'], function() {
+gulp.task('browser-sync', ['sass', 'js', 'jekyll-build'], function() {
     browserSync({
         server: {
             baseDir: '_site'
@@ -159,14 +159,26 @@ gulp.task('sw', function() {
 
   sw.write(`${rootDir}/sw.js`, {
     staticFileGlobs: [distDir + '/**/*.{js,html,css,png,jpg,svg}'],
-    maximumFileSizeToCacheInBytes:1,
     stripPrefix: distDir
   });
 });
 
 // Images
 gulp.task('img', function() {
-    return gulp.src(['_img/**/*.{png,jpg}'], {base: '_img/'})
+    // Just pass through icons with not supported extensions.
+    gulp.src(['_img/icons/*', '!_img/icons/*.{png.jpg}'], {base: '_img/'})
+    .pipe(gulp.dest('assets/img'));
+
+    // Icons with supported extensions are minified.
+    gulp.src(['_img/icons/*.{png,jpg}'], {base: '_img/'})
+      .pipe(responsive({
+        '**/*': {}
+      }))
+      .pipe(imagemin())
+      .pipe(gulp.dest('assets/img'));
+
+    // The remaining images are processed.
+    return gulp.src(['_img/**/*.{png,jpg}', '!_img/icons/**'], {base: '_img/'})
         .pipe(responsive({
             // For all the images in the folder
             '**/*': [{
@@ -223,4 +235,4 @@ gulp.task('serve', function() {
   });
 });
 
-gulp.task('build', ['sass', 'js', 'jekyll-build', 'img', 'sw']);
+gulp.task('build', ['sass', 'js', 'jekyll-build', 'img']);
