@@ -165,13 +165,19 @@ gulp.task('sw', function() {
 
 // Images
 gulp.task('img', function() {
+    // Just pass through icons with not supported extensions.
+    gulp.src(['_img/icons/*', '!_img/icons/*.{png.jpg}'], {base: '_img/'})
+    .pipe(gulp.dest('assets/img'));
+
+    // Icons with supported extensions are minified.
     gulp.src(['_img/icons/*.{png,jpg}'], {base: '_img/'})
       .pipe(responsive({
-        '**/*': [{
-        }]
+        '**/*': {}
       }))
       .pipe(imagemin())
-      .pipe(gulp.dest('assets/img'));     
+      .pipe(gulp.dest('assets/img'));
+
+    // The remaining images are processed.
     return gulp.src(['_img/**/*.{png,jpg}', '!_img/icons/**'], {base: '_img/'})
         .pipe(responsive({
             // For all the images in the folder
