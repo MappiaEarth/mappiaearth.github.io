@@ -137,7 +137,7 @@ gulp.task('critical', function (cb) {
 
 gulp.task('watch', function() {
   gulp.watch('_sass/**/*.scss', ['sass']);
-  gulp.watch(['*.html', '_layouts/*.html', '_includes/*.html', '_elements/*.md', '_examples/*.md', '_raw_maps/*.md', 'pages_/*.md', '_include/*html'], ['rebuild']);
+  gulp.watch(['*.md', '*.html', '_layouts/*.html', '_includes/*.html', '_elements/*.md', '_examples/*.md', '_raw_maps/*.md', 'pages_/*.md', '_include/*html'], ['rebuild']);
   gulp.watch(src.js, ['js']);
 });
 
