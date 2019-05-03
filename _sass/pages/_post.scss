@@ -230,10 +230,25 @@
   align-items: center;
 
   &__left-panel {
-
+    display: flex;
+    align-items: center;
+    width: 100%;
   }
-
+  
   &__right-panel {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+
+    .filter-members {
+      width: 165px;
+      margin: 0px 15px;
+      padding: 5px;
+      background-color: #FFF;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.30);
+    }
+
     .toggle-all-properties {
       display: block;
       height: 22px;
@@ -252,6 +267,18 @@
 .api-container {
   hr {
     margin: 0;
+  }
+
+  div {
+    transition: max-height 5s ease;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  #empty-filter-results {
+    margin: 5px 5px 50px;
   }
 }
 
@@ -322,7 +349,7 @@
   }
 
   &.open {
-    .property {
+    .property:not(.hidden) {
       display: block;
     }
   }
@@ -345,29 +372,31 @@
   color: #838c8d;
   border-top: 1px solid #ededed;
 
-  &::before {
-    content: " ";
-    position: absolute;
-    width: 2px;
-    background-color: #EEEEEE;
-    top: -6px;
-    bottom: -27px;
-    left: -27px;
-  }
-
-  &:last-child::before {
-    height: 26.5px;
-    bottom: 0;
-  }
-
-  &::after {
-    content: " ";
-    position: absolute;
-    left: -25px;
-    width: 10px;
-    height: 2px;
-    background-color: #EEEEEE;
-    top: 19px;
+  &:not(.hidden) {
+    &::before {
+      content: " ";
+      position: absolute;
+      width: 2px;
+      background-color: #EEEEEE;
+      top: -6px;
+      bottom: -27px;
+      left: -27px;
+    }
+  
+    &:last-of-type::before, &.lastVisible::before {
+      height: 26.5px;
+      bottom: 0;
+    }
+  
+    &::after {
+      content: " ";
+      position: absolute;
+      left: -25px;
+      width: 10px;
+      height: 2px;
+      background-color: #EEEEEE;
+      top: 19px;
+    }
   }
 
   &__title {
