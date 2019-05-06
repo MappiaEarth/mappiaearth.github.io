@@ -75,7 +75,7 @@
       "key": "hideLegendButton",
       "description": "True to hide the 'show legend' button, False to show.\nUsage: {hideLegendButton:true}",
       "type": "{Boolean}",
-      "default": "undefined"
+      "default": "false"
     },
     {
       "key": "associatedButtonID",
@@ -110,12 +110,6 @@
       "default": "false"
     },
     {
-      "key": "hideLegendButton",
-      "description": "False to show the 'Show legend' button, True to hide the button with the legends.\nUsage: {hideLegendButton: true}",
-      "type": "{Boolean}",
-      "default": "false"
-    },
-    {
       "key": "visible",
       "description": "Indicate which map will start visible. True to initially visible and False otherwise.\nPS: Depends on the URL property '?visiblelayers=custom' to be added to link URL.\nUsage: {visible: false}",
       "type": "{Boolean}",
@@ -144,15 +138,10 @@
       "description": "Define funções para serem utilizadas nos widgets, a função é disponibilizada para ser utilizada no widget a partir do nome dentro dessa propriedade.\nPS1) Funções definidas aqui são visiveis apenas dentro desse mapa.\nPS2) Essas funções podem ser acessadas dentro de outras funções de callback do layer utilizando (this.functions.['NOME_DA_FUNCAO'])\nUsage defining a named onClick function:\n functions: {\n    onClick: function() {\n      ExtjsUtils.ALERTIFY.log(\"Clicked Button\");\n    }\n  }\nUsage: {functions: {showAlert: function() {alert('show');} }",
       "type": "{Object}",
       "default": "null"
-    }, {
-      "key": "paramsButtonConfig",
-      "description": "Configura os botoes a serem exibidos no controle do mapa. (tem q descrever direito detalhadamente)",
-      "type": "{Object}",
-      "default": "null"
     },
     {
-      "key": "?group",
-      "description": "Nao sei :)",
+      "key": "group",
+      "description": "Defines this layer as part of a group, when it is set to be visible the others in the same group will be hidden.",
       "type": "{String}",
       "default": "null"
     }
@@ -210,7 +199,7 @@
       "key": "_information",
       "completeAPI": "This button is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.form.ComboBox' target='_blank'>Ext.form.ComboBox</a>.\n*Only the main properties are described here check link for more options.",
       "description": "Cria um input de ComboBox onde o valor do input é selecionavel em um combobox. <a href='/elements/combobox-widget/'>Usage examples</a>.\nUsage: '\\\\{\\\\combobox\\\\}\\\\}'",
-      "name": "Button widget"
+      "name": "Combobox widget"
     },
     {
       "key": "onSelect",
@@ -255,9 +244,9 @@
   "TooltipHelper": [
     {
       "key": "_information",
-      "completeAPI": "To view all Alertify API <a href=\"\">click here</a>.\n*Only the main properties are described here check link for more options.",
-      "description": "Functions to help showing dialog informations to the users.\nUsage: ExtjsUtils.TooltipHelper",
-      "name": "Alertify helper"
+      "completeAPI": "To view all the TooltipHelper API <a href=\"\">click here</a>.",
+      "description": "Functions to create tooltips at elements, fixed positions or even mouse events.\nUsage: ExtjsUtils.TooltipHelper",
+      "name": "Tooltip helper"
     },
     {
       "key": "CreateTooltipThumb",
@@ -292,7 +281,7 @@
     {
       "key": "_information",
       "completeAPI": "To view all Alertify API <a href=\"\">click here</a>.\n*Only the main properties are described here check link for more options.",
-      "description": "Functions to help showing dialog informations to the users.",
+      "description": "Functions to help showing dialog informations to users.",
       "name": "Alertify"
     },
     {
@@ -535,9 +524,9 @@
   "Timeline": [
     {
       "key": "_information",
-      "completeAPI": "View PickPoint full api description",
-      "description": "Create an input that allows users to interact with the real cell or feature value on the point.\n\nThe returned values are from the original mal to the selected point,\n in case of RASTER is returned a cell value, in case of shapefile the geometry is returned too.\n Usage: '\\\\{\\\\{timeline\\\\}\\\\}",
-      "name": "PickPoint tool"
+      "completeAPI": "View timeline full api description",
+      "description": "Create a timeline with maps in a sequence which changes at a given interval.\nUsage: '\\\\{\\\\{timeline\\\\}\\\\}'",
+      "name": "Timeline tool"
     },
     {
       "key": "nextStepInterval",

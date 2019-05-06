@@ -1,5 +1,7 @@
 @echo off
 
+set PATH=C:\Ruby25-x64\bin;%PATH%
+
 rem set gitpath=C:\Users\danilo\AppData\Local\GitHubDesktop\app-1.5.1\resources\app\git\cmd
 rem set PATH=%PATH%;%gitpath%
 where /q git || ECHO The GIT is missing. Ensure it is installed and placed in your PATH. && PAUSE && EXIT /B

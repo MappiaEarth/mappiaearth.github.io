@@ -8,7 +8,7 @@ type: Example
 map-link: lang=pt&map=&queryid=76&extent=&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened&visiblelayers=custom
 api: 
   - key: Timeline
-  - key: Query
+  - key: QUERY
     tags: ['setQueryGlobalProperties']
   - key: ConfigLayer
     tags: ['paramsButtonConfig', 'visibility']

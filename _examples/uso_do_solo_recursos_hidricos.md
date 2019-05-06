@@ -8,7 +8,7 @@ type: Example
 map-link: lang=eng&map=&queryid=78&extent=&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=1000
 api: 
     - key: Sankey
-    - key: Query
+    - key: QUERY
       tags: ['setQueryGlobalProperties']
     - key: LayerInternal
       tags: ['setCalculateLegend', 'changeLayers']
@@ -17,7 +17,7 @@ api:
     - key: Combobox
     - key: ConfigUrl
       tags: ['options', 'tools', 'visiblelayers']
-    - key: Inputmanager
+    - key: InputManager
     - key: Highcharts
 ---
 Show multiple simple maps together.

@@ -13,7 +13,7 @@ api:
     - key: LoadCsv
     - key: Slider
     - key: Label
-    - Highcharts
+    - key: Highcharts
     - key: HTML
 ---
 Create a tool to load a remote csv and create a CsvTable instance, the object created allows query the result and it can be used in any function callback.

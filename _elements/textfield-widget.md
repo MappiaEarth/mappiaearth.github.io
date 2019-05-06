@@ -2,7 +2,7 @@
 layout: element
 title: Textfield
 summary: Textfield to enter any input text or number assuring if the input is valid.
-categories: [Textfield, HideLegendButton]
+categories: [Textfield, ConfigLayer]
 featured-img: textfield-widget
 type: Element
 examples:
@@ -11,7 +11,8 @@ examples:
       featured-img: textfield_filter_height
 api: 
     - key: Textfield
-    - key: HideLegendButton
+    - key: ConfigLayer
+      tags: ['hideLegendButton']
 ---
 TextField is a tool that allows editing of a single line of text.
 

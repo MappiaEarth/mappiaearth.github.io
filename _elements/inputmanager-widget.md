@@ -2,7 +2,7 @@
 layout: element
 title: InputManager
 summary: Combobox to select one or multiple values from a list.
-categories: [Inputmanager, BeforeCalc, Expression, Highcharts, HTML, RunOnceLayerVisible]
+categories: [InputManager, BeforeCalc, Expression, Highcharts, HTML, RunOnceLayerVisible]
 featured-img: inputmanager-widget
 type: Element
 examples:
