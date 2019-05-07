@@ -2,34 +2,34 @@
   "ConfigUrl": [
     {
       "key": "_information",
-      "completeAPI": "View all url options.",
-      "description": "These options are defined in query url, and can configure tools and view settings.\nUsage: https://maps.csr.ufmg.br/editor/?lang=eng&map=&queryid=78&extent=&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=1000",
-      "name": "Query configuration"
+      "completeAPI": "View all URL <a href='/api/#category_ConfigUrl'>API here</a>.",
+      "description": "These options are defined in query url, and can configure tools and view settings.\nUsage (IN LINK URL): <a target='_blank' href='https://maps.csr.ufmg.br/editor/?lang=eng&map=&queryid=78&extent=&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=1000'>https://maps.csr.ufmg.br/editor/?lang=eng&map=&queryid=78&extent=&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=1000</a>",
+      "name": "URL Parameters"
     },
     {
-      "key": "&tools=",
+      "key": "tools=",
       "description": "Set the enabled map tools, these tools are shown in the top right side of the map viewer.\n\nhovershowlegend: Add a tool to shows map legends on hovering.\nlayerchooser: Add to 'legends viewer' a list of map layers. (Not affects 'calculate' maps).\nzoomextent: Add zoom to visible maps extents tool.\ngetfeature: Add GetFeatureInfo tool, a tool to click and get any pixel complete information.\nmeasure: Add a measurement tool that can measure a polygon area or a distance in a map.\nlegend: Add a floating panel to show the map legends.\nmetadata: Add a button to show all maps metadata.\nhelpintro: Show a button with help options, tutorial and step by step guide.\nUsage: URL/?tools=helpintro,layerchooser,zoomextent,customzoom,getfeature",
       "type": "{String}"
     },
     {
-      "key": "&options=",
-      "description": "Set options for the elements in the map viewer.\n\nonlyfirstvisible: Only the first layer is initially visible.\nhidemetadata: Remove the layer button to see layer metadata.\ndisabledownload: Remove the button 'Download' for all maps.\nhidestylechooser: ?Add to 'legends viewer' a list of map layers. (Not affects 'calculate' maps).\nscale: Show the scale indicator at bottom left of the map.\ngrid: Show grid tiles bounds.\noverview: Shows a small map to help user idenfity where globally is he viewing.\nstartopened: Painel showing layers is initially opened. (Deprecated)\nonevisible: Only one layer is visible at any time. (Deprecated)\nUsage: URL/?options=enablequeries,scale,startopened",
+      "key": "options=",
+      "description": "Set options for the elements in the map viewer.\n\nonlyfirstvisible: Only the first layer is initially visible.\nhidemetadata: Remove layers metadata button.\ndisabledownload: Remove layers 'Download' button.\nhidestylechooser: If defined remove the list of bands of layers. (Do not affect 'calculate' maps).\nscale: Show the scale indicator at bottom left of the map.\ngrid: Show grid tiles bounds.\noverview: Shows a small map to help user idenfity where globally is he viewing.\ncapabilities: Load capabilities only for the layers in query. Reduces drastically the loading speed.\nstartopened: Painel showing layers is initially opened. (Deprecated)\nonevisible: Only one layer is visible at any time. (Deprecated)\nUsage: URL/?options=enablequeries,scale,startopened",
       "type": "{String}"
     },
     {
-      "key": "&lang=",
-      "description": "Set the language translation, actually: 'pt-br', 'eng'.\nUsage: URL/?lang=eng",
+      "key": "lang=",
+      "description": "Select the interface language, which actually are: 'pt-br', 'eng'.\nUsage: URL/?lang=eng",
       "type": "{String}",
       "default": "pt-br"
     },
     {
-      "key": "&queryid=",
-      "description": "Query content identifier.\nUsage: URL/?queryid=57",
+      "key": "queryid=",
+      "description": "Id of the Query content to load.\nUsage: URL/?queryid=57",
       "type": "{Numeric}",
       "default": ""
     },
     {
-      "key": "&extent=",
+      "key": "extent=",
       "description": "If defined shows a given bounds defined in EPSG:4626|EPSG:900913 coordinate system, otherwise zoom to visible layers extents. The boundbox is defined as 'left, bottom,Right,top' coordinates.\nUsage: extent=-443.628,-16.847,-407.373,3.294",
       "type": "{String}"
     },
@@ -40,46 +40,46 @@
       "default": "100"
     }
   ],
+  "GroupingMaps" : [
+    {
+      "key": "_information",
+  "description": "Defines groups of {ConfigLayers}, each layer in the same group is shown under the same sub-menu. A group of layers is defined by an array of one Group definition followed by his inside layers declarations as: [{GroupingMaps{title, color}}, {ConfigLayer}, ...].\nGroupingMaps.title: {String} Title of the group of maps\nGroupingMaps.color: {String} RGB string content.\nUsage: [{title: \"Prodes Group\", color: \"#8F7C7C\"}, {name:'CSR:prodes', source:'local'}] ",
+      "name": "Grouping maps"
+    }
+  ],
   "ConfigLayer": [
     {
       "key": "_information",
-      "completeAPI": "View all layer configuration documentation: LINK_MOSTRANDO_CONFIG_LAYER_COMPLETO",
-      "description": "Properties to configure the map exihibition, each property must be added as a properties.",
+      "completeAPI": "View all layer configuration <a href='/api/#category_ConfigLayer'>API here</a>.",
+      "description": "Configurable exhibition of each map, defining interactions, possible internal maps and applied calculations among them.",
       "name": "Layer properties configuration"
     },
     {
       "key": "paramsButtonConfig",
-      "description": "Define custom buttons to be shown on the layer representation.\n\nThere are multiple types of buttons, there are some commum properties and some special properties:\n\nCommom properties:\n{\n  iconCls: {String} The class to add on the button. Ex: \"icon-timeline-slider\"\n  pressed: {Boolean} True to indicate if the button starts pressed, False otherwise. Ex: true,\n  toggleGroup: {String} Identify a group by name where only one button of the group can be pressed. Ex: 'onlyOneAtTime'\n}\n\nTypes:\nassociated: {associatedButtonID: 'ANOTHER_BUTTON_ID', type: 'associated'}\n Treat the layer button and the associated as the same button, so no matter which one is clicked both will\n  receive the click event.\nquery: {type: 'query'}\n This configuration allows the user to change the default query button behavior overriting his definition.\ndownload: {type: 'download', layerIndex: 0}\n Set what layer should be downloaded when more than one layer is shown by its internal layer index.\nmetadata: {type: 'metadata', layerIndex: 0}\n Set the metadata button to show one of the inside composite layer by his index.\n\n\nPS: The layerIndex is from 0 to the quantity of layers in a composed map.\nPS2: The properties are aditional, so the common must always be present, and for each type his\n corresponding property must be added.\nUsage: paramsButtonConfig: {\n    associatedButtonID: \"population_2015_2036_timeline\",\n        iconCls: \"icon-timeline-slider\",\n        pressed: true,\n        toggleGroup: undefined\n}",
+      "description": "Choose what custom buttons are shown on the layer representation.\n\nThere are multiple types of buttons, there are some commum properties and some special properties:\n\nCommom properties:\n{\n  iconCls: {String} The class to add on the button. Ex: \"icon-timeline-slider\"\n  pressed: {Boolean} True to indicate if the button starts pressed, False otherwise. Ex: true,\n  toggleGroup: {String} Identify a group by name where only one button of the group can be pressed. Ex: 'onlyOneAtTime'\n}\n\nTypes:\nassociated: {associatedButtonID: 'ANOTHER_BUTTON_ID', type: 'associated'}\n Treat the layer button and the associated as the same button, so no matter which one is clicked both will\n  receive the click event.\nquery: {type: 'query'}\n This configuration allows the user to change the default query button behavior overriting his definition.\ndownload: {type: 'download', layerIndex: 0}\n Set what layer should be downloaded when more than one layer is shown by its internal layer index.\nmetadata: {type: 'metadata', layerIndex: 0}\n Set the metadata button to show one of the inside composite layer by his index.\n\n\nPS: The layerIndex is from 0 to the quantity of layers in a composed map.\nPS2: The properties are aditional, so the common must always be present, and for each type his\n corresponding property must be added.\nUsage: paramsButtonConfig: {\n    associatedButtonID: \"population_2015_2036_timeline\",\n        iconCls: \"icon-timeline-slider\",\n        pressed: true,\n        toggleGroup: undefined\n}",
       "type": "{Object}"
     },
     {
-      "key": "Group",
-      "description": "Define the name and color of a group to the showing maps.\nObject.title: {String} Title of the group of maps\nObject.color: {String} RGB string content.\nUsage: [{title: \"Prodes Group\", color: \"#8F7C7C\"}, {name:'CSR:prodes', source:'local'}]",
-      "type": "[{Object}, {LayerDescription}, ...]",
-      "default": "undefined",
-      "required": "true"
-    },
-    {
       "key": "visibility",
-      "description": "Define the layer as initially visible. (the property visibleLayers can override this value).\nUsage: {visibility: false}",
+      "description": "Define the layer as initial visibility, True to start visible False otherwise. (the URL parameter visibleLayers can override this value).\nUsage: {visibility: false}",
       "type": "{Boolean}",
       "default": "true"
     },
     {
       "key": "legendTitle",
-      "description": "A title added to the legend representation.\nUsage: {legendTitle: '(Ton/ha)'}",
+      "description": "Defines a title for the map legend representation.\nUsage: {legendTitle: '(Ton/ha)'}",
       "type": "{String}",
-      "default": "''"
+      "default": "empty"
     },
     {
       "key": "hideLegendButton",
-      "description": "True to hide the 'show legend' button, False to show.\nUsage: {hideLegendButton:true}",
+      "description": "Set the 'show legend' button visibility, True to hide button or False to keep it visible.\nUsage: {hideLegendButton:true}",
       "type": "{Boolean}",
       "default": "false"
     },
     {
       "key": "associatedButtonID",
-      "description": "Define (by its id) what button will be associated with the query button, so when click on one of these buttons the other receives the click aswell.\nUsage: ",
+      "description": "Defines a button to associate with the query button, so when click on one of these buttons the other receives the click too.\nUsage: ",
       "type": "{Boolean}",
       "default": "undefined"
     },
@@ -99,49 +99,49 @@
     },
     {
       "key": "title",
-      "description": "Specifies a custom title for the map, otherwise the name is got from map documentation.\nUsage: title: 'My 1º Custom Title'",
+      "description": "Define map title, if empty the title is read from metadata.\nUsage: title: 'My 1º Custom Title'",
       "type": "{String}",
       "default": "{String}"
     },
     {
       "key": "updateAutomatically",
-      "description": "Flag that controls if the calculations would be right after a widget update/change or will wait the user end the interaction.\n\n'True' to the calculations start immediately and 'False' otherwise.\n\n*PS: Only applicable to 'calculate' maps.\nUsage: {updateAutomatically: true}",
+      "description": "Flag to control the calculations delay after a widget update/change by user interaction.\n\n'True' to start calculations immediately and 'False' otherwise.\n\n*PS: Only applicable to 'calculate' maps.\nUsage: {updateAutomatically: true}",
       "type": "{Boolean}",
       "default": "false"
     },
     {
       "key": "visible",
-      "description": "Indicate which map will start visible. True to initially visible and False otherwise.\nPS: Depends on the URL property '?visiblelayers=custom' to be added to link URL.\nUsage: {visible: false}",
+      "description": "Defines initial map visibility, True to start visible, False otherwise.\nUsage: {visible: false}",
       "type": "{Boolean}",
       "default": "true"
     },
     {
       "key": "opacity",
-      "description": "Define the map initial opacity.\nUsage: {opacity: 0.8}",
+      "description": "Defines initial map opacity.\nUsage: {opacity: 0.8}",
       "type": "{Numeric}",
       "default": "1"
     },
     {
       "key": "beforeCalc",
-      "description": "Function to be called always before of the expression calculation.\nPs: Maps even without 'expression' function will call the 'beforeCalc' function.\nPs2: This function is called synchronously and the context is the map layer.\nUsage: beforeCalc: function(inputs){}",
+      "description": "Function called before each expression calculation.\nPs: Maps even without 'expression' function will call the 'beforeCalc' function on a input update.\nPs2: This function is called synchronously and the context is the map layer.\nUsage: beforeCalc: function(inputs){}",
       "type": "{Function}({{inputs}})",
       "default": "null"
     },
     {
       "key": "expression",
-      "description": "Function to process each layer pixels calculating the resulting map.\n\n@param layersValue {Array} Array with the layers values, each layer in one position of the array.\n@param inputs {Object} Inputs defined to interact with the map.\n@return {*} Value to be attributed to each processed pixel.\nUsage: { expression: function(layersVals, inputs) {return layersVals[0];} }",
+      "description": "Function to process each layer pixels to the resulting map.\n\n@param layersValue {Array} Array with the layers values, each layer in one position of the array.\n@param inputs {Object} Inputs defined to interact with the map.\n@return {*} Value of each processed pixel.\nUsage: { expression: function(layersVals, inputs) {return layersVals[0];} }",
       "type": "{Function}({{layersVals}}, {{inputs}})",
       "default": "null"
     },
     {
       "key": "functions",
-      "description": "Define funções para serem utilizadas nos widgets, a função é disponibilizada para ser utilizada no widget a partir do nome dentro dessa propriedade.\nPS1) Funções definidas aqui são visiveis apenas dentro desse mapa.\nPS2) Essas funções podem ser acessadas dentro de outras funções de callback do layer utilizando (this.functions.['NOME_DA_FUNCAO'])\nUsage defining a named onClick function:\n functions: {\n    onClick: function() {\n      ExtjsUtils.ALERTIFY.log(\"Clicked Button\");\n    }\n  }\nUsage: {functions: {showAlert: function() {alert('show');} }",
+      "description": " Allows to create custom functions on the context of each layer. These functions can be used in any tool callbacks, in the tool callback must use the same name in this 'functions' property.\n PS1: Functions only visible inside this layer.\n PS2: Functions accessed by tools callbacks using his property name as:  (this.functions.['onClick']) to refer the following onClick function:\n functions: {\n   onClick: function() {\n     ExtjsUtils.ALERTIFY.log(\"Clicked Button\");\n   }\n }",
       "type": "{Object}",
       "default": "null"
     },
     {
       "key": "group",
-      "description": "Defines this layer as part of a group, when it is set to be visible the others in the same group will be hidden.",
+      "description": "Defines this layer as part of a group of exclusively visible, when one is shown all others will become hidden.",
       "type": "{String}",
       "default": "null"
     }
@@ -149,29 +149,27 @@
   "LayerInternal": [
     {
       "key": "_information",
-      "completeAPI": "View all layer internal functions.",
-      "description": "Functions to manipulate some Layer attributes.",
-      "name": "Layer properties configuration"
+      "completeAPI": "View all layer internal helper functions <a href='/api/#category_LayerInternal'>API here</a>.",
+      "description": "Functions to manipulate a composed map layers from inside, like what maps are composing or what legend will be applied.",
+      "name": "Layer internal functions"
     },
     {
       "key": "changeLayers",
       "description": "Change a internal layer in a given index by another.\n\nPS: Its highly recommended to pass multiple configuration in a array, avoid call this function multiple\n times in the same callback.\n@param newConfig {Array|Object} One or more layers configurations with a property 'index' indicating the replacing layer.\n Each config object must contain at least the following properties:\n  [{name: 'MAP_FULL_NAME', styles: 'MAP_STYLE', index: 'MAP_INDEX_TO_CHANGE'}, ... ]\n@param force {Boolean} Force redraw even if no change is done when the layer is the same.\nUsage: (layer.changeLayers({name:'CSR:estados', index:1} ))",
       "type": "{Array{Object} }",
-      "default": "undefined",
-      "required": "true"
+      "default": "undefined"
     },
     {
       "key": "setCalculateLegend",
-      "description": "",
-      "type": "{Array{Object} }",
-      "default": "undefined",
-      "required": "true"
+      "description": "Defines the current map legend, so it prevents from a new legends calculation process.\n\nPS: Can be called inside the 'beforeCalculate' callback, which is the time right before the new legend calculation.\nPS2: Can be called on a tool callback.\n\n@param legendEntries {Array{{String|Array{Number, Number, Number} }, {Object}, {String} } } Array with the legends sorted entries in ascending order, the ones out of order will be ignored.\nUsage: layer.setCalculateLegend([['00FF00', 10, 'lower Bound'], ['F100F3',50,'higher Bound']]);",
+      "type": ["{Function}({{legendEntries}})"],
+      "default": "undefined"
     }
   ],
   "Button": [
     {
       "key": "_information",
-      "completeAPI": "This button is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.Button' target='_blank'>Button.Configs</a>.\n*Only the main properties are described here check link for more options.",
+      "completeAPI": "This button is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.Button' target='_blank'>Button.Configs</a>.\nOnly some properties are listed in <a href='/api/#category_Button'>API here</a>.",
       "description": "Create a simple button to user interact with the map.",
       "name": "Button widget"
     },
@@ -197,8 +195,8 @@
   "Combobox": [
     {
       "key": "_information",
-      "completeAPI": "This button is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.form.ComboBox' target='_blank'>Ext.form.ComboBox</a>.\n*Only the main properties are described here check link for more options.",
-      "description": "Cria um input de ComboBox onde o valor do input é selecionavel em um combobox. <a href='/elements/combobox-widget/'>Usage examples</a>.\nUsage: '\\\\{\\\\combobox\\\\}\\\\}'",
+      "completeAPI": "This button is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.form.ComboBox' target='_blank'>Ext.form.ComboBox</a> for customized properties click on <a href='/api/#category_Combobox'>API here</a>.",
+      "description": "Cria um input de ComboBox onde o valor do input é selecionavel em um combobox. <a href='/elements/combobox-widget/'>Usage examples</a>.\nUsage: '\\{\\combobox\\}\\}'",
       "name": "Combobox widget"
     },
     {
@@ -217,16 +215,16 @@
   "LegendHtml": [
     {
       "key": "_information",
-      "description": "Cria um elemento DOM contendo a legenda do mapa.\n Usage: '\\\\{\\\\{legendhtml\\\\}\\\\}'",
+      "description": "Creates a DOM element with the map legend contents.\nUsage: '\\{\\{legendhtml\\}\\}'",
       "name": "Legend HTML"
     }
   ],
   "Hoverpixel": [
     {
       "key": "_information",
-      "completeAPI": "This button is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.form.ComboBox' target='_blank'>Ext.form.ComboBox</a>.\n*Only the main properties are described here check link for more options.",
-      "description": "Create a tool to instantly inspect pixel under mouse. The value of the map can so be used as input for another functions.\nUsage: \\\\{\\\\{hoverpixel\\\\}\\\\}",
-      "name": "Hover Pixel tool"
+      "completeAPI": "View the complete HoverPixel <a href='/api/#category_Hoverpixel'>API here</a>.",
+      "description": "Create a tool to instantly inspect pixel under mouse. The value of the map can also be used as input for another functions.\nUsage: \\{\\{hoverpixel\\}\\}",
+      "name": "HoverPixel tool"
     },
     {
       "key": "runOnClick",
@@ -244,26 +242,26 @@
   "TooltipHelper": [
     {
       "key": "_information",
-      "completeAPI": "To view all the TooltipHelper API <a href=\"\">click here</a>.",
-      "description": "Functions to create tooltips at elements, fixed positions or even mouse events.\nUsage: ExtjsUtils.TooltipHelper",
+      "completeAPI": "View the complete TooltipHelper <a href='/api/#category_TooltipHelper'>API here</a>.",
+      "description": "Functions to create tooltips on elements, at fixed positions and at mouse events.\nUsage: ExtjsUtils.TooltipHelper",
       "name": "Tooltip helper"
     },
     {
       "key": "CreateTooltipThumb",
-      "description": "Create a tooltip with title, description and thumbnail.\n\nThe tooltip follow the pointer, but is fixed when it exceeds the visible part of the window.\nPS: The description content is shown until three break lines in sequence and the rest of the content is\nthrown away.\n\n@param title {String} Tooltip title.\n@param description {String} Tooltip content.\n@param target {DOM} DOM object to create the tooltip.\n@param thumbUrl {String} URL of the thumbnail.\n@param showDelay {Numeric} Define how many seconds until hide the tooltip.\n@returns {Ext.ToolTip} Created tooltip with the properties.\nUsage: ExtjsUtils.TooltipHelper.CreateTooltipThumb()",
+      "description": "Create a tooltip which follows the mouse on hovering an element with title, description and thumbnail.\n\nPS: The description content is shown until three break lines in sequence and the rest of the content is thrown away.\n\n@param title {String} Tooltip title.\n@param description {String} Tooltip content.\n@param target {DOM} DOM object to create the tooltip.\n@param thumbUrl {String} URL of the thumbnail.\n@param showDelay {Numeric} Define how many seconds until hide the tooltip.\n@returns {Ext.ToolTip} Created tooltip with the properties.\nUsage: ExtjsUtils.TooltipHelper.CreateTooltipThumb()",
       "type": ["({{title}}, {{description}}, {{target}}, {{thumbUrl}}, {{showDelay}})"]
     },
     {
       "key": "CreateTooltipOnPosition",
-      "description": "Create a tooltip at the desired position.\n\nIf the position is the mouse event, the tooltip will be at the right side and below the pointer.\nIf the position is a array[x,y] will anchor the top left at this point.\n\n@param title {String} Tooltip title.\n@param contentHtml {String} Tooltip HTML content.\n@param position {Event|Array[Number, Number]}} Define the top left position of the tooltip.\n@param additionalConfig {Object} Additional configuration for the tooltip.\nUsage: ExtjsUtils.TooltipHelper.CreateTooltipOnPosition()",
+      "description": "Create a tooltip at a fixed position.\n\nIf the position is the mouse event, the tooltip will be at the right side and below the pointer.\nIf the position is a array[x,y] will anchor the top left at this point.\n\n@param title {String} Tooltip title.\n@param contentHtml {String} Tooltip HTML content.\n@param position {Event|Array[Number, Number]}} Defines the top left position of the tooltip.\n@param additionalConfig {Object} Additional configuration for the tooltip.\n@returns {Ext.Tooltip} A tooltip anchored at the given position.\nUsage: ExtjsUtils.TooltipHelper.CreateTooltipOnPosition('title', 'My <span>tooltip</span> content', [0, 0])",
       "type": ["({{title}}, {{contentHtml}}, {{position}}, {{additionalConfig}})"]
     }
   ],
   "Extjs": [
     {
       "key": "_information",
-      "completeAPI": "To view all <a href=\"https://docs.sencha.com/extjs/3.4.0\">Extjs API 3.4 click here</a>.\n*Only the main properties are described here check link for more information.",
-      "description": "Calling Extjs core functions.",
+      "completeAPI": "View the full <a target='_blank' href=\"https://docs.sencha.com/extjs/3.4.0\">Extjs API 3.4 click here</a>.\n*Only the functions which where used in CSR projects are listed <a href='/api/#category_Extjs'>here</a>.",
+      "description": "Calling core Extjs functions allows fine control over the CSRMaps internal elements.",
       "name": "Extjs 3.4"
     },
     {
@@ -280,43 +278,43 @@
   "Alertify": [
     {
       "key": "_information",
-      "completeAPI": "To view all Alertify API <a href=\"\">click here</a>.\n*Only the main properties are described here check link for more options.",
+      "completeAPI": "View the complete Alertify <a href='/api/#category_Alertify'>API here</a>.",
       "description": "Functions to help showing dialog informations to users.",
-      "name": "Alertify"
+      "name": "Alertify dialogs"
     },
     {
       "key": "log",
-      "description": "Shows a user notification (if enabled).\n\nPS: If layer is loading only the last message will be shown after load end.\n\n@param msg {String} Notification HTML content.\n@param config {Object} Message configuration parameters.\n {force: {Boolean} Force to show notification even when disabled.\n  func: {Callback} Callback function when the notification is clicked.\n  onlyMsg: {Boolean} True to only show message and hide the close and the stop notifications, False otherwise.\n }\nUsage: ExtjsUtils.ALERTIFY.log('test msg', {force:true})",
-      "type": ["({{msg}},{{config}})"]
+      "description": "Shows an user notification (if enabled).\n\nPS: The messages before layer loading are delayed, when it finishes only the last message will be shown.\n\n@param msg {String} Notification HTML content.\n@param config {Object} Message configuration parameters.\n {force: {Boolean} Force to show notification even when disabled.\n  func: {Callback} Callback function when the notification is clicked.\n  onlyMsg: {Boolean} True to only show message and hide the close and the stop notifications, False otherwise.\n }\nUsage: ExtjsUtils.ALERTIFY.log('test msg', {force:true})",
+      "type": ["{Function}({{msg}},{{config}})"]
     }
   ],
   "InputManager": [
     {
       "key": "_information",
-      "completeAPI": "",
-      "description": "Tool to store local variables to be used in others functions callbacks.\nPS: DOM elements cannot be used in 'expression' context, because them cannot be sent to WebWorkers (javascript language limitation).\nUsage: '\\\\{\\\\{inputmanager\\\\}\\\\}'",
+      "completeAPI": "View the complete InputManager <a href='/api/#category_InputManager'>API here</a>.",
+      "description": "Tool to store local variables to be used in others functions callbacks.\nPS: DOM elements cannot be used in 'expression' context, because them cannot be sent to WebWorkers (javascript language limitation).\nUsage: '\\{\\{inputmanager\\}\\}'",
       "name": "InputManager tool"
     },
     {
       "key": "getValue",
-      "description": "Get a stored value by its property name, if doenst exists returns null.\n\n@param key {String} Stored property name.\n@returns {*} Desired stored property or null when it doesnt exists..\nUsage: (inputs.id['id'].getValue('name'))",
+      "description": "Get the stored value by his property name, if it does not exists returns null.\n\n@param key {String} Stored property name.\n@returns {*} Desired stored property when it exists or null otherwise.\nUsage: (inputs.id['id'].getValue('name'))",
       "type": ["({String}) => {Object}"]
     },
     {
       "key": "forceRecalc",
-      "description": "Fire the layer input change event at any given time, this is needeed when a stored variable change its contents and a recalculation should happen.\nUsage: (inputs.id['id'].forceRecalc())",
+      "description": "Force a legend map recalculation.\nUsage: (inputs.id['id'].forceRecalc())",
       "type": ["()"]
     },
     {
       "key": "setValues",
-      "description": "\nStore object properties to use in other functions callbacks.\n\nPS: If has name property collision the older is replaced.\n@param obj {Object} Object with the properties to be stored.\n@param cancelUpdate {Boolean} False if the change must recalculate layer values, True otherwise.\n@param local {Boolean} False to store an element that will not be sent to expression callback.\n(i.e. Local properties are not sent to WebWorkers and ignore circular references.)\nUsage: (inputs.id['id'].setValues({toStore:5}, ))('name'))",
+      "description": "Stores object properties for later usage.\n\nPS: If has name property collision the older is replaced.\n@param obj {Object} Object with the properties to be stored.\n@param cancelUpdate {Boolean} False if this change must cause layer recalculation, True otherwise.\n@param local {Boolean} True to store the property locally, False otherwise. The local properties aren't sent to 'expression' calbacks. (i.e. If a element is recursive or have DOM elements, it must local avoid stringify errors on 'expression' callbacks)\nUsage: (inputs.id['id'].setValues({toStore:5}, ))('name'))",
       "type": ["({{obj}}, {{cancelUpdate}}, {{local}})"]
     }
   ],
   "RawMaps": [
     {
       "key": "_information",
-      "completeAPI": "View Raw Maps full description ... ",
+      "completeAPI": "View the complete Raw Maps <a href='/api/#category_RawMaps'>API here</a>.",
       "description": "The Raw Maps are some maps that are sent with each pixel value and not a RGBA color. All the manipulations are at most with integer or float precision so the colors must be applied on the client, after some calculation to, on the client, create each cell color value.",
       "name": "Web Raw Maps"
     },
@@ -334,8 +332,8 @@
   "QUERY": [
     {
       "key": "_information",
-      "completeAPI": "View Raw Maps full description ... ",
-      "description": "Functions that simplify some functions usage with the query.",
+      "completeAPI": "View the complete Query <a href='/api/#category_QUERY'>API here</a>.",
+      "description": "Defines a set of query helper functions.",
       "name": "Query utils"
     },
     {
@@ -345,112 +343,105 @@
     },
     {
       "key": "setQueryGlobalProperties",
-      "description": "A function that allows to define custom global functions that can be used in order to define properties or even inside the functions callbacks. \nglobalProperties: {Object} The object that all his functions will became globals, each property can be a value or a object or evan a function.\nPS: All properties defined here are added to the global scope and are removed when the query is changed.\nUsage: ExtjsUtils.QUERY.setQueryGlobalProperties({globalCount: 0}) && QUERY_DESCRIPTION",
-      "type": ["({{globalProperties}}) || QUERY_DESCRIPTION"]
+      "description": "A function that allows to define custom global functions that can be used in order to define properties or even inside the functions callbacks. \nglobalProperties: {Object} The object that all his functions will became globals, each property can be a value or a object or evan a function.\nPS: All properties defined here are added to the global scope and are removed when the query is changed.\n@param QUERY_DESCRIPTION {Array{ConfigLayer} } Array of layers in the query.\nUsage: ExtjsUtils.QUERY.setQueryGlobalProperties({globalCount: 0}) && QUERY_DESCRIPTION",
+      "type": ["{Function}({{globalProperties}}) && {{QUERY_DESCRIPTION}}"]
     }
   ],
   "LegendHtml": [
     {
       "key": "_information",
-      "completeAPI": "",
-      "description": "Create a tool representing the legends at any place of the query description.\nUsage: '\\\\{\\\\{legendhtml\\\\}\\\\}'",
+      "description": "Create a tool with the map legends at any place of the query description.\nUsage: '\\{\\{legendhtml\\}\\}'",
       "name": "Map Legend HTML"
     }
   ],
   "OpacitySlider": [
     {
       "key": "_information",
-      "completeAPI": "",
-      "description": "Create a tool to select the map opacity slider.\nUsage: '\\\\{\\\\{opacityslider\\\\}\\\\}'",
+      "description": "Create a tool to select the map opacity slider.\nUsage: '\\{\\{opacityslider\\}\\}'",
       "name": "Opacity slider tool"
     }
   ],
   "LoadCsv": [
     {
       "key": "_information",
-      "completeAPI": "View load csv full api description",
-      "description": "Tool that allows users to interact with a csv file from any url.",
+      "completeAPI": "View the complete LoadCSV <a href='/api/#category_LoadCsv'>API here</a>.",
+      "description": "Describes the API to read and manipulate ExtjsUtils.CSV.CsvTable files from URL.",
       "name": "Csv manager tool"
     },
     {
       "key": "getValue",
       "description": "Get a value by the matrix index and column.\n@param column {Number} Column index (First index is 0).\n@param line {Number} Line index (First index is 0).\n@return {String} Get the cell value.\nUsage: inputs.id['loadjson'](0,0)",
-      "type": ["({{column}}, {{line}}) => {String}"]
+      "type": ["{Function}({{column}}, {{line}}) => {String}"]
     },
     {
       "key": "columnNameToInd",
-      "description": "Get the index of a column with the 'columnName' name.\n@param columnName {String} Column name to search for.\n@return {Number} When it exists returns the column index, otherwise -1.\nUsage: inputs.id['loadjson'](0,0)",
-      "type": ["({{columnName}}) => {Numeric}"]
+      "description": "Get the index of a column with the 'columnName' name.\n@param columnName {String} Column name to search for.\n@return {Number} When it exists returns the column index, otherwise -1.\nUsage: inputs.id['loadjson']('total_ha')",
+      "type": ["{Function}({{columnName}}) => {Numeric}"]
     },
     {
       "key": "setValue",
-      "description": "Get the index of a column with the 'columnName' name.\n@param columnName {String} Column name to search for.\n@return {Number} When it exists returns the column index, otherwise -1.\nUsage: inputs.id['loadjson'].setValue(0,0)",
-      "type": ["({{columnName}})"]
+      "description": "Change a cell value by its cell index.\n\n@param column {Numeric} Column index.\n@param line {Numeric} Line index to change (ignore the header information when it exists).\n@param value {*} New value to replace the older value.\nUsage: inputs.id['loadjson'].setValue(2,2, 'myValue')",
+      "type": ["{function}({{column}}, {{line}}, {{value}}) "]
     },
     {
       "key": "getLines",
-      "description": "Return the lines that 'column' has the value equals 'value'.\n\nPS: To use the 'column' as index, it must be numeric and dont use text\nto avoid ambiguity.\n\n PS: The result is always a array even when getting one column and one value, the result is added to resulting array.\n PS: To filter multiple column each value and index one must be added to the 'columns' and 'values' arrays.\n Ex: ([1,4,2], [\"FIRST_COLUMN_VALUE\",\"FORTH_COLUMN_VALUE\", SECOND_COLUMN_VALUE])\n\n @param columns {Array} (Optional) Array of indexes/names of the filtered columns.\n @param values {Array} {Opcional) Array of values to match each column.\n @param includeHeader {Boolean} True to include the table header line in response, false otherwise.\n @returns {Array} If exists 'column' and 'value' returns the filtered lines, otherwise\n  the matrix is not filtered and returns all lines.\nUsage: (inputs.id['id'].getLines([1,2,4], [20, 'blue', false], false);)",
-      "type": ["({{columns}}, {{values}}, {{includeHeader}})"]
+      "description": "Get all lines that 'column' has the value equals to 'value'.\n\nPS: To use the 'column' as index, it must be numeric, when the 'column' is a text the index is searched on header by its name.\nPS: To filter multiple column each value and index one must be added to the 'columns' and 'values' arrays.\nEx: ([1,4,2], [\"FIRST_COLUMN_VALUE\",\"FORTH_COLUMN_VALUE\", SECOND_COLUMN_VALUE])\n\n@param columns {Array} (Optional) Array of indexes/names of the filtered columns.\n@param values {Array} {Opcional) Array of values to match each column.\n@returns {Array} If the parameters 'column' and 'value' aren't defined return all lines, otherwise returns only the matched lines.\nUsage: (inputs.id['id'].getLines([1,2,4], [20, 'blue', false], false);)",
+      "type": ["{Function}({{columns}}, {{values}}, {{includeHeader}})"]
     }
   ],
   "Slider": [
     {
       "key": "_information",
-      "completeAPI": "View complete slider tool documentation.",
-      "description": "Tool that allows users to create a slider bar to interact with the map.",
-      "name": "Slider bar tool 'slider'"
+      "completeAPI": "View the complete Slider <a href='/api/#category_Slider'>API here</a>.",
+      "description": "\nTool that allows users to create a slider that the user can drag and change its value as map input.",
+      "name": "Slider tool"
     },
     {
       "key": "plugins.tip",
-      "description": "Show a tooltip with any html content representing current slider value.\nUsage: |plugins=tip=Filter {0}% of total cells|",
+      "description": "Shows a tooltip with any html content with the value while dragging.\nUsage: |plugins=tip=Filter {0}% of total cells|",
       "type": ["{String}"]
     },
     {
       "key": "minValue",
-      "description": "Minimum slider value.\nUsage: |minValue=0|",
+      "description": "Defines the minimum acceptable value to slider.\nUsage: |minValue=0|",
       "type": ["{Numeric}"]
     },
     {
       "key": "maxValue",
-      "description": "Maximum slider value.\nUsage: |maxValue=0|",
+      "description": "Defines the maximum acceptable value to slider.\nUsage: |maxValue=0|",
       "type": ["{Numeric}"]
     },
     {
       "key": "value",
-      "description": "Initial slider value.\nUsage: |value=0|",
+      "description": "Defines the initial value to slider with only one thumb.\nUsage: |value=0|",
       "type": ["{Numeric}"]
     },
     {
-      "key": "runOnDragEnd",
-      "description": "Declare a function to be called when the thumb drag end.\nUsage: |runOnDragEnd=function(slider, evt) {alert('aaa')}|",
-      "type": ["{Function}({{Slider}}, {{Evt}})"]
-    },
-    {
       "key": "values",
-      "description": "Use slider with two or more thumbs, each value is the initial thumb value.\nUsage: |values=[0,100]|",
+      "description": "Property to use two or more thumbs, each value is the initial thumb value\n@type {Array} Array of initial values.\nUsage: |values=[0,100]|",
       "type": ["{Array}"]
     },
     {
       "key": "backgroundColors",
-      "description": "Array of colors of background slider values, to define background slider color based in slider value.\nThe values are defined from most to minimum with two properties each:\n  - color: {String} CSS color definition for the current interval. i.e. 'red','black','#FF0000', '#000000'.\n  - startValue: {Numeric} Initial value which above will apply this color.\n\nEx.:\n    backgroundColors: [\n        {\n            // Define background color to red when slider has value above 75.\n            color: \"red\",\n            startValue: 75\n        },\n        {\n            // Define background color starting from value 0.\n            // That results two intervals, from 0 to 75 as blue, and from 76 to 100 as red.\n            color: \"blue\",\n            startValue: 0\n        }\nUsage: |backgroundColors=[{color:'red',startValue:75},{color:'blue'}]|",
-      "type": ["{String}"]
+      "description": "Array of colors of background slider values, to define background slider color based in slider value.\nThe values are defined from most to minimum with two properties each:\n  - color: {String} CSS color definition for the current interval. i.e. 'red','black','#FF0000', '#000000'.\n  - startValue: {Numeric} If defined define the initial value which above will apply this color, otherwise use theminimum slider value as default.\n\nEx.:\n backgroundColors: [\n     {\n         // Define background color to red when slider has value above 75.\n         color: \"red\",\n         startValue: 75\n     },\n     {\n         // Define background color starting from value 0.\n         // That results two intervals, from 0 to 75 as blue, and from 76 to 100 as red.\n         color: \"blue\",\n         startValue: 0\n     }\n ]\nUsage: |backgroundColors=[{color:'red',startValue:75},{color:'blue'}]|",
+      "type": ["{Array}"]
     }
   ],
   "Textfield": [
     {
       "key": "_information",
-      "completeAPI": "View complete textfield API.",
-      "description": "TextField is a tool that allows editing of a single line of text.\nUsage:  '\\\\{\\\\{textfield\\\\}\\\\}'",
+      "completeAPI": "This tool is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.form.TextField' target='_blank'>Ext.form,TextField</a>.\nOnly customized properties are <a href='/api/#category_Textfield'>listed here</a>.",
+      "description": "TextField is a tool that allows editing of a single line of text.\nUsage:  '\\{\\{textfield\\}\\}'",
       "name": "Textfield tool"
     },
     {
       "key": "value",
-      "description": "Initial content.\nUsage: |value=text|",
+      "description": "Set the initial tool content.\nUsage: |value=text|",
       "type": ["{String}"]
     },
     {
       "key": "isnumeric",
-      "description": "Initial content.\nUsage: |isnumeric|",
+      "description": "Assures that the text content is a numeric string.\nUsage: |isnumeric|",
       "type": ["{String}"]
     },
     {
@@ -467,8 +458,8 @@
   "Label": [
     {
       "key": "_information",
-      "completeAPI": "This label is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.form.Label' target='_blank'>Ext.form.Label</a>.",
-      "description": "Create a simple label element to display some text.\nUsage: \\\\{\\\\{label|\\\\}\\\\}",
+      "completeAPI": "This label is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.form.Label' target='_blank'>Ext.form.Label</a>.\nOnly some properties are <a href='/api/#category_Label'>listed here</a>.",
+      "description": "Create a simple label element to display some text.\nUsage: \\{\\{label|\\}\\}",
       "name": "Label element tool 'label'"
     },
     {
@@ -489,25 +480,25 @@
     {
       "key": "_information",
       "completeAPI": "",
-      "description": "Tool that create a remote JSON to interact with the map, this object can contain functions, values and objects.\nUsage: \\\\{\\\\{loadjson\\\\}\\\\}",
-      "name": "Load json tool"
+      "description": "Tool to load a remote JSON and use it with map, this object can store string, values and functions.\nUsage: \\{\\{loadjson\\}\\}",
+      "name": "LoadJson tool"
     }
   ],
   "PickPoint": [
     {
       "key": "_information",
-      "completeAPI": "View PickPoint full api description",
-      "description": "Create an input that allows users to interact with the real cell or feature value on the point.\n\nThe returned values are from the original mal to the selected point,\n in case of RASTER is returned a cell value, in case of shapefile the geometry is returned too.\nUsage: \\\\{\\\\{pickpoint\\\\}\\\\}",
+      "completeAPI": "View the complete PickPoint <a href='/api/#category_PickPoint'>API here</a>",
+      "description": "Creates an input that allows users to interact with the real cell or feature value at any position.\n\nThe returned values are from the original mal to the selected point,\n in case of RASTER is returned a cell value, in case of shapefile the geometry is returned too.\nUsage: \\{\\{pickpoint\\}\\}",
       "name": "PickPoint tool"
     },
     {
       "key": "text",
-      "description": "Text associated with the pickpoint.\nUsage: |text: 'Descibe pickpoint action'|",
+      "description": "Text associated with the pickpoint activation button.\nUsage: |text: 'Descibe pickpoint action'|",
       "type": ["{String}"]
     },
     {
       "key": "markLayerInd",
-      "description": "The layer index of the layer to draw his geometry.\nUsage: |markLayerInd=1|",
+      "description": "Set the index of the internal layer to be drawn when a region is selected.\nUsage: |markLayerInd=1|",
       "type": ["{Numeric}"]
     },
     {
@@ -524,18 +515,18 @@
   "Timeline": [
     {
       "key": "_information",
-      "completeAPI": "View timeline full api description",
-      "description": "Create a timeline with maps in a sequence which changes at a given interval.\nUsage: '\\\\{\\\\{timeline\\\\}\\\\}'",
+      "completeAPI": "View the complete Timeline <a href='/api/#category_Timeline'>API here</a>.",
+      "description": "Creates a timeline with maps in a sequence which changes at a given interval.\nUsage: '\\{\\{timeline\\}\\}'",
       "name": "Timeline tool"
     },
     {
       "key": "nextStepInterval",
-      "description": "Define the delay between steps after the layer loadend in seconds.\nUsage: |nextStepInterval={Numeric}|",
+      "description": "Sets the delay in seconds between steps when timeline is playing.\nUsage: |nextStepInterval={Numeric}|",
       "type": ["{Numeric}"]
     },
     {
       "key": "steps",
-      "description": "Array of values for each timestamp representation, each element is a tuple of [VALUE,'Title'] where the Title is optional.\n Usage: |steps=[[1918, 'World War 1'], [1939, 'World War 2']]|",
+      "description": "Array of all timeline steps where each element is a tuple of [VALUE,'Title']. The value is a mandatory parameter for the step, the title give a optional custom representation to value.\n Usage: |steps=[[1918, 'World War 1'], [1939, 'World War 2']]|",
       "type": ["{Array{Array} }"]
     }
   ],
@@ -543,14 +534,14 @@
     {
       "key": "_information",
       "completeAPI": "",
-      "description": "Load one or more external resource by its URL and call the callback function when it is finished.\narray: {Array} A array of resource urls to load.\ncallback: Function that will be called when the load ends.\nUsage: AsyncLoader.loadScriptOnce({Array}, {Function}}",
+      "description": "Load one or more external resources by its URL and call a callback function when it finishes.\narray: {Array} A array of resource urls to load.\ncallback: Function that will be called when the load ends.\nUsage: AsyncLoader.loadScriptOnce({Array}, {Function}}",
       "name": "Asynchronous resource loader"
     }
   ],
   "Highcharts" : [
     {
       "key": "_information",
-      "completeAPI": "Highcharts JS has a complete set of examples well documented and can be <a href='https://www.highcharts.com/demo'>accessed here</a>.",
+      "completeAPI": "Highcharts JS has a complete set of examples and a nice documentation that can be <a target='_blank' href='https://www.highcharts.com/demo'>accessed here</a>.",
       "description": "Highcharts is a library used to easly create interactive charts.\nUsage: (Highcharts.chart(DOM_ID, {});)",
       "name": "Highcharts library"
     }
@@ -558,7 +549,6 @@
   "QGIS": [
     {
       "key": "_information",
-      "completeAPI": "View full QGIS description here.",
       "description": "The style can be defined in QGIS and the automatic publication process will create the same looking style from the style file.",
       "name": "QGIS stylization"
     }
@@ -566,15 +556,14 @@
   "Sankey": [
     {
       "key": "_information",
-      "completeAPI": "View complete Sankey API.",
-      "description": "Sankey element is not avaiable yet.",
+      "description": "Soon.",
       "name": "Sankey transitions chart"
     }
   ],
   "SummedArea": [
     {
       "key": "_information",
-      "completeAPI": "",
+      "completeAPI": "View the complete SummedArea <a href='/api/#category_Slider'>API here</a>.",
       "description": "Create an input of summatory in any arbitrary area.\n\nCallBack parameters (context {OpenLayers.Layer}, layersValues {Array[Number]}, inputs {[Object]}, feature {Geometry})\nrunOnClick {Function}  Callback called exactly after sum the map region.,\n\nPS: 'layersValues' return the sum of each internal layer and an adittional value which is the sum of all pixels of resulting layer.",
       "name": "Summed Area tool"
     },
