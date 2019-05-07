@@ -5,7 +5,7 @@ summary: Realtime analysis given any scenary selected by user showing the forest
 categories: [Slider, Label, Textfield, isNumeric, visibleLayers, priority, LegendTitle, Title]
 featured-img: amazones-panel
 type: Example
-map-link: lang=eng&map=&queryid=19&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=-1
+map-link: lang=eng&map=&queryid=19&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries,capabilities&visiblelayers=-1
 api: 
   - key: Slider
   - key: Label
