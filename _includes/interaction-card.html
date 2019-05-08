@@ -1,5 +1,5 @@
 <div class="post-card" itemprop="blogPosts" itemscope="" itemtype="http://schema.org/BlogPosting">
-  {% if intro.url.empty? %}
+  {% if intro.url %}
   <a href="{{ intro.url | relative_url }}">
   {% endif %}
     <figure class="post-card__thumb">
@@ -21,7 +21,7 @@
         {% endif %}
       </div>
     </div>
-  {% if intro.url.empty? %}
+  {% if intro.url %}
   </a>
   {% endif %}
 </div>
