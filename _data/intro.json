@@ -5,7 +5,7 @@
       "featured-img": ["/custom/composed1", "png"],
       "hover-img": ["/custom/composed2", "png"],
       "title": "Composing maps",
-      "content": "Choose tools, view options composing layers groups defining precedence interactions."
+      "content": "Choose tools, viewer options, layers groups, priorities and interactions."
     },
     {
       "url": "/examples/amazones-timber/",
