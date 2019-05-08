@@ -1,6 +1,6 @@
 ---
 layout: example
-title: Laurel - Data showcase
+title: Data showcase
 summary: Show a combination of maps styled in different tools with some advanced interactive maps.
 categories: [setQueryGlobalProperties, Timeline, QGIS, useLayerTooltip, LoadCsv, Highcharts, LegendHtml, QUERY, hideLegendButton, visibility]
 featured-img: laurel_data_integration

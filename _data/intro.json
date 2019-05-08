@@ -1,7 +1,7 @@
 {
   "interaction": [
     {
-      "url": "/examples/amazones_water/",
+      "url": "/examples/data_showcase/",
       "featured-img": ["/custom/composed1", "png"],
       "hover-img": ["/custom/composed2", "png"],
       "title": "Composing maps",
