@@ -4,8 +4,8 @@
 {% if include.isHeader %}
 
 <script>
-
-    {% include fadeAnimation.js %}
+/*
+     % include fadeAnimation.js %}
 
     var tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
@@ -59,9 +59,10 @@
         if (document.getElementById('ol_{{ include.videoid }}').style.opacity == 1)
             fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);
     }, 10000);
+    */
 </script>
         <div id="{{ include.videoid }}" class="video_fullDiv"></div>
-        <div class="video_overlay" id="ol_{{ include.videoid }}" style="background-repeat: no-repeat; background-attachment: fixed; background-position: center; background-image: url('{{ site.url }}{{ site.baseurl }}/assets/img/{{ include.isHeader }}'"></div>
+        <div class="video_overlay" id="ol_{{ include.videoid }}" style="background-repeat: no-repeat; background-position: center; background-size: cover; background-image: url('{{ site.url }}{{ site.baseurl }}/assets/img/{{ include.isHeader }}'"></div>
 
         <div class="video_btn_wrapper">
             <a href="./documentation" class="video_btn_link"><div class="btn">Documentation</div></a>
