@@ -8,7 +8,7 @@ type: Element
 examples:
     - title: Interacting Map and CSV
       map-link: lang=eng&map=&queryid=113&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=custom
-      featured-img: loadcsv_interacting_map
+      featured-img: loadcsv-widget
 api: 
     - key: LoadCsv
     - key: Slider

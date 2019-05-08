@@ -7,8 +7,8 @@ featured-img: loadjson-widget
 type: Element
 examples:
     - title: Remote Javascript Object Transfer
-      map-link: lang=eng&map=&queryid=114&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=custom
-      featured-img: loadjson_remote_transfer
+      map-link: lang=eng&map=&queryid=114&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=1
+      featured-img: loadjson-widget
 api: 
     - key: LoadJson
     - key: HTML
