@@ -3,7 +3,7 @@ layout: element
 title: Timeline Panel
 summary: Learn how to create and use the Timeline Panel.
 categories: [Timeline]
-featured-img: Timeline-Panel
+featured-img: timeline-panel
 type: Element
 api:
     - key: Textfield
