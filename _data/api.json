@@ -393,7 +393,7 @@
     {
       "key": "_information",
       "completeAPI": "View the complete Slider <a href='/api/#category_Slider'>API here</a>.",
-      "description": "\nTool that allows users to create a slider that the user can drag and change its value as map input.",
+      "description": "Tool that allows users to create a slider that the user can drag and change its value as map input.",
       "name": "Slider tool"
     },
     {
