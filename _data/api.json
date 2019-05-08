@@ -196,7 +196,7 @@
     {
       "key": "_information",
       "completeAPI": "This button is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.form.ComboBox' target='_blank'>Ext.form.ComboBox</a> for customized properties click on <a href='/api/#category_Combobox'>API here</a>.",
-      "description": "Cria um input de ComboBox onde o valor do input é selecionavel em um combobox. <a href='/elements/combobox-widget/'>Usage examples</a>.\nUsage: '\\{\\combobox\\}\\}'",
+      "description": "It creates an input of ComboBox tool where the value is selectable from a list.\nUsage: '\\{\\combobox\\}\\}' or <a href='/elements/combobox-widget/'>examples</a>.",
       "name": "Combobox widget"
     },
     {
