@@ -1,6 +1,6 @@
 ---
 layout: element
-title: Picksoint
+title: Pickpoint
 summary: Pick a point and use the feature information.
 categories: [PickPoint, Highcharts]
 featured-img: pickpoint-widget

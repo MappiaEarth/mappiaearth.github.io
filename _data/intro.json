@@ -1,14 +1,14 @@
 {
   "interaction": [
     {
-      "url": "",
+      "url": "/examples/amazones_water/",
       "featured-img": ["/custom/composed1", "png"],
       "hover-img": ["/custom/composed2", "png"],
       "title": "Composing maps",
-      "content": "Combine multiple maps, tools, layer precedence, groups and interactions."
+      "content": "Choose tools, view options composing layers groups defining precedence interactions."
     },
     {
-      "url": "",
+      "url": "/examples/amazones-timber/",
       "featured-img": ["/custom/inspectpixel1", "png"],
       "hover-img": ["/custom/inspectpixel2", "png"],
       "title": "Inspect values in realtime",
@@ -22,7 +22,7 @@
       "content": "Run simulations with chosen maps together with user input values."
     },
     {
-      "url": "",
+      "url": "/elements/textfield-widget/",
       "featured-img": ["/custom/filter1", "png"],
       "hover-img": ["/custom/filter2", "png"],
       "title": "Filter map to interest ranges",
