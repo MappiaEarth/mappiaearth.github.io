@@ -79,8 +79,8 @@
     },
     {
       "key": "associatedButtonID",
-      "description": "Defines a button to associate with the query button, so when click on one of these buttons the other receives the click too.\nUsage: ",
-      "type": "{Boolean}",
+      "description": "Defines a button to associate with the query button, so when click on one of these buttons the other receives the click too.\nUsage: paramsButtonConfig: [{\n associatedButtonID: \"precip_monthly_average_timeline\",\n iconCls: \"icon-timeline-slider\",\n pressed: true,\n type:\"query\",\n toggleGroup: undefined\n}]",
+      "type": "{String}",
       "default": "undefined"
     },
     {
