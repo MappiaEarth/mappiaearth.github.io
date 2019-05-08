@@ -1,6 +1,6 @@
 ---
 layout: example
-title: AMAZONES - Hydrological Services
+title: AMAZONES - Hydrological services
 summary: Proccess map in realtime by the given product value.
 categories: [Legendhtml, getId, LoadCsv, Slider, changeLayers, Label, Highcharts]
 featured-img: amazones_water

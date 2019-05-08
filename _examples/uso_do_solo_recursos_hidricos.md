@@ -1,6 +1,6 @@
 ---
 layout: example
-title: Hydric resources influenced by Land use
+title: Hydric resources influenced by land use
 summary: Show multiple simple maps together.
 categories: [scale, startopened, hidestylechooser, enablequeries, visiblelayers]
 featured-img: uso_do_solo_recursos_hidricos

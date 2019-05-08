@@ -1,6 +1,6 @@
 ---
 layout: example
-title: Fip Cerrado - Geral
+title: Fip Cerrado
 summary: Show multiple informations about fire trending in the cerrado biome.
 categories: [Timeline, setQueryGlobalProperties, paramsButtonConfig, InputManager, visibility]
 featured-img: fip_cerrado_geral

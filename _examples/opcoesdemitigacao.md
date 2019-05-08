@@ -1,6 +1,6 @@
 ---
 layout: example
-title: Opções de Mitigação
+title: Opções de mitigação
 summary: Show analysis over the years of the land use in which the user can inspect any transition in details.
 categories: [Sankey, setQueryGlobalProperties, setCalculateLegend, AsyncLoader, ChangeLayers, Timeline, Combobox, InputManager, Highcharts]
 featured-img: opcoesmitigacao-panel

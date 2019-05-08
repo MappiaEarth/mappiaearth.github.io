@@ -1,6 +1,6 @@
 ---
 layout: example
-title: AMAZONES - Economic Valuation
+title: AMAZONES - Economic valuation
 summary: Realtime analysis given any scenary selected by user showing the forest value.
 categories: [Slider, Label, Textfield, isNumeric, visibleLayers, priority, LegendTitle, Title]
 featured-img: amazones-panel
