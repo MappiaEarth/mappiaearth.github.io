@@ -1,7 +1,7 @@
 ---
 layout: example
 title: AMAZONES - Timber product
-summary: Compare in a graph the value of timber product per region.
+summary: Display in a graph the value of timber product per region.
 categories: [Slider, Label, Textfield, isnumeric, priority, legendTitle, title]
 featured-img: amazones_timber-panel
 type: Example
@@ -15,4 +15,4 @@ api:
   - key: ConfigLayer
     tags: ['priority', 'title', 'legendTitle']
 ---
-Shows the hydrological services dynamics in the Amazon Forest, this analysis is part of a bigger project {{ site.data.urls.AMAZONES }}.
+Current total and potential net revenues from sustainable logging from {{ site.data.urls.AMAZONES }}.

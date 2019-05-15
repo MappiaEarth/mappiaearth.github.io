@@ -1,7 +1,7 @@
 ---
 layout: example
 title: Fip Cerrado
-summary: Show multiple informations about fire trending in the cerrado biome.
+summary: Fire propagation modeling in the cerrado biome.
 categories: [Timeline, setQueryGlobalProperties, paramsButtonConfig, InputManager, visibility]
 featured-img: fip_cerrado_geral
 type: Example
@@ -14,4 +14,4 @@ api:
     tags: ['paramsButtonConfig', 'visibility']
   - key: InputManager
 ---
-Show multiple informations about fire trending in the cerrado biome.
+Display fire risks in the Cerrado biome.

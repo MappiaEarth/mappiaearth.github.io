@@ -1,7 +1,7 @@
 ---
 layout: example
-title: Hydric resources influenced by land use
-summary: Show multiple simple maps together.
+title: Hydrologic resources influenced by land use change
+summary: Show multiple maps together.
 categories: [scale, startopened, hidestylechooser, enablequeries, visiblelayers]
 featured-img: uso_do_solo_recursos_hidricos
 type: Example
@@ -20,4 +20,4 @@ api:
     - key: InputManager
     - key: Highcharts
 ---
-Show multiple simple maps together.
+Show multiple maps together.

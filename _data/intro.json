@@ -11,36 +11,36 @@
       "url": "/examples/amazones-timber/",
       "featured-img": ["/custom/inspectpixel1", "png"],
       "hover-img": ["/custom/inspectpixel2", "png"],
-      "title": "Inspect values in realtime",
-      "content": "View each region value stock and cell values in real time."
+      "title": "Inspect values in real-time",
+      "content": "Get any cell value or a region's total value in real-time."
     },
     {
       "url": "/examples/amazones-economic_valuation/",
       "featured-img": ["/custom/process1", "png"],
       "hover-img": ["/custom/process2", "png"],
-      "title": "Simulate sceneries",
-      "content": "Run simulations with chosen maps together with user input values."
+      "title": "Simulate scenarios",
+      "content": "Run simulations from selected input maps."
     },
     {
       "url": "/elements/textfield-widget/",
       "featured-img": ["/custom/filter1", "png"],
       "hover-img": ["/custom/filter2", "png"],
-      "title": "Filter map to interest ranges",
-      "content": "Allows to dinamically limit range of values in each sceneries."
+      "title": "Filter map to specific values ranges",
+      "content": "Dynamically limit the range of map values."
     },
     {
       "url": "/examples/opcoesdemitigacao/",
       "featured-img": ["/custom/transition1", "png"],
       "hover-img": ["/custom/transition2", "png"],
       "title": "Show transitions",
-      "content": "Select a value or a transition between two sceneries and only show what changed between them."
+      "content": "Select a transition between two maps and show that specific transition on the map."
     },
     {
       "url": "/elements/timeline-panel/",
       "featured-img": ["/custom/timeline1", "png"],
       "hover-img": ["/custom/timeline2", "png"],
       "title": "View timeline",
-      "content": "Show map changes through time."
+      "content": "Display map changes over time."
     }
   ],
   "database": [
@@ -48,13 +48,13 @@
       "url": "/documentation#tutorial",
       "featured-img": ["/custom/server", "jpg"],
       "title": "CSR DATABASE",
-      "content": "All CSR Maps are available to your project, all maps are categorized with the most recent metadata and content."
+      "content": "All maps publicly available; all maps include comprehensive metadata."
     },
     {
       "url": "/documentation#tutorial",
       "featured-img": ["/custom/homeserver", "png"],
       "title": "DISPLAY YOUR MAPS",
-      "content": "Easily configure a server to display your maps on CSRMaps or in a GIS software."
+      "content": "Easily configure a server to display your maps on CSR Maps or on a GIS software."
     },
     {
       "url": "/documentation#tutorial",
@@ -68,19 +68,19 @@
       "url": "/about#license",
       "featured-img": "/icons/icons8-classroom-30.png",
       "title": "EDUCATIONAL",
-      "content": "Completely free to use for any educational purpose."
+      "content": "Completely free for any educational purpose."
     },
     {
       "url": "/about#license",
       "featured-img": "/icons/icons8-factory-30.png",
       "title": "PROFITABLE",
-      "content": "Free to use in any profitable project except the highcharts library. This library has a limitation in <a target=\"_blank\" href=\"https://www.highcharts.com/\">highchart license</a> contact directly them."
+      "content": "Free for any commercial use except the highcharts library. This library has a limitation in href=\"https://www.highcharts.com/\">highchart license</a>, please contact them directly."
     },
     {
       "url": "/about#license",
       "featured-img": "/icons/icons8-statistics-30.png",
       "title": "RESEARCH",
-      "content": "Feel free to display any research project results even using the CSRMaps Database."
+      "content": "Feel free to display any research project results using the CSR Maps Database."
     },
     {
       "url": "/documentation",
@@ -92,7 +92,7 @@
       "url": "/documentation#examples",
       "featured-img": "/icons/icons8-map-editing-30.png",
       "title": "FEATURED EXAMPLES",
-      "content": "Some research projects examples."
+      "content": "Projects examples."
     },
     {
       "url": "/about#faq",

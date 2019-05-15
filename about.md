@@ -18,18 +18,18 @@ Just add an iframe to your site with the link to add your platform to your site.
 
 # FAQ
 
-- Can i use your data in my profitable project?
+- Can I use CSR data in my commercial project?
 
    R: Yes.
 
-- I have to send my data to use it on your platform?
+- Do I have to send my data to your platform?
  
-   R: No data has to be sent, we have a tutorial to configure your own server and data to integrate with our platform.
+   R: No data have to be sent, we have a tutorial to configure your own server and data to integrate with our platform.
 
 - What is the platform processing usage limit?
  
-   R: None, all post-processing is done in user browser and the pre-processing happens once per map.
+   R: None, all post-processing is done on user browser and the pre-processing once per map.
 
 - There is a simple tutorial to learn how to customize my platform?
  
-   R: We have multiple usage examples, the simples path is editing duplicate one of our projects and customize with your own data.
+   R: We have multiple usage examples, the simplest way is  by duplicating and editing one of our projects to customize the interface to your own data.

@@ -1,7 +1,7 @@
 ---
 layout: example
-title: AMAZONES - Biodiversity
-summary: Compare deforestation in regions of different relevance.
+title: Biodiversity
+summary: Compare deforestation in regions of different biodiversity relevance.
 categories: [LegendHtml, getid, LoadCsv, Slider, RunOnceLayerVisible, changeLayers, Label, Highcharts]
 featured-img: amazones_biodiversity-panel
 type: Example
@@ -19,4 +19,4 @@ api:
   - key: Label
   - key: Highcharts
 ---
-Shows the biodiversity dynamics and relative importance of each area of the Amazon Forest for the biodiversity conservation, this analysis is part of a bigger project {{ site.data.urls.AMAZONES }}.
+Display biodiversity relative importance across the Amazon Forest, this analysis is part of {{ site.data.urls.AMAZONES }}.

@@ -1,7 +1,7 @@
 ---
 layout: element
 title: Loadcsv
-summary: Using a scroll bar to switch between multiple values.
+summary: Load a remote CSV file.
 categories: [Loadcsv, Slider, Label, Highcharts, HTML]
 featured-img: loadcsv-widget
 type: Element

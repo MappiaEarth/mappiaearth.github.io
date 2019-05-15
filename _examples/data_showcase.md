@@ -1,7 +1,7 @@
 ---
 layout: example
-title: Data showcase
-summary: Show a combination of maps styled in different tools with some advanced interactive maps.
+title: Map publishing customization
+summary: Publish a map using layout created in QGIS.
 categories: [setQueryGlobalProperties, Timeline, QGIS, useLayerTooltip, LoadCsv, Highcharts, LegendHtml, QUERY, hideLegendButton, visibility]
 featured-img: laurel_data_integration
 type: Example
@@ -18,3 +18,4 @@ api:
   - key: Highcharts
   - key: LegendHtml
 ---
+Example of map publishing using layout created in QGIS.

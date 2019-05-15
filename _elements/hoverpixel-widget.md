@@ -1,7 +1,7 @@
 ---
 layout: element
 title: Hoverpixel
-summary: Hover map to inspect each exact pixel value.
+summary: Hover map to inspect pixel value.
 categories: [Hoverpixel, Functions, TooltipHelper, RawMap, GetCmp]
 featured-img: hoverpixel-widget
 type: Element

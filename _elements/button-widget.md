@@ -1,7 +1,7 @@
 ---
 layout: element
 title: Button
-summary: Create a custom button to use within the query.
+summary: Create a custom button to use in a query.
 categories: [Button, functions, Alertify]
 featured-img: button-widget
 type: Element

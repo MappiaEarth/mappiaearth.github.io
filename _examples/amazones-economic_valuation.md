@@ -1,7 +1,7 @@
 ---
 layout: example
-title: AMAZONES - Economic valuation
-summary: Realtime analysis given any scenary selected by user showing the forest value.
+title: Economic valuation
+summary: Real-time display of the forest values given a combination of inputs and weights (scenario).
 categories: [Slider, Label, Textfield, isNumeric, visibleLayers, priority, LegendTitle, Title]
 featured-img: amazones-panel
 type: Example
@@ -15,4 +15,4 @@ api:
   - key: ConfigLayer
     tags: ['priority', 'LegendTitle', 'Title']
 ---
-This map shows the economic value of each cell in the Amazon Forest where the user can select the simulation parameters and see the result in real time. In this simulation many products are analysed together like: timber exploitation, biodiversity dinamics, fire costs, Soy cultivation, livestock price, carbon stocks and others, and the result is a good aproximation of the amazon economic service value as explained in the project {{ site.data.urls.AMAZONES }}.
+This map shows the economic value for each cell in the Amazon Forest. User can select different parameters and see results in real-time. In this simulation many products are analysed together including timber harvesting, biodiversity, costs of fire, losses on soy cultivation, livestock, carbon stocks and others due to deforestation, as a means to value the ecosystem services provided by the Amazon forests as explained in the project {{ site.data.urls.AMAZONES }}.
