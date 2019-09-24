@@ -98,10 +98,22 @@
       "required": "true"
     },
     {
+      "key": "otherNames",
+      "description": "One or more maps identifiers which will be used within the changeLayers in the expression function. Usage:\nOne map: 'CSR:protected_areas'.\nTwo Maps: 'CSR:protected_areas,CSR:altimetria'",
+      "type": "{String}",
+      "default": "undefined",
+      "required": "true"
+    },
+    {
       "key": "title",
       "description": "Define map title, if empty the title is read from metadata.\nUsage: title: 'My 1º Custom Title'",
       "type": "{String}",
       "default": "{String}"
+    },
+    {
+      "key": "styles",
+      "description": "A string that describes the index/attribute of each map will be used. The style quantity must be the same of maps defined in query.\nUsage: '1,1,1,1'",
+      "type": ["String"]
     },
     {
       "key": "updateAutomatically",
@@ -123,7 +135,13 @@
     },
     {
       "key": "beforeCalc",
-      "description": "Function called before each expression calculation.\nPs: Maps even without 'expression' function will call the 'beforeCalc' function on a input update.\nPs2: This function is called synchronously and the context is the map layer.\nUsage: beforeCalc: function(inputs){}",
+      "description": "Function called before each expression calculation.\nPs: Maps even without 'expression' function will call the 'beforeCalc' function on an input update.\nPs2: This function is called synchronously and the context is the map layer.\nUsage: beforeCalc: function(inputs){}",
+      "type": "{Function}({{inputs}})",
+      "default": "null"
+    },
+    {
+      "key": "afterCalc",
+      "description": "Function called after each expression calculation.\nPs: Maps even without 'expression' function will call the 'afterCalc' function on an input update.\nPs2: This function is called synchronously and the context is the map layer.\nUsage: afterCalc: function(inputs){}",
       "type": "{Function}({{inputs}})",
       "default": "null"
     },
@@ -210,13 +228,6 @@
       "description": "Define element initial width in pixels.\nUsage: |width=200|",
       "type": ["{Number}"],
       "default": "190"
-    }
-  ],
-  "LegendHtml": [
-    {
-      "key": "_information",
-      "description": "Creates a DOM element with the map legend contents.\nUsage: '\\{\\{legendhtml\\}\\}'",
-      "name": "Legend HTML"
     }
   ],
   "Hoverpixel": [
@@ -322,11 +333,6 @@
       "key": "operation",
       "description": "A string that describe the RAW MAPS operations, each operation identifier da must be separated by a comma.\nPS: The operations must be one for each defined map.\n\nRaw Maps operations:\n\n'normal' (NORMAL): A normal map is a map with each cell representing a legend/color and aren't a RAW Maps type.\n'raw' (RAW): Each cell in resulting map has the value of ther most centered cell in aggregated region.\n'rgba' (RGBA): Each cell in resulting map has a integer value representing the RGBA composition.\n  PS: Tanto o resultado como o input são inteiros representando valores RGBA.\n'sum' (SUM): Each resulting cell is the weighted sum of cells in the covering region.\n  PS: The weight used is the proportion of the covered area against the total area of the cell i.e. VALUE * COVERED_PERCENTAGE.\n'average' (AVERAGE): Each cell is the resulting of the weighted mean of cell in the covered region.\n  i.e. Sum(A) / Sum(B) : A is CELL_VALUE * COVERED_PROPORTION, B is COVERED_PROPORTION.\n  Example: A full covered cell the COVERED_PROPORTION is 1, and the half covered cell the proportion is 0.5 .\n'max' (MAX): Each resulting cell is the greater cell that is at least partially covered in the given region.\n'min' (MIN): Each resulting cell is the smaller cell that is at least partially covered in the given region.\n'integral' (INTEGRAL): A technique that allows to calculate the sum in a region just inspecting the cells on the\n  boundaries of a retangular area i.e. calculate sum in a region using only 4 points.\n'areaintegral' (AREAINTEGRAL): ?\n'area' (AREA): Each cell carry the original map area in the aggregated region.\n  ?PS: Esse simplificador agrupa as áreas do mapa original e permite avialiar a área do mapa minimizando erros de\n   calculos de área causados pela reprojeção uma vez q a própria célula armazena esse valor.\n'cells' (CELLS): Weighted sum of the cell quantity in a given region.\nExemplo: 'min,max,raw,integral'",
       "type": ["{String})"]
-    },
-    {
-      "key": "styles",
-      "description": "A string that describes the index/attribute of each map will be used. The style quantity must be the same of maps defined in query.\nUsage: '1,1,1,1'",
-      "type": ["String"]
     }
   ],
   "QUERY": [
