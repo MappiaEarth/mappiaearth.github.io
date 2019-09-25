@@ -101,8 +101,7 @@
       "key": "otherNames",
       "description": "One or more maps identifiers which will be used within the changeLayers in the expression function. Usage:\nOne map: 'CSR:protected_areas'.\nTwo Maps: 'CSR:protected_areas,CSR:altimetria'",
       "type": "{String}",
-      "default": "undefined",
-      "required": "true"
+      "default": "undefined"
     },
     {
       "key": "title",
@@ -132,6 +131,12 @@
       "description": "Defines initial map opacity.\nUsage: {opacity: 0.8}",
       "type": "{Numeric}",
       "default": "1"
+    },
+    {
+      "key": "priority",
+      "description": "Defines map listing order priority. The higher this value, the higher its placement in the layer list.\nUsage: {priority: 1}",
+      "type": "{Numeric}",
+      "default": "0"
     },
     {
       "key": "beforeCalc",
