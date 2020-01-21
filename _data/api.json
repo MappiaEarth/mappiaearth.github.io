@@ -175,7 +175,7 @@
     },
     {
       "key": "handler",
-      "description": "{{Function}} called when the button is clicked. \n{{Component}}: This button.\n{{EventObject}}: The click event.\nUsage: |handler=function() {alert('btn clicked');}|",
+      "description": "{{Function}} called, on layer scope, when the button is clicked. \n{{Component}}: This button.\n{{EventObject}}: The click event.\nUsage: |handler=function() {alert('btn on layer: ' + this.name + ' was clicked.');}|",
       "type": ["{Function}({Component}, {EventObject})"],
       "default": "null"
     },
@@ -261,7 +261,7 @@
     {
       "key": "_information",
       "completeAPI": "View the full <a target='_blank' href=\"https://docs.sencha.com/extjs/3.4.0\">Extjs API 3.4 click here</a>.\n*Only the functions which where used in CSR projects are listed <a href='/api/#category_Extjs'>here</a>.",
-      "description": "Calling core Extjs functions allows fine control over the CSRMaps internal elements.",
+      "description": "Calling core Extjs functions allows fine control over the CSR Maps internal elements.",
       "name": "Extjs 3.4"
     },
     {

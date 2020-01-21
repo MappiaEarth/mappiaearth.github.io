@@ -114,6 +114,10 @@
     margin-bottom: 0;
     padding-bottom: 0.3em;
     padding-top: 10px;
+
+    &-center {
+      text-align: center;
+    }
   }
 
   &-subcategory {
@@ -122,6 +126,11 @@
     margin-bottom: 1.5em;
     border-bottom: 2px solid #d4d4d4;
     font-weight: 500;
+
+    &-center {
+      color: #b8b7b9;
+      text-align: center;
+    }
   }
 }
 

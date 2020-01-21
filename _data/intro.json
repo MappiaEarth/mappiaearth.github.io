@@ -4,42 +4,42 @@
       "url": "/examples/data_showcase/",
       "featured-img": ["/custom/composed1", "png"],
       "hover-img": ["/custom/composed2", "png"],
-      "title": "Composing maps",
+      "title": "Layout composition",
       "content": "Choose tools, viewer options, layers groups, priorities and interactions."
-    },
-    {
-      "url": "/examples/amazones-timber/",
-      "featured-img": ["/custom/inspectpixel1", "png"],
-      "hover-img": ["/custom/inspectpixel2", "png"],
-      "title": "Inspect values in real-time",
-      "content": "Get any cell value or a region's total value in real-time."
     },
     {
       "url": "/examples/amazones-economic_valuation/",
       "featured-img": ["/custom/process1", "png"],
       "hover-img": ["/custom/process2", "png"],
-      "title": "Simulate scenarios",
+      "title": "Perform map algebra",
       "content": "Run simulations from selected input maps."
+    },
+    {
+      "url": "/examples/amazones-timber/",
+      "featured-img": ["/custom/inspectpixel1", "png"],
+      "hover-img": ["/custom/inspectpixel2", "png"],
+      "title": "Inspect hover",
+      "content": "Get any cell value or a region's total value in real-time."
     },
     {
       "url": "/elements/textfield-widget/",
       "featured-img": ["/custom/filter1", "png"],
       "hover-img": ["/custom/filter2", "png"],
-      "title": "Filter map to specific values ranges",
+      "title": "Display specific values ranges",
       "content": "Dynamically limit the range of map values."
     },
     {
       "url": "/examples/opcoesdemitigacao/",
       "featured-img": ["/custom/transition1", "png"],
       "hover-img": ["/custom/transition2", "png"],
-      "title": "Show transitions",
+      "title": "Show sankey diagrams",
       "content": "Select a transition between two maps and show that specific transition on the map."
     },
     {
       "url": "/elements/timeline-panel/",
       "featured-img": ["/custom/timeline1", "png"],
       "hover-img": ["/custom/timeline2", "png"],
-      "title": "View timeline",
+      "title": "Display time-series map",
       "content": "Display map changes over time."
     }
   ],
@@ -53,17 +53,46 @@
     {
       "url": "/documentation#tutorial",
       "featured-img": ["/custom/homeserver", "png"],
-      "title": "DISPLAY YOUR MAPS",
+      "title": "REMOTE WMS SERVERS",
       "content": "Easily configure a server to display your maps on CSR Maps or on a GIS software."
     },
     {
       "url": "/documentation#tutorial",
       "featured-img": ["/custom/integrate", "png"],
-      "title": "DATA SOURCES",
-      "content": "Use others data sources in your project: CSV, JSON or cloud storage services."
+      "title": "DISPLAY YOUR MAPS",
+      "content": "Access your maps or tables from file storage services such as GitHub, Bitbucket and many others."
+    }
+  ],
+  "share": [
+    {
+      "url": "/documentation#tutorial",
+      "featured-img": ["/custom/publish1", "jpg"],
+      "hover-img": ["/custom/publish2", "jpg"],
+      "title": "Step 1) PUBLISH YOUR MAPS",
+      "content": "Publish your interactive maps online. With few clicks proccess your map to display online and send it to a file storage such as GitHub or BitBucket."
+    },
+    {
+      "url": "/documentation#tutorial",
+      "featured-img": ["/custom/editquery1", "jpg"],
+      "hover-img": ["/custom/editquery2", "jpg"],
+      "title": "Step 2) CREATE YOUR LAYOUTS",
+      "content": "Create your maps presentation and interactions. Create your platform layout by choosing maps, elements, tools and interactions."
+    },
+    {
+      "url": "/documentation#tutorial",
+      "featured-img": ["/custom/share1", "png"],
+      "hover-img": ["/custom/share2", "png"],
+      "title": "Step 3) SHARE YOUR PLATFORM",
+      "content": "Make your data accessible to all persons. Share your research your data online with millions of users."
     }
   ],
   "license" : [
+    {
+      "url": "/about#license",
+      "featured-img": "/icons/icons8-factory-30.png",
+      "title": "FREE OF CHARGE",
+      "content": "Completely free for any commercial use except the highcharts library. This library has a limitation in <a href=\"https://www.highcharts.com/\">highchart license</a>, please contact them directly."
+    },
     {
       "url": "/about#license",
       "featured-img": "/icons/icons8-classroom-30.png",
@@ -72,27 +101,21 @@
     },
     {
       "url": "/about#license",
-      "featured-img": "/icons/icons8-factory-30.png",
-      "title": "PROFITABLE",
-      "content": "Free for any commercial use except the highcharts library. This library has a limitation in href=\"https://www.highcharts.com/\">highchart license</a>, please contact them directly."
-    },
-    {
-      "url": "/about#license",
       "featured-img": "/icons/icons8-statistics-30.png",
-      "title": "RESEARCH",
-      "content": "Feel free to display any research project results using the CSR Maps Database."
+      "title": "Portfolio projects",
+      "content": "Projects made using this platform."
     },
     {
       "url": "/documentation",
       "featured-img": "/icons/icons8-documents-30.png",
       "title": "DOCUMENTATION",
-      "content": "View complete documentation with use cases."
+      "content": "Fully documented with examples."
     },
     {
       "url": "/documentation#examples",
       "featured-img": "/icons/icons8-map-editing-30.png",
       "title": "FEATURED EXAMPLES",
-      "content": "Projects examples."
+      "content": "Multiple usage examples for each element."
     },
     {
       "url": "/about#faq",

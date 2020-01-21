@@ -1,6 +1,6 @@
 ---
 layout: example
-title: Mitigation Option project
+title: Mitigation option project
 summary: Display land use transition through sankey diagram.
 categories: [Sankey, setQueryGlobalProperties, setCalculateLegend, AsyncLoader, ChangeLayers, Timeline, Combobox, InputManager, Highcharts]
 featured-img: opcoesmitigacao-panel

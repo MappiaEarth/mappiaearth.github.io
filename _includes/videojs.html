@@ -1,0 +1,61 @@
+<script src="{{ site.url }}{{ site.baseurl }}/assets/js/asyncloader.min.js"></script>
+<link async rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/video-js.min.css" as="style">
+
+<div class="video_wrapper" style="padding-bottom:{{ include.height }}%">
+    <div class="video_content">
+
+        <video id='{{ include.videoid }}' autoplay='true' loop='true' controls='false'
+               class='video-js video_fullDiv' preload="auto"
+               poster='{{ site.url }}{{ site.baseurl }}/assets/img/{{ include.isHeader }}'
+               data-setup='{"autoplay":"true", "fluid": "true"}' frameBorder="0" width="100%" height="100%">
+            <source src='{{ include.videoURL }}' type='video/mp4'>
+            <p class='vjs-no-js'>
+                To view this video please enable JavaScript, and consider upgrading to a web browser that
+                <a href='https://videojs.com/html5-video-support/' target='_blank'>supports HTML5 video</a>
+            </p>
+        </video>
+
+        <div class="video_overlay" id="ol_{{ include.videoid }}" style="background-repeat: no-repeat; background-position: center; background-size: cover; background-image: url('{{ site.url }}{{ site.baseurl }}/assets/img/{{ include.isHeader }}'"></div>
+
+        <div class="video_btn_wrapper">
+            <a href="./documentation" class="video_btn_link">
+                <div class="btn">Documentation</div>
+            </a>
+            <a href="//maps.csr.ufmg.br" target="_blank" class="video_btn_link">
+                <div class="btn">CSR Maps Database</div>
+            </a>
+            <a href="//maps.csr.ufmg.br/editor/?options=tutorial" class="video_btn_link">
+                <div class="btn">CSR Maps Editor</div>
+            </a>
+        </div>
+
+        <script>
+
+            {% include fadeAnimation.js %}
+
+            AsyncLoader.loadScriptOnce(["{{ site.url }}{{ site.baseurl }}/assets/js/video.min.js"],
+                function () {
+                    var player = videojs("{{ include.videoid }}", {"autoplay":"true", "fluid": "true"}, function onPlayerReady() {
+                        fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);
+                        player.play();
+                        player.load();
+                        player.currentTime(0);
+
+                        {% if include.loopMax and include.loopTo %}
+                        this.on("timeupdate", function () {
+                            var current_time = this.currentTime();
+                            if (current_time > {{ include.loopMax }}) {
+                                player.currentTime({{ include.loopTo }});
+                                player.play();
+                            }
+                        });
+                        {% endif %}
+                    });
+
+                }
+            );
+        </script>
+
+
+    </div>
+</div>

@@ -1,6 +1,6 @@
 ---
 layout: intro
-title: CSRMaps maps for everyone everywhere.
+title: CSR Maps maps for everyone everywhere.
 tagline: Addressing your needs.
 ---
 
@@ -19,7 +19,7 @@ tagline: Addressing your needs.
     Parte 4:
         Mostrar q pode usar em qlqr projeto.
     Parte 5:
-        Logo do CSRMaps, (make it ease)
+        Logo do CSR Maps, (make it ease)
         
 ## Map interactions
 

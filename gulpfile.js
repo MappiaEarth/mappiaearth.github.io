@@ -158,24 +158,28 @@ gulp.task('sw', function() {
   const distDir = './_site';
 
   sw.write(`${rootDir}/sw.js`, {
-    staticFileGlobs: [distDir + '/**/*.{js,html,css,png,jpg,svg}'],
+    staticFileGlobs: [distDir + '/**/*.{mp4,js,html,css,png,jpg,svg}'],
     stripPrefix: distDir
   });
 });
 
 // Images
 gulp.task('img', function() {
+    // Just pass through videos with not supported extensions.
+    gulp.src(['_video/*.*'], {base: '_video/'})
+        .pipe(gulp.dest('assets/video'));
+
     // Just pass through icons with not supported extensions.
     gulp.src(['_img/icons/*', '!_img/icons/*.{png.jpg}'], {base: '_img/'})
-    .pipe(gulp.dest('assets/img'));
+        .pipe(gulp.dest('assets/img'));
 
     // Icons with supported extensions are minified.
     gulp.src(['_img/icons/*.{png,jpg}'], {base: '_img/'})
-      .pipe(responsive({
-        '**/*': {}
-      }))
-      .pipe(imagemin())
-      .pipe(gulp.dest('assets/img'));
+        .pipe(responsive({
+            '**/*': {}
+        }))
+        .pipe(imagemin())
+        .pipe(gulp.dest('assets/img'));
 
     // The remaining images are processed.
     return gulp.src(['_img/**/*.{png,jpg}', '!_img/icons/**'], {base: '_img/'})
