@@ -12,16 +12,36 @@
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-    var player;
+    window.updateMuted = function () {
+        var arr = document.getElementById('video_toggle').className.split(" ") || [];
+
+        if (!window.player || !window.player.isMuted)
+            return;
+
+        if (arr.indexOf("sound_mute") != -1)
+            arr.splice(arr.indexOf("sound_mute"), 1);
+        if (arr.indexOf("sound_max") != -1)
+            arr.splice(arr.indexOf("sound_max"), 1);
+
+        arr.push((window.player.isMuted()) ? "sound_max" : "sound_mute");
+        document.getElementById('video_toggle').className = arr.join(" ");
+    };
+
+    var displayNoneCB = function () {
+        window.updateMuted();
+
+        return;
+    };
+
     window.onYouTubeIframeAPIReady = function onYouTubeIframeAPIReady() {
-        player = new YT.Player('{{ include.videoid }}', {
+        window.player = new YT.Player('{{ include.videoid }}', {
             videoId: '{{ include.videoid }}',
             playerVars: {
                 modestbranding: 0,
                 autoplay: 1,
                 controls: 0,
                 showinfo: 0,
-                mute: 1,
+                mute: 0,
                 wmode: 'opaque',
                 loop: 1,
                 branding: 0,
@@ -37,8 +57,8 @@
                     setInterval(function (){
                         var current_time = event.target.getCurrentTime();
                         if (current_time > {{ include.loopMax }}) {
-                            player.seekTo({{ include.loopTo }});
-                            player.playVideo();
+                            window.player.seekTo({{ include.loopTo }});
+                            window.player.playVideo();
                         }
                     }, 10);
                     {% endif %}
@@ -46,7 +66,7 @@
                 onStateChange: function onPlayerStateChange(event) {
                     if(event.data === 1) {
                         if (this.wasLoad === undefined) {
-                            fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);
+                            fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1, displayNoneCB);
                             this.wasLoad = true;
                         }
                     }
@@ -57,12 +77,19 @@
 
     setTimeout(function() {
         if (document.getElementById('ol_{{ include.videoid }}').style.opacity == 1)
-            fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);
+            fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1, displayNoneCB);
     }, 10000);
+
+    window.toggleVideoAudio = function () {
+        if (!window.player && !window.player.isMuted)
+            return;
+        window.player[window.player.isMuted() ? "unMute" : "mute"]();
+        window.updateMuted();
+    };
 
 </script>
         <div id="{{ include.videoid }}" class="video_fullDiv"></div>
-        <div class="video_overlay" id="ol_{{ include.videoid }}" style="background-repeat: no-repeat; background-position: center; background-size: cover; background-image: url('{{ site.url }}{{ site.baseurl }}/assets/img/{{ include.isHeader }}'"></div>
+        <div onclick="window.toggleVideoAudio();" class="video_overlay"><div id="ol_{{ include.videoid }}" style="background-repeat: no-repeat; background-position: center; background-size: cover; background-image: url('{{ site.url }}{{ site.baseurl }}/assets/img/{{ include.isHeader }}');"></div><div id="video_toggle"></div></div></div>
 
         <div class="video_btn_wrapper">
             <a href="./documentation" class="video_btn_link"><div class="btn">Documentation</div></a>

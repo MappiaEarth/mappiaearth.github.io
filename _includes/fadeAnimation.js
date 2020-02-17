@@ -18,9 +18,8 @@ function fadeAnimation(element,seconds,end, from, onEndCallback){
     var curOpacity = initial;
     fadeAnimation.running = fadeAnimation.running || {};
 
-
     clearInterval(fadeAnimation.running[element.id]);
-    var changeOpacity = function(){
+    var changeOpacity = function() {
         if (increment > 0 ? curOpacity >= end : curOpacity <= end){
             onEndCallback && onEndCallback();
             clearInterval(fadeAnimation.running[element.id]);

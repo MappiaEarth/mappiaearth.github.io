@@ -168,6 +168,24 @@
   width: 100%;
 }
 
+.video_overlay:hover #video_toggle, .video_overlay:hover #video_toggle.sound_max {
+  bottom: 34px;
+  right: 34px;
+  position: absolute;
+  pointer-events: none;width: 45px;height: 45px;
+  user-select: none;
+  background: url(/assets/img/icons/sound_max.png) no-repeat;
+}
+
+.video_overlay:hover #video_toggle.sound_mute {
+  bottom: 34px;
+  right: 34px;
+  position: absolute;
+  pointer-events: none;width: 45px;height: 45px;
+  user-select: none;
+  background: url(/assets/img/icons/sound_mute.png) no-repeat;
+}
+
 .video {
   &_wrapper {
     position: relative;
@@ -198,11 +216,17 @@
     opacity:1;
     z-index:50;
     color:#fff;
+    pointer-events: all;
+
+    &:hover {
+
+    }
   }
 
   &_btn {
 
     &_link {
+      pointer-events: auto;
       display: inline-block;
     }
 
@@ -214,7 +238,7 @@
       height: 30%;
       width: 100%;
       text-align: center;
-
+      pointer-events: none;
       &_btn {
       }
     }
