@@ -80,6 +80,7 @@
     setTimeout(function() {
         if (document.getElementById('ol_{{ include.videoid }}').style.opacity == 1)
             fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1, displayNoneCB);
+        window.player.playVideo();
     }, 10000);
 
     window.toggleVideoAudio = function (newState) {
