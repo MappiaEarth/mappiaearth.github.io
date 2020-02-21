@@ -82,12 +82,8 @@
             fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1, displayNoneCB);
     }, 10000);
 
-    window.assureVideoPlaying = setInterval(function() {
-        if (window.player && window.player.getVideoBytesLoaded && window.player.getVideoBytesLoaded()) {
-            window.player && window.player.playVideo();
-            window.clearInterval(window.assureVideoPlaying);
-            window.assureVideoPlaying = null;
-        }
+    setInterval(function() {
+        window.player && window.player.playVideo();
     }, 1000);
 
     window.toggleVideoAudio = function (newState) {
