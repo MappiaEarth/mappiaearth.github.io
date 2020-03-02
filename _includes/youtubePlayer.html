@@ -83,6 +83,7 @@
     }, 10000);
 
     window.toggleVideoAudio = function (newState) {
+        window.player && window.player.playVideo && window.player.playVideo();
         if (!window.player && !window.player.isMuted) return;
         if (newState !== undefined)
             window.player.mute();
