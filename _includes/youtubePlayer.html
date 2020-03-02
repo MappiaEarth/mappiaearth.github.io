@@ -82,10 +82,6 @@
             fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1, displayNoneCB);
     }, 10000);
 
-    setInterval(function() {
-        window.player && window.player.playVideo();
-    }, 1000);
-
     window.toggleVideoAudio = function (newState) {
         if (!window.player && !window.player.isMuted) return;
         if (newState !== undefined)
