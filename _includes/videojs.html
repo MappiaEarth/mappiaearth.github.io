@@ -1,5 +1,5 @@
-<script src="{{ site.url }}{{ site.baseurl }}/assets/js/asyncloader.min.js"></script>
-<link async rel="stylesheet" href="{{ site.url }}{{ site.baseurl }}/assets/css/video-js.min.css" as="style">
+<script src="{{ site.baseurl }}/assets/js/asyncloader.min.js"></script>
+<link async rel="stylesheet" href="{{ site.baseurl }}/assets/css/video-js.min.css" as="style">
 
 <div class="video_wrapper" style="padding-bottom:{{ include.height }}%">
     <div class="video_content">
@@ -33,7 +33,7 @@
 
             {% include fadeAnimation.js %}
 
-            AsyncLoader.loadScriptOnce(["{{ site.url }}{{ site.baseurl }}/assets/js/video.min.js"],
+            AsyncLoader.loadScriptOnce(["{{ site.baseurl }}/assets/js/video.min.js"],
                 function () {
                     var player = videojs("{{ include.videoid }}", {"autoplay":"true", "fluid": "true"}, function onPlayerReady() {
                         fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1);

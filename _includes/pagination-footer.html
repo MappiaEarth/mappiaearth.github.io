@@ -41,8 +41,8 @@
     {% if previousPage.url %}
     <a href="{{previousPage.url | relative_url }}">
       <img
-      src="{{ site.url }}{{ site.baseurl }}/assets/img/posts/{{previousPage.featured-img}}_placehold.jpg",
-      data-srcset="{{ site.url }}{{ site.baseurl }}/assets/img/posts/{{previousPage.featured-img}}_placehold.jpg, {{ site.url }}{{ site.baseurl }}/assets/img/posts/{{previousPage.featured-img}}_thumb@2x.jpg 2x"
+      src="{{ site.baseurl }}/assets/img/posts/{{previousPage.featured-img}}_placehold.jpg",
+      data-srcset="{{ site.baseurl }}/assets/img/posts/{{previousPage.featured-img}}_placehold.jpg, {{ site.url }}{{ site.baseurl }}/assets/img/posts/{{previousPage.featured-img}}_thumb@2x.jpg 2x"
       class="lazyload blur"
       style="height: 100px;"
       title="{{previousPage.title}}"
@@ -78,8 +78,8 @@
     </div>
     <a href="{{nextPage.url | relative_url }}">
       <img
-        src="{{ site.url }}{{ site.baseurl }}/assets/img/posts/{{nextPage.featured-img}}_placehold.jpg",
-        data-srcset="{{ site.url }}{{ site.baseurl }}/assets/img/posts/{{nextPage.featured-img}}_placehold.jpg, {{ site.url }}{{ site.baseurl }}/assets/img/posts/{{nextPage.featured-img}}_thumb@2x.jpg 2x"
+        src="{{ site.baseurl }}/assets/img/posts/{{nextPage.featured-img}}_placehold.jpg",
+        data-srcset="{{ site.baseurl }}/assets/img/posts/{{nextPage.featured-img}}_placehold.jpg, {{ site.url }}{{ site.baseurl }}/assets/img/posts/{{nextPage.featured-img}}_thumb@2x.jpg 2x"
         class="lazyload blur"
         style="height: 100px;"
         title="{{nextPage.title}}"
