@@ -240,8 +240,7 @@ gulp.task( "watch", function() {
     '_examples/*.md',
     '_raw_maps/*.md',
     "_posts/*.md",
-    "pages_/*.md",
-    "_include/*html"
+    "pages_/*.md"
   ], gulp.series( "rebuild" ) );
   gulp.watch( "_js/**/*.js", gulp.series( "js" ) );
 } );
@@ -256,6 +255,8 @@ gulp.task( "build", gulp.series( [
 
 gulp.task( "default", gulp.series( [
   "build",
-  "serve",
-  "watch"
+  gulp.parallel ( [ 
+    "serve",
+    "watch"
+  ] )
 ] ) );
