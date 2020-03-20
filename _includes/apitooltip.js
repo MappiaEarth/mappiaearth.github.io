@@ -55,7 +55,20 @@ function getPropertyElement(elementDOM){
     }
     return propertyElement;
 }
+
+function addExampleTooltip(propertyDOM) {
+    var examples = propertyDOM.getElementsByClassName("property__example");
+    if (examples.length > 0) {
+        var propertyTooltip = document.createElement("span");
+        propertyTooltip.className = "property_tooltip";
+        propertyTooltip.innerText = examples[0].innerText;
+        var propertyKey = propertyDOM.getElementsByClassName("property-key")[0];
+        propertyKey.appendChild(propertyTooltip);
+    }
+}
+
 var properties = document.getElementsByClassName("property");
 for (var iProp = 0; iProp < properties.length; iProp++) {
     interpretProperty(properties[iProp]);
+    addExampleTooltip(properties[iProp]);
 }
