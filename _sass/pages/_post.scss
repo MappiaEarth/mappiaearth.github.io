@@ -437,6 +437,10 @@
       &:hover {
         color: #277CEA;
         cursor: pointer;
+
+        .property_tooltip {
+          visibility: visible;
+        }
       }
     }
 
