@@ -45,15 +45,15 @@
                 showinfo: 0,
                 mute: 0,
                 wmode: 'opaque',
-                loop: 1,
+                loop: 0,
                 branding: 0,
                 rel: 0,
-                autohide: 0,
-                origin: window.location.origin
+                autohide: 0
             },
             events: {
                 onReady: function onPlayerReady(event) {
-                    event.target.playVideo();
+                    window.player && window.player.playVideo && window.player.playVideo();
+                    event.target && event.target.playVideo && event.target.playVideo();
 
                     {% if include.loopMax and include.loopTo %}
                     setInterval(function (){
@@ -82,11 +82,8 @@
             fadeOut(document.getElementById('ol_{{ include.videoid }}'), 1, displayNoneCB);
     }, 10000);
 
-    setInterval(function() {
-        window.player && window.player.playVideo();
-    }, 1000);
-
     window.toggleVideoAudio = function (newState) {
+        window.player && window.player.playVideo && window.player.playVideo();
         if (!window.player && !window.player.isMuted) return;
         if (newState !== undefined)
             window.player.mute();
@@ -97,7 +94,7 @@
 
 </script>
         <div id="{{ include.videoid }}" class="video_fullDiv"></div>
-        <div onclick="window.toggleVideoAudio();" class="video_overlay"><div id="ol_{{ include.videoid }}" style="background-repeat: no-repeat; background-position: center; background-size: cover; background-image: url('{{ site.url }}{{ site.baseurl }}/assets/img/{{ include.isHeader }}');"></div><div id="video_toggle"></div></div></div>
+        <div onclick="window.toggleVideoAudio();" class="video_overlay"><div id="ol_{{ include.videoid }}" style="background-repeat: no-repeat; background-position: center; background-size: cover; background-image: url('{{ site.baseurl }}/assets/img/{{ include.isHeader }}');"></div><div id="video_toggle"></div></div></div>
 
         <div class="video_btn_wrapper">
             <a href="./documentation" class="video_btn_link"><div class="btn">Documentation</div></a>

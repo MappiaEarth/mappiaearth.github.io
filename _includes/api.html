@@ -106,6 +106,9 @@
               </h3>
               <p>{{ tag.description | newline_to_br }}</p>
               <div class="property__expanded">
+                {% for example in tag.examples %}
+                  <div class="property__example">Example: <code>{{ example | newline_to_br }}</code></div>
+                {% endfor %}
                 <span>Defaults to <code>{{ tag.default | default: "undefined" }}</code></span>
               </div>
             </div>

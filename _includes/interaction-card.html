@@ -4,12 +4,12 @@
   {% endif %}
     <figure class="post-card__thumb">
       <img
-              src="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_placehold.{{intro.featured-img[1]}}",
-              data-srcset="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb.{{intro.featured-img[1]}}, {{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb@2x.{{intro.featured-img[1]}} 2x"
-              class="lazyload blur hoverswap" hoversrc="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.hover-img[0]}}_placehold.{{intro.hover-img[1]}}" hoversrcset="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.hover-img[0]}}_thumb.{{intro.hover-img[1]}}, {{ site.url }}{{ site.baseurl }}/assets/img/{{intro.hover-img[0]}}_thumb@2x.{{intro.hover-img[1]}} 2x"
+              src="{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_placehold.{{intro.featured-img[1]}}",
+              data-srcset="{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb.{{intro.featured-img[1]}}, {{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb@2x.{{intro.featured-img[1]}} 2x"
+              class="lazyload blur hoverswap" hoversrc="{{ site.baseurl }}/assets/img/{{intro.hover-img[0]}}_placehold.{{intro.hover-img[1]}}" hoversrcset="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.hover-img[0]}}_thumb.{{intro.hover-img[1]}}, {{ site.url }}{{ site.baseurl }}/assets/img/{{intro.hover-img[0]}}_thumb@2x.{{intro.hover-img[1]}} 2x"
               alt="{{intro.title}}"
       />
-      <noscript><img src="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb.{{intro.featured-img[1]}}" alt="{{ intro.title }}"></noscript>
+      <noscript><img src="{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb.{{intro.featured-img[1]}}" alt="{{ intro.title }}"></noscript>
     </figure>
     <div class="post-card__inner">
       <div class="post-card__header">

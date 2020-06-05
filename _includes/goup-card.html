@@ -1,6 +1,6 @@
 <div class="goup-card_container" itemprop="blogPosts" itemscope="" itemtype="http://schema.org/BlogPosting">
   {% if intro.url != '' %}
-  <a class="goup-card_link" href="{{ site.url }}{{ site.baseurl }}/./{{ intro.url | relative_url }}">
+  <a class="goup-card_link" href="{{ site.baseurl }}/./{{ intro.url | relative_url }}">
   {% endif %}
   <div class="goup-card_titlewrapper">
     <h2 class="goup-card_title">{{ intro.title | strip_html }}</h2>
@@ -8,12 +8,12 @@
   <div class="goup-card_inner hovergoup">
     <figure class="goup-card_image">
       <img
-              src="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_placehold.{{intro.featured-img[1]}}",
-              data-srcset="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_goup.{{intro.featured-img[1]}}"
+              src="{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_placehold.{{intro.featured-img[1]}}",
+              data-srcset="{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_goup.{{intro.featured-img[1]}}"
               class="lazyload blur"
               alt="{{intro.title}}"
       />
-      <noscript><img src="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb.{{intro.featured-img[1]}}" alt="{{ intro.content }}"></noscript>
+      <noscript><img src="{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb.{{intro.featured-img[1]}}" alt="{{ intro.content }}"></noscript>
       <p class="goup-card_text">{{intro.content}}</p>
     </figure>
   {% if intro.url != '' %}

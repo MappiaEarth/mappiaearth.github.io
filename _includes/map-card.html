@@ -3,11 +3,11 @@
     {% if post.featured-img %}
       <figure class="post-card__thumb">
         <img
-          src="{{ site.url }}{{ site.baseurl }}/assets/img/posts/{{post.featured-img}}_placehold.jpg",
+          src="{{ site.baseurl }}/assets/img/posts/{{post.featured-img}}_placehold.jpg",
           class="lazyload blur"
           alt="{{post.title}}"
         />
-        <noscript><img src="{{ site.url }}{{ site.baseurl }}/assets/img/posts/{{post.featured-img}}_placehold.jpg" alt="{{ post.title }}"></noscript>
+        <noscript><img src="{{ site.baseurl }}/assets/img/posts/{{post.featured-img}}_placehold.jpg" alt="{{ post.title }}"></noscript>
       </figure>
     {% else %}
       <figure class="post-card__thumb">
