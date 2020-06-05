@@ -183,6 +183,7 @@
 
     &:hover {
       color: darken($link-color, 20%);
+      cursor: pointer;
     }
 
     &:hover::after,

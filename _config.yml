@@ -16,6 +16,7 @@ social:
 navigation: # Navigation links
   - {name: 'Home', link: '/'}
   - {name: 'Documentation', link: '/documentation'}
+  - {name: 'Mappia Publisher', link: '/mappia_publisher'}
   - {name: 'About', link: '/about'}
 
 tagline: >

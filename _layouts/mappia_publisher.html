@@ -1,0 +1,102 @@
+---
+layout: compress
+---
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: 'en-US' }}">
+
+{% include head.html %}
+
+
+<body class="site">
+
+<style class="inlineCSS">
+qgis, qgis a {
+    color: #557921;
+    font-weight: bold;
+}
+
+gh, gh a {
+    color: #636467;
+    font-weight: bold;
+}
+
+evidence {
+    font-weight: 500;
+}
+
+mappia, mappia a {
+    color: #22589F;
+    font-weight: bold;
+}
+</style>
+
+{% if site.google_tag_manager %}
+
+<!-- Google Tag Manager (noscript) -->
+<noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id={{ site.google_tag_manager }}"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+{% endif %}
+
+{% include header.html %}
+
+<div class="fillHeader"></div>
+
+<main class="site__content">
+    <section class="blog">
+        <div class="category-section">
+            <div class="container">
+                <h2 class="intro-category">About mappia</h2>
+                <h3 class="intro-subcategory">CSR Maps makes your interactive maps easy to publish online</h3>
+                <p>&nbsp;&nbsp;&nbsp;<b>The service is free of charge</b>, and fully customizable with low effort. To <b>publish your data</b> we offer two options, one option does not require a private server but only an account in an online file storage service such as <b>GitHub</b>, <b>BitBucket</b> and many others, the other requires a private server configured with a Web Map Service (<b>WMS</b>). The platform offers a set of <b>customizable ready-to-use tools</b> called elements. These elements allows many different interactions such as inspect values, apply map algebra, create interactive charts and many others. This platform can integrate multiple data sources simultaneously, such as <b>CSR Database</b>, other online databases, and user maps.</br></br>
+                    &nbsp;&nbsp;&nbsp;Create your layout in the editor mode, an interactive and easy-to-use interface that allows the full control of the platform itself. You have the full control of the customizations by: choosing maps, using map interactive elements, getting user inputs, creating interactive charts, defining a map algebra expression, alot of others customizations and creating your own tools. These maps can be easily <b>embedded into sites, or shared by the project url</b>.</br></br>
+                    &nbsp;&nbsp;&nbsp;This is a complete solution for online mapping <b>designed for all users</b>, the ones that just want to create an online map viewer, to the ones that want to simulate sceneries using your data online. So for all users, we <b>fully documented our elements with examples</b>, and a tutorial showing the simplest way to publishing your interactive maps online and create a shareable platform. All CSR Platforms were made within mappia as a <b>fully accessible and editable</b> portfolio. No install is required, try it online now.<br><br></p>
+            </div>
+
+            <div class="container">
+                <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
+
+                    {% for intro in site.data.intro.share %}
+                    {% include interaction-card.html %}
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <div class="container">
+                <h2 class="intro-category">Publish by QGIS</h2>
+                <h3 class="intro-subcategory">QGIS (until 2013 known as Quantum GIS[2]) is a free and open-source cross-platform desktop geographic information system (GIS) application that supports viewing, editing, and analysis of geospatial data.[3]</h3>
+                <ul>
+                    {% for curData in site.data.publisher.qgis_tutorial %}
+                    <li><a href="#{{ curData.id | strip_html }}">{{ curData.title | strip_html }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            {% for curData in site.data.publisher.qgis_tutorial %}
+            <div id="{{ curData.id | strip_html }}">
+            <div class="container">
+                <h3 class="intro-subcategory">{{ curData.title | strip_html }}</h3>
+                <p>{{ curData.html }}</p>
+            </div>
+            {% if curData.iframe != '' %}
+            <iframe src="{{ curData.iframe }}" width="100%" height="600" style="border:0;"></iframe>
+            {% endif %}
+            </div>
+            {% endfor %}
+
+        </div>
+
+    </section>
+</main>
+
+{% include footer.html %}
+
+</body>
+
+</html>
