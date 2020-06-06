@@ -208,8 +208,7 @@ gulp.task( "jekyll-build", function( done ) {
 } );
 
 // Rebuild Jekyll & do page reload
-gulp.task( "rebuild",
-  gulp.series( [ "jekyll-build" ], function( done ) {
+gulp.task( "rebuild", gulp.series( [ "jekyll-build" ], function( done ) {
     browserSync.reload();
     done();
   } )
@@ -255,7 +254,7 @@ gulp.task( "build", gulp.series( [
 
 gulp.task( "default", gulp.series( [
   "build",
-  gulp.parallel ( [ 
+  gulp.parallel ( [
     "serve",
     "watch"
   ] )
