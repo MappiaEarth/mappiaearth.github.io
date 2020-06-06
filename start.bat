@@ -7,4 +7,4 @@ set PATH=C:\Ruby25-x64\bin;%npm_path%;%PATH%
 set gitpath=C:\Danilo\Programas\PortableGit\cmd
 set PATH=%gitpath%;%PATH%
 
-bundle exec gulp --watch
+bundle exec gulp --watch --incremental

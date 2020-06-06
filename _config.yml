@@ -1,10 +1,9 @@
 # SITE CONFIGURATION
-title: CSR Maps Documentation
+title: Mappia Documentation
 author: CSR
 description: > # Meta description of Homepage
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  A service to share maps. Publish maps online, and easily create customized platforms
+  using geographic data.
 
 # SEO PLUGIN
 social:
@@ -16,11 +15,12 @@ social:
 navigation: # Navigation links
   - {name: 'Home', link: '/'}
   - {name: 'Documentation', link: '/documentation'}
-  - {name: 'Mappia Publisher', link: '/mappia_publisher'}
+  - {name: 'API Reference', link: '/api'}
+  - {name: 'Publish your Maps', link: '/mappia_publisher'}
   - {name: 'About', link: '/about'}
 
 tagline: >
-  Documentation for using CSR Maps
+  Documentation for using Mappia
 
 hero_img: posts/CSR-Maps-bg.jpg # Main background image: use the path from /assets/img/ => This will output /assets/img/posts/sleek_lg.jpg
 

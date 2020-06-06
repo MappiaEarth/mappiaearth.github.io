@@ -60,23 +60,6 @@ layout: compress
 
         <div class="category-section">
           <div class="container">
-            <h2 class="post-category">Publishing Your Maps</h2>
-            <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
-
-              <p>Soon <a href="https://github.com/MappiaEarth/mappia_publisher/raw/master/mappia_publisher.zip">Download your plugin here, while it is not yet available at QGIS officional repository.</a></p>
-              <!--
-              {% assign sortedRawMaps = site.raw_maps | sort: 'title' %}
-              {% for post in sortedRawMaps %}
-                {% include card.html %}
-              {% endfor %}
-              -->
-              <!-- {% include pagination.html %} -->
-            </div>
-          </div>
-        </div>
-
-        <div class="category-section">
-          <div class="container">
             <h2 class="post-category">Raw Maps</h2>
             <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
 
@@ -97,7 +80,11 @@ layout: compress
             <h2 class="post-category">Tutorials</h2>
             <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
 
-              <p>Soon</p>
+              <ul>
+                <li>Steps to easily publish your own maps: <a href="/mappia_publisher">Checkout this tutorial</a>.</li>
+                <li>How customize the maps by visual edition: soon</li>
+                <li>How customize the maps by code edition: soon</li>
+              </ul>
               <!--
               {% assign sortedRawMaps = site.raw_maps | sort: 'title' %}
               {% for post in sortedRawMaps %}

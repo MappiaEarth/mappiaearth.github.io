@@ -1,7 +1,7 @@
 ---
 layout: mappia_publisher
-title: Mappia publish your maps as a professional.
-tagline: Your maps online 24/7 for free.
+title: Learn how to publish your interactive Maps online.
+tagline: We will add all the plugins created here
 
 permalink: /mappia_publisher/
 apiConfig:
