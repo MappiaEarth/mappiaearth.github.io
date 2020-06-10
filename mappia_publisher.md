@@ -4,6 +4,7 @@ title: Learn how to publish your interactive Maps online.
 tagline: We will add all the plugins created here
 
 permalink: /mappia_publisher/
+hasYoutube: true
 apiConfig:
   startPropertiesOpen: true
 ---
@@ -14,4 +15,4 @@ apiConfig:
   {% endfor %}
   {% include api.html api=api %}
 </div>
-
+ 

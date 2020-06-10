@@ -2,6 +2,7 @@
 layout: intro
 title: CSR Maps maps for everyone everywhere.
 tagline: Addressing your needs.
+hasYoutube: true
 ---
 
 

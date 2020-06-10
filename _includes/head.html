@@ -11,12 +11,28 @@
   <meta name="application-name" content="CSR Maps Documentation">
   <meta name="theme-color" content="#ffffff">
 
+  {% if page.hasYoutube %}
+  <script src="https://www.youtube.com/iframe_api" type="text/javascript"></script>
+  <script type="text/javascript">
+  window.Youtube = {
+    callbacks: [],
+    addCallback: function(cbFunction) {
+      window.Youtube.callbacks.push(cbFunction);
+    }
+  };
+  window.onYouTubeIframeAPIReady = function() {
+    for (var i = 0; i < window.Youtube.callbacks.length; i++) {
+      window.Youtube.callbacks[i]();
+    }
+  }
+  </script>
+  {% endif %}
+
   {% if site.google_tag_manager %}
 
     {% include gtm.html %}
 
   {% endif %}
-
   <style class="inlineCSS">
 
     {% include critical.css %}

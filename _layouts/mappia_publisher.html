@@ -28,6 +28,10 @@ mappia, mappia a {
     color: #22589F;
     font-weight: bold;
 }
+li[playing=true] a {
+    color: #2624c7;
+    font-weight: bold;
+}
 </style>
 
 {% if site.google_tag_manager %}
@@ -67,6 +71,9 @@ mappia, mappia a {
             </div>
             {% if curData.iframe != '' %}
             <iframe src="{{ curData.iframe }}" width="100%" height="600" style="border:0;"></iframe>
+            {% endif %}
+            {% if curData.javascript != '' %}
+                <script type="text/javascript">{{ curData.javascript }}</script>
             {% endif %}
             </div>
             {% endfor %}
