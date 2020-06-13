@@ -277,7 +277,7 @@
     {
       "key": "_information",
       "completeAPI": "View the full <a target='_blank' href=\"https://docs.sencha.com/extjs/3.4.0\">Extjs API 3.4 click here</a>.\n*Only the functions which where used in CSR projects are listed <a href='/api/#category_Extjs'>here</a>.",
-      "description": "Calling core Extjs functions allows fine control over the CSR Maps internal elements.",
+      "description": "Calling core Extjs functions allows fine control over the map internal elements.",
       "name": "Extjs 3.4"
     },
     {
