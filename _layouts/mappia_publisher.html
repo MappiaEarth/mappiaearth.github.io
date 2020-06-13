@@ -32,6 +32,29 @@ li[playing=true] a {
     color: #2624c7;
     font-weight: bold;
 }
+.lateral-list-topic div {
+    width: 100%;
+    text-align: center;
+    height: 100px;
+    padding: 0 0 10px 0;
+}
+.lateral-list-topic div img {
+    max-width: 100%;
+    max-height: 100%;
+    margin: auto;
+    display: block;
+}
+.lateral-list-topic {
+    width: 20%;
+    float: left;
+    margin: 10px;
+    text-align: justify;
+    margin-bottom: 25px;
+}
+.wrapper-lateral-list-topic {
+    clear:both;
+    overflow: hidden;
+}
 </style>
 
 {% if site.google_tag_manager %}
@@ -57,13 +80,12 @@ li[playing=true] a {
                 <h2 class="intro-category">Publish by QGIS</h2>
                 <h3 class="intro-subcategory">QGIS (until 2013 known as Quantum GIS) is a free and open-source cross-platform desktop geographic information system (GIS) application that supports viewing, editing, and analysis of geospatial data.</h3>
                 <p>This plugin is part of QGIS software that can be downloaded at <a target='_blank' href="https://www.qgis.org/pt_BR/site/forusers/download.html" >https://www.qgis.org/pt_BR/site/forusers/download.html official site</a>.</p>
-                <ul>
+                <div class="wrapper-lateral-list-topic">
                     {% for curData in site.data.publisher.qgis_tutorial %}
-                    <li><a href="#{{ curData.id | strip_html }}">{{ curData.title | strip_html }}</a></li>
+                    <div class="lateral-list-topic"><a href="#{{ curData.id | strip_html }}"><div><img src="{{ site.baseurl }}/assets/img/{{ curData.featured-img | relative_url }}"></div>{{ curData.title | strip_html }}</a></div>
                     {% endfor %}
-                </ul>
+                </div>
             </div>
-
             {% for curData in site.data.publisher.qgis_tutorial %}
             <div id="{{ curData.id | strip_html }}">
             <div class="container">

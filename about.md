@@ -28,7 +28,7 @@ Just add an iframe to your site with the link to add your platform to your site.
 
 - What is the platform processing usage limit?
  
-   R: None, all post-processing is done on user browser and the pre-processing once per map.
+   R: None, all post-processing is done on user browser and the pre-processing during the map publication.
 
 - There is a simple tutorial to learn how to customize my platform?
  
