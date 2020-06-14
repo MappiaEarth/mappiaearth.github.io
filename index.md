@@ -1,6 +1,6 @@
 ---
 layout: intro
-title: CSR Maps maps for everyone everywhere.
+title: Mappia maps for everyone everywhere.
 tagline: Addressing your needs.
 hasYoutube: true
 ---
@@ -20,7 +20,7 @@ hasYoutube: true
     Parte 4:
         Mostrar q pode usar em qlqr projeto.
     Parte 5:
-        Logo do CSR Maps, (make it ease)
+        Logo do Mappia, (make it ease)
         
 ## Map interactions
 
