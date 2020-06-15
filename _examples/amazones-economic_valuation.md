@@ -1,7 +1,7 @@
 ---
 layout: example
 title: Economic valuation
-summary: Real-time display of the forest values given a combination of inputs and weights (scenario).
+summary: Real-time display of ecosystem services values given a combination of inputs and weights.
 categories: [Slider, Label, Textfield, isNumeric, visibleLayers, priority, LegendTitle, Title]
 featured-img: amazones-panel
 type: Example

@@ -1,6 +1,6 @@
 ---
 layout: example
-title: Fip Cerrado
+title: Fip Cerrado project
 summary: Fire propagation modeling in the cerrado biome.
 categories: [Timeline, setQueryGlobalProperties, paramsButtonConfig, InputManager, visibility]
 featured-img: fip_cerrado_geral

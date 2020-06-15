@@ -1,7 +1,7 @@
 ---
 layout: example
-title: Biodiversity
-summary: Compare deforestation in regions of different biodiversity relevance.
+title: AMAZONES - Biodiversity
+summary: Show deforestation threat in regions of biodiversity relevance.
 categories: [LegendHtml, getid, LoadCsv, Slider, RunOnceLayerVisible, changeLayers, Label, Highcharts]
 featured-img: amazones_biodiversity-panel
 type: Example
@@ -19,4 +19,4 @@ api:
   - key: Label
   - key: Highcharts
 ---
-Display biodiversity relative importance across the Amazon Forest, this analysis is part of {{ site.data.urls.AMAZONES }}.
+Display biodiversity relative importance across the Amazon Forest, this analysis is part of {{ site.data.urls.AMAZONES }}. See <a target='_blank' href='https://csr.ufmg.br/amazones/biodiversity/'>https://csr.ufmg.br/amazones/biodiversity/</a>.

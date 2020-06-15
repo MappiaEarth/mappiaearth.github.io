@@ -1,7 +1,7 @@
 ---
 layout: example
 title: Hydrologic resources influenced by land use change
-summary: Show multiple maps together.
+summary: Display multiple maps together.
 categories: [scale, startopened, hidestylechooser, enablequeries, visiblelayers]
 featured-img: uso_do_solo_recursos_hidricos
 type: Example

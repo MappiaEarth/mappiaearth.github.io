@@ -1,7 +1,7 @@
 ---
 layout: element
 title: Textfield
-summary: Textfield to enter any input text or number ensuring if the input is valid.
+summary: Textfield to input text or number ensuring input validity.
 categories: [Textfield, ConfigLayer]
 featured-img: textfield-widget
 type: Element

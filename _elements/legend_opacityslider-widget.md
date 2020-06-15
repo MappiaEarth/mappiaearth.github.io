@@ -1,7 +1,7 @@
 ---
 layout: element
 title: LegendHtml and OpacitySlider
-summary: View legend together with the query and change the layer opacity.
+summary: View legend query and change the layer opacity.
 categories: [LegendHtml, OpacitySlider, SetQueryGlobalProperties, Group, BeforeCalc]
 featured-img: legend_opacityslider-widget
 type: Element

@@ -1,7 +1,7 @@
 ---
 layout: example
 title: AMAZONES - Hydrologic services
-summary: Process map in real-time to derive query values.
+summary: Process and query map values.
 categories: [Legendhtml, getId, LoadCsv, Slider, changeLayers, Label, Highcharts]
 featured-img: amazones_water
 type: Example

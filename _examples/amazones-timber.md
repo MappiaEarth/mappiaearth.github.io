@@ -1,7 +1,7 @@
 ---
 layout: example
 title: AMAZONES - Timber product
-summary: Display in a graph the value of timber product per region.
+summary: Display using a graph timber volumes and rents per region.
 categories: [Slider, Label, Textfield, isnumeric, priority, legendTitle, title]
 featured-img: amazones_timber-panel
 type: Example
@@ -15,4 +15,4 @@ api:
   - key: ConfigLayer
     tags: ['priority', 'title', 'legendTitle']
 ---
-Current total and potential net revenues from sustainable logging from {{ site.data.urls.AMAZONES }}.
+Current total and potential net revenues from sustainable logging from {{ site.data.urls.AMAZONES }}. See <a target='_blank' href='https://csr.ufmg.br/amazones/timber/'>https://csr.ufmg.br/amazones/timber/</a>

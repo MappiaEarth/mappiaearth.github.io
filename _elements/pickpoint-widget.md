@@ -1,7 +1,7 @@
 ---
 layout: element
 title: Pickpoint
-summary: Pick a point and use the feature information.
+summary: Pick a cell value and use the feature information.
 categories: [PickPoint, Highcharts]
 featured-img: pickpoint-widget
 type: Element
