@@ -64,6 +64,8 @@ collections:
   raw_maps:
     output: true
 
+future: true
+
 compress_html:
   clippings: all
 
