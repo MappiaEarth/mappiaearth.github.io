@@ -1,6 +1,6 @@
 ---
 layout: intro
-title: Mappia - Make and publish yourself interactive maps online.
+title: Mappia - Publish yourself interactive maps online.
 tagline: Addressing your needs.
 hasYoutube: true
 ---

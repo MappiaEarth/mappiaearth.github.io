@@ -92,21 +92,6 @@ li[playing=true] a {
 
             {% for curData in site.data.publisher.qgis_tutorial %}
             <div id="{{ curData.id | strip_html }}">
-                <div class="container">
-                    <h3 class="intro-subcategory">{{ curData.title | strip_html }}</h3>
-                    <p style="text-align: justify;">{{ curData.html }}</p>
-                </div>
-                {% if curData.iframe != '' %}
-                <iframe src="{{ curData.iframe }}" width="100%" height="600" style="border:0;"></iframe>
-                {% endif %}
-                {% if curData.javascript != '' %}
-                <script type="text/javascript">{{ curData.javascript }}</script>
-                {% endif %}
-            </div>
-            {% endfor %}
-
-            {% for curData in site.data.publisher.qgis_tutorial %}
-            <div id="{{ curData.id | strip_html }}">
             <div class="container">
                 <h3 class="intro-subcategory">{{ curData.title | strip_html }}</h3>
                 <p style="text-align: justify;">{{ curData.html }}</p>
