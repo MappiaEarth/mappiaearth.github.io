@@ -10,7 +10,7 @@ The Product is licensed As-Is basis, subject to the terms and conditions of this
 
 # Usage
 
-Just add an iframe to your site with the link to add your platform to your site.
+Just add the iframe with link in your site.
 
 ```
 <iframe id="11287" src="//maps.csr.ufmg.br/calculator/?lang=eng&map=&queryid=19&visiblelayers=custom" width="100%" height="600"></iframe>
@@ -22,9 +22,9 @@ Just add an iframe to your site with the link to add your platform to your site.
 
    R: Yes.
 
-- Do I have to send my data to your map server?
+- Do I have to send my data to Mappia server?
  
-   R: No data need to be sent, we have a tutorial to configure Mappia server to display your data.
+   R: No data is sent to Mappia, we just access the data available.
 
 - What is the platform processing usage limit?
  

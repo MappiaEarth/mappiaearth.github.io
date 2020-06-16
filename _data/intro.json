@@ -59,7 +59,7 @@
     {
       "url": "/documentation#tutorial",
       "featured-img": ["/custom/integrate", "png"],
-      "title": "DISPLAY YOUR MAPS",
+      "title": "DISPLAY MAPS YOURSELF",
       "content": "Access maps or tables from online file storage services such as GitHub, Bitbucket and many others as well."
     }
   ],
@@ -68,22 +68,22 @@
       "url": "/mappia_publisher/#qgis_tutorial",
       "featured-img": ["/custom/publish1", "jpg"],
       "hover-img": ["/custom/publish2", "jpg"],
-      "title": "Step 1) PUBLISH YOUR MAPS",
+      "title": "Step 1) PUBLISH MAPS YOURSELF",
       "content": "Publish yourslef interactive online maps. With few clicks, proccess map to display online and send them to a file storage such as GitHub or BitBucket."
     },
     {
       "url": "/documentation#elements",
       "featured-img": ["/custom/editquery1", "jpg"],
       "hover-img": ["/custom/editquery2", "jpg"],
-      "title": "Step 2) CREATE YOUR OWN LAYOUTS",
+      "title": "Step 2) CREATE LAYOUTS YOURSELF",
       "content": "Create yourself maps presentation and interactions. Create yourself platform layout choosing a selection of maps, elements, tools and interactions."
     },
     {
       "url": "/mappia_publisher/#qgis_customizations",
       "featured-img": ["/custom/share1", "png"],
       "hover-img": ["/custom/share2", "png"],
-      "title": "Step 3) SHARE YOUR PLATFORM",
-      "content": "Make your data public. Share your research results online."
+      "title": "Step 3) SHARE PROJECTS",
+      "content": "Share online maps, research results, school projects."
     }
   ],
   "license" : [

@@ -16,7 +16,7 @@ navigation: # Navigation links
   - {name: 'Home', link: '/'}
   - {name: 'Documentation', link: '/documentation'}
   - {name: 'API Reference', link: '/api'}
-  - {name: 'Publish your Maps', link: '/mappia_publisher'}
+  - {name: 'Publish Maps Yourself', link: '/mappia_publisher'}
   - {name: 'About', link: '/about'}
 
 tagline: >
