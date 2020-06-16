@@ -1,6 +1,6 @@
 ---
 layout: mappia_publisher
-title: Learn how to publish your interactive Maps online.
+title: Learn how to publish interactive Maps online.
 tagline: We will add all the plugins created here
 
 permalink: /mappia_publisher/
