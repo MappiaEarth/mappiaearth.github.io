@@ -5,7 +5,7 @@ summary: Publish a map using layout created in QGIS.
 categories: [setQueryGlobalProperties, Timeline, QGIS, useLayerTooltip, LoadCsv, Highcharts, LegendHtml, QUERY, hideLegendButton, visibility]
 featured-img: laurel_data_integration
 type: Example
-map-link: lang=eng&map=&queryid=57&extent=&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened&visiblelayers=custom
+map-link: lang=eng&map=&queryid=57&extent=&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened,capabilities&visiblelayers=custom
 api: 
   - key: QUERY
     tags: ['setQueryGlobalProperties']

@@ -5,7 +5,7 @@ summary: Display multiple maps together.
 categories: [scale, startopened, hidestylechooser, enablequeries, visiblelayers]
 featured-img: uso_do_solo_recursos_hidricos
 type: Example
-map-link: lang=eng&map=&queryid=78&extent=&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=1000
+map-link: lang=eng&map=&queryid=78&extent=&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries,capabilities&visiblelayers=1000
 api: 
     - key: Sankey
     - key: QUERY

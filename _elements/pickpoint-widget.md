@@ -7,7 +7,7 @@ featured-img: pickpoint-widget
 type: Element
 examples:
     - title: PickPoint from map to analyse
-      map-link: lang=eng&map=&queryid=116&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=custom
+      map-link: lang=eng&map=&queryid=116&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries,capabilities&visiblelayers=custom
       featured-img: pickpoint-widget
 api: 
     - key: PickPoint

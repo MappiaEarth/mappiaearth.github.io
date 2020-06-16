@@ -7,7 +7,7 @@ featured-img: button-widget
 type: Element
 examples:
     - title: Button Example
-      map-link: lang=eng&map=&queryid=119&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=2
+      map-link: lang=eng&map=&queryid=119&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries,capabilities&visiblelayers=2
       featured-img: button-widget
 api: 
   - key: Button

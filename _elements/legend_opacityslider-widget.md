@@ -7,7 +7,7 @@ featured-img: legend_opacityslider-widget
 type: Element
 examples:
     - title: LegendHTML and OpacitySlider Simple Example
-      map-link: lang=eng&map=&queryid=120&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=2
+      map-link: lang=eng&map=&queryid=120&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries,capabilities&visiblelayers=2
       featured-img: legendhtml_example
 api: 
     - key: LegendHtml

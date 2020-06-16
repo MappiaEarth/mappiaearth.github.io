@@ -65,7 +65,6 @@ collections:
     output: true
 
 future: true
-timezone: America/Sao_Paulo
 
 compress_html:
   clippings: all
