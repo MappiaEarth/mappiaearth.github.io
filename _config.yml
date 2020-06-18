@@ -19,6 +19,8 @@ navigation: # Navigation links
   - {name: 'Publish Maps Yourself', link: '/mappia_publisher'}
   - {name: 'About', link: '/about'}
 
+disable_disk_cache: true
+
 tagline: >
   Documentation for using Mappia
 
