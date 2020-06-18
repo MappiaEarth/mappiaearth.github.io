@@ -9,7 +9,7 @@ description: > # Meta description of Homepage
 social:
   name: CSR
   links:
-    - http://maps.csr.ufmg.br
+    - https://maps.csr.ufmg.br
 
 # THEME SETTINGS
 navigation: # Navigation links
