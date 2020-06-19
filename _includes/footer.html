@@ -27,14 +27,19 @@ document.getElementById('scriptBundle').addEventListener('load', function () {
 });
 </script>
 {% if site.service_worker %}
-<!-- <script async>
+<script async>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('{{ "/sw.js" | relative_url }}').then(function( registration ) {
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+      registrations.forEach(function(registration) {
+        registration.unregister();
+      });
+    }); 
+    /* navigator.serviceWorker.register('{{ "/sw.js" | relative_url }}').then(function( registration ) {
       console.log('ServiceWorker registration successful with scope: ', registration.scope);
     })
     .catch(function(error) {
       console.log('ServiceWorker registration failed: ', error);
-    });
+    }); */
   }
-</script> -->
+</script>
 {% endif %}
