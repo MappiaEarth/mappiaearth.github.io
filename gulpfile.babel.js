@@ -248,8 +248,7 @@ gulp.task( "build", gulp.series( [
   "clean",
   gulp.parallel( [ "sass", "js", "img" ] ),
   "jekyll-build",
-  "critical",
-  "sw"
+  "critical"
 ] ) );
 
 gulp.task( "default", gulp.series( [

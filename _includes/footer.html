@@ -27,7 +27,7 @@ document.getElementById('scriptBundle').addEventListener('load', function () {
 });
 </script>
 {% if site.service_worker %}
-<script async>
+<!-- <script async>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('{{ "/sw.js" | relative_url }}').then(function( registration ) {
       console.log('ServiceWorker registration successful with scope: ', registration.scope);
@@ -36,5 +36,5 @@ document.getElementById('scriptBundle').addEventListener('load', function () {
       console.log('ServiceWorker registration failed: ', error);
     });
   }
-</script>
+</script> -->
 {% endif %}
