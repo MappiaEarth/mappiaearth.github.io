@@ -25,7 +25,7 @@ const prefix = require( "gulp-autoprefixer" );
 const sourcemaps = require( "gulp-sourcemaps" );
 const uglify = require( "gulp-uglify" );
 const critical = require( "critical" );
-const sw = require( "sw-precache" );
+const workboxBuild = require('workbox-build');
 
 // Image Generation
 const responsive = require( "gulp-responsive" );
@@ -122,12 +122,10 @@ gulp.task( "html", function( done ) {
 
 // Service Worker
 gulp.task( "sw", function() {
-  const rootDir = "./";
-  const distDir = "./_site";
-
-  return sw.write( `${rootDir}/sw.js`, {
-    staticFileGlobs: [ distDir + "/**/*.{js,html,css,png,jpg,svg}" ],
-    stripPrefix: distDir
+  return workboxBuild.generateSW( {
+    swDest: "./sw.js",
+    globDirectory: "_site",
+    globPatterns: ["**/*.{html,css,png,jpg,svg}"]
   } );
 } );
 
@@ -208,7 +206,7 @@ gulp.task( "jekyll-build", function( done ) {
 } );
 
 // Rebuild Jekyll & do page reload
-gulp.task( "rebuild", gulp.series( [ "jekyll-build" ], function( done ) {
+gulp.task( "rebuild", gulp.series( [ "jekyll-build", "sw" ], function( done ) {
     browserSync.reload();
     done();
   } )
@@ -230,7 +228,7 @@ gulp.task( "serve", function() {
 gulp.task( "styles", gulp.series( [ "sass", "critical" ] ) );
 
 gulp.task( "watch", function() {
-  gulp.watch( "_sass/**/*.scss", gulp.series( "styles" ) );
+  gulp.watch( "_sass/**/*.scss", gulp.series( "styles", "sw" ) );
   gulp.watch( [
     "*.html",
     "_layouts/*.html",
@@ -241,7 +239,7 @@ gulp.task( "watch", function() {
     "_posts/*.md",
     "pages_/*.md"
   ], gulp.series( "rebuild" ) );
-  gulp.watch( "_js/**/*.js", gulp.series( "js" ) );
+  gulp.watch( "_js/**/*.js", gulp.series( "js", "sw" ) );
 } );
 
 gulp.task( "build", gulp.series( [
