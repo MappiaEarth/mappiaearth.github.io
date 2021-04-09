@@ -9,6 +9,7 @@
     "lazysizes": "^4.0.1",
     "normalize.css": "^7.0.0",
     "picturefill": "^3.0.2",
+    "requirements": "^1.4.1",
     "velocity-animate": "^1.5.0"
   },
   "devDependencies": {

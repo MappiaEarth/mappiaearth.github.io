@@ -12,7 +12,7 @@ The Product is licensed As-Is basis, subject to the terms and conditions of this
 
 Just add the iframe with link into any site.
 
-```
+```HTML
 <iframe id="11287" src="//maps.csr.ufmg.br/calculator/?lang=eng&map=&queryid=19&visiblelayers=custom" width="100%" height="600"></iframe>
 ```
 
