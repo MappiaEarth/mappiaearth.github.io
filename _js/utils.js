@@ -113,8 +113,8 @@ window.DocUtils = {
          */
         filterVisibleProperties: function () {
             var eventTimeout;
-            var propertySelector = $(".api-container").find(".property");
-            var categorySelector = $(".api-container").find(".property-category");
+            var propertySelector = $("#api-container").find(".property");
+            var categorySelector = $("#api-container").find(".property-category");
             var emptyResultsElement = $("#empty-filter-results");
             return function filterVisibleProperties() {
                 clearTimeout(eventTimeout);
@@ -202,7 +202,31 @@ window.DocUtils = {
                 //  elemento selecionado do indice
                 element.classList.add("text-primary")
             }
+        },
 
+        /**
+         * Faz o rolamento do indice lateral acompanhar o da página 
+         */
+        scrollUpdate: function (event) {
+            //  Obtem o primeiro container visivel na tela 
+            let containers = document.querySelectorAll(".property-category");
+            for(let i = 0; i < containers.length; i++){
+                var container = containers[i];
+                if(container.offsetTop > window.pageYOffset && i > 0){
+                    container = containers[i - 1];
+                    break;
+                }
+            }
+
+            //  Obtem o elemento do indice referente ao container
+            let id = container.id;
+            let keyArray = id.split("_");
+            let key = keyArray[keyArray.length - 1];
+            let filterNode = document.querySelector(`[key="${key}"]`);
+
+            //  Move o scroll para que o elemento do indice seja visivel
+            let parentNode = filterNode.parentElement;
+            parentNode.scrollTop = filterNode.offsetTop;
         }
     }
 };

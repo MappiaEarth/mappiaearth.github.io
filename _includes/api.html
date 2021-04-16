@@ -1,7 +1,6 @@
 {% assign api = include.api | default: page.api %}
 {% if api %}
 {% include prevent-selection.html selector=".property-key" %}
-
 <div class="api-toolbar">
   <div class="api-toolbar__left-panel">
     <h2>Mappia API</h2>
@@ -13,17 +12,18 @@
       title="Expand all properties">&nbsp;</span>
   </div>
 </div>
-<div class="api-container">
-  <div style="float: left; width: 300px; padding: 15px;">
+<div id="api-container" class="d-flex">
+  <div class="position-sticky overflow-auto" style="width: 300px; height: 100vh; top: 0px; padding: 15px;">
     {% for category in api %}
     {% assign key = category.key | default: category %}
     {% assign tags = site.data.api[key] %}
     {% assign info = tags[0] %}
     {% assign name = info.name %}
-    <div class="link-primary index-item" key="{{key}}" style="margin-bottom: 15px;" onclick="DocUtils.API.filterById(this)">{{name}}</div>
+    <div class="link-primary index-item" key="{{key}}" style="font-size: 18px; margin-bottom: 15px;"
+      onclick="DocUtils.API.filterById(this)">{{name}}</div>
     {% endfor %}
   </div>
-  <div style="float: left; width: calc(100% - 300px);">
+  <div style="flex: 0 0 auto; width: calc(100% - 300px); padding: 20px 0 0 20px;">
     <div id="empty-filter-results" class="hidden">No results found.</div>
     {% for category in api %}
     {% assign key = category.key | default: category %}
@@ -97,11 +97,13 @@
         {% endif %}
 
         {% if informationTags contains "_description" %}
-        <p class="property-category__metadata__description">{{ informationData.description | newline_to_br }}</p>
+        <p class="property-category__metadata__description">{{ informationData.description | newline_to_br }}
+        </p>
         {% endif %}
 
         {% if informationTags contains "_completeAPI" %}
-        <p class="property-category__metadata__completeAPI">{{ informationData.completeAPI | newline_to_br }}</p>
+        <p class="property-category__metadata__completeAPI">{{ informationData.completeAPI | newline_to_br }}
+        </p>
         {% endif %}
       </div>
       <div class="properties-container">
@@ -112,8 +114,8 @@
           </a>
           <h3 class="property__title">
             <span>
-              <span class="property-key" onclick="DocUtils.API.togglePropertyOpen(this)">{{ tag.key }}</span>: <span
-                class="property_type">{{ tag.type }}</span>
+              <span class="property-key" onclick="DocUtils.API.togglePropertyOpen(this)">{{ tag.key
+                }}</span>: <span class="property_type">{{ tag.type }}</span>
             </span>
             {% if tag.required %}
             <span class="property-required">required</span>
@@ -136,8 +138,12 @@
     {% endfor %}
   </div>
 </div>
-
 <script defer>
   {% include apitooltip.js %}
+</script>
+<script>
+  window.addEventListener("load", function () {
+    document.addEventListener('scroll', DocUtils.API.scrollUpdate);
+  });
 </script>
 {% endif %}
