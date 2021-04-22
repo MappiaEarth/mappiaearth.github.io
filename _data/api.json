@@ -7,43 +7,23 @@
       "name": "URL Parameters"
     },
     {
-      "key": "tools=",
-      "description": "Set the enabled map tools, these tools are shown in the top right side of the map viewer.\n\nhovershowlegend: Add a tool to shows map legends on hovering.\nlayerchooser: Add to 'legends viewer' a list of map layers. (Not affects 'calculate' maps).\nzoomextent: Add zoom to visible maps extents tool.\ngetfeature: Add GetFeatureInfo tool, a tool to click and get any pixel complete information.\nmeasure: Add a measurement tool that can measure a polygon area or a distance in a map.\nlegend: Add a floating panel to show the map legends.\nmetadata: Add a button to show all maps metadata.\nhelpintro: Show a button with help options, tutorial and step by step guide.\nUsage: URL/?tools=helpintro,layerchooser,zoomextent,customzoom,getfeature",
-      "type": "{String}"
-    },
-    {
-      "key": "options=",
-      "description": "Set options for the elements in the map viewer.\n\nonlyfirstvisible: Only the first layer is initially visible.\nhidemetadata: Remove layers metadata button.\ndisabledownload: Remove layers 'Download' button.\nhidestylechooser: If defined remove the list of bands of layers. (Do not affect 'calculate' maps).\nscale: Show the scale indicator at bottom left of the map.\ngrid: Show grid tiles bounds.\noverview: Shows a small map to help user idenfity where globally is he viewing.\ncapabilities: Load capabilities only for the layers in query. Reduces drastically the loading speed.\nstartopened: Painel showing layers is initially opened. (Deprecated)\nonevisible: Only one layer is visible at any time. (Deprecated)\nUsage: URL/?options=enablequeries,scale,startopened",
-      "type": "{String}"
-    },
-    {
-      "key": "lang=",
-      "description": "Select the interface language, which actually are: 'pt-br', 'eng'.\nUsage: URL/?lang=eng",
-      "type": "{String}",
-      "default": "pt-br"
-    },
-    {
-      "key": "queryid=",
-      "description": "Id of the Query content to load.\nUsage: URL/?queryid=57",
-      "type": "{Numeric}",
-      "default": ""
-    },
-    {
-      "key": "extent=",
-      "description": "If defined shows a given bounds defined in EPSG:4626|EPSG:900913 coordinate system, otherwise zoom to visible layers extents. The boundbox is defined as 'left, bottom,Right,top' coordinates.\nUsage: extent=-443.628,-16.847,-407.373,3.294",
-      "type": "{String}"
-    },
-    {
       "key": "visibleLayers",
-      "description": "Define the initially visible layers.\n\nvisibleLayers < 0 'lower than zero' : Shows the first defined maps as visible (From top to bottom).\nvisibleLayers > 0 'higher than zero': Shows the last defined maps as visible (From bottom to top).\nvisibleLayers = 0                   : Start with no layer visible.\nvisibleLayers = 'custom'            : Visibility defined in each map by 'visibility: {Boolean}' property.\nUsage: URL/?visibleLayers=custom",
-      "type": "{Number|String}",
+      "description": "Define the initially visible layers.",
+      "type": "Number",
+      "examples": [
+        "visibleLayers < 0  // Lower than zero: shows the first defined maps as visible (From top to bottom).",
+        "visibleLayers > 0 // Higher than zero: shows the last defined maps as visible (From bottom to top).",
+        "visibleLayers = 0 // Start with no layer visible.",
+        "visibleLayers = 'custom' // Visibility defined in each map by 'visibility: {Boolean}' property.",
+        "visibleLayers = null // No limit of visible layers."
+      ],
       "default": "100"
     }
   ],
-  "GroupingMaps" : [
+  "GroupingMaps": [
     {
       "key": "_information",
-  "description": "Defines groups of {ConfigLayers}, each layer in the same group is shown under the same sub-menu. A group of layers is defined by an array of one Group definition followed by his inside layers declarations as: [{GroupingMaps{title, color}}, {ConfigLayer}, ...].\nGroupingMaps.title: {String} Title of the group of maps\nGroupingMaps.color: {String} RGB string content.\nUsage: [{title: \"Prodes Group\", color: \"#8F7C7C\"}, {name:'CSR:prodes', source:'local'}] ",
+      "description": "Defines groups of {ConfigLayers}, each layer in the same group is shown under the same sub-menu. A group of layers is defined by an array of one Group definition followed by his inside layers declarations as: [{GroupingMaps{title, color}}, {ConfigLayer}, ...].\nGroupingMaps.title: {String} Title of the group of maps\nGroupingMaps.color: {String} RGB string content.\nUsage: [{title: \"Prodes Group\", color: \"#8F7C7C\"}, {name:'CSR:prodes', source:'local'}] ",
       "name": "Grouping maps"
     }
   ],
@@ -55,118 +35,133 @@
       "name": "Layer properties configuration"
     },
     {
-      "key": "paramsButtonConfig",
-      "description": "Choose what custom buttons are shown on the layer representation.\n\nThere are multiple types of buttons, there are some commum properties and some special properties:\n\nCommom properties:\n{\n  iconCls: {String} The class to add on the button. Ex: \"icon-timeline-slider\"\n  pressed: {Boolean} True to indicate if the button starts pressed, False otherwise. Ex: true,\n  toggleGroup: {String} Identify a group by name where only one button of the group can be pressed. Ex: 'onlyOneAtTime'\n}\n\nTypes:\nassociated: {associatedButtonID: 'ANOTHER_BUTTON_ID', type: 'associated'}\n Treat the layer button and the associated as the same button, so no matter which one is clicked both will\n  receive the click event.\nquery: {type: 'query'}\n This configuration allows the user to change the default query button behavior overriting his definition.\ndownload: {type: 'download', layerIndex: 0}\n Set what layer should be downloaded when more than one layer is shown by its internal layer index.\nmetadata: {type: 'metadata', layerIndex: 0}\n Set the metadata button to show one of the inside composite layer by his index.\n\n\nPS: The layerIndex is from 0 to the quantity of layers in a composed map.\nPS2: The properties are aditional, so the common must always be present, and for each type his\n corresponding property must be added.\nUsage: paramsButtonConfig: {\n    associatedButtonID: \"population_2015_2036_timeline\",\n        iconCls: \"icon-timeline-slider\",\n        pressed: true,\n        toggleGroup: undefined\n}",
-      "type": "{Object}"
-    },
-    {
-      "key": "visibility",
-      "description": "Define the layer as initial visibility, True to start visible False otherwise. (the URL parameter visibleLayers can override this value).\nUsage: {visibility: false}",
-      "type": "{Boolean}",
-      "default": "true"
-    },
-    {
-      "key": "legendTitle",
-      "description": "Defines a title for the map legend representation.\nUsage: {legendTitle: '(Ton/ha)'}",
-      "type": "{String}",
-      "default": "empty"
-    },
-    {
-      "key": "hideLegendButton",
-      "description": "Set the 'show legend' button visibility, True to hide button or False to keep it visible.\nUsage: {hideLegendButton:true}",
-      "type": "{Boolean}",
-      "default": "false"
-    },
-    {
-      "key": "associatedButtonID",
-      "description": "Defines a button to associate with the query button, so when click on one of these buttons the other receives the click too.\nUsage: paramsButtonConfig: [{\n associatedButtonID: \"precip_monthly_average_timeline\",\n iconCls: \"icon-timeline-slider\",\n pressed: true,\n type:\"query\",\n toggleGroup: undefined\n}]",
-      "type": "{String}",
-      "default": "undefined"
-    },
-    {
-      "key": "source",
-      "description": "Type of desired interaction with map, there are two possible types:\n 1) 'local': Maps without complex pixel actions.\n 2) 'calculate': Maps to interact with his values and use to create others maps.\nUsage: {source: 'calculate'}",
-      "type": "{String}",
-      "default": "undefined",
-      "required": "true"
-    },
-    {
-      "key": "name",
-      "description": "One or more maps identifiers, each map have a unique name, and the name is a group  of identifiers separated by comma. Usage:\nOne map: 'CSR:protected_areas'.\nTwo Maps: 'CSR:protected_areas,CSR:altimetria'",
-      "type": "{String}",
-      "default": "undefined",
-      "required": "true"
-    },
-    {
-      "key": "otherNames",
-      "description": "One or more maps identifiers which will be used within the changeLayers in the expression function. Usage:\nOne map: 'CSR:protected_areas'.\nTwo Maps: 'CSR:protected_areas,CSR:altimetria'",
-      "type": "{String}",
-      "default": "undefined"
-    },
-    {
-      "key": "title",
-      "description": "Define map title, if empty the title is read from metadata.\nUsage: title: 'My 1º Custom Title'",
-      "type": "{String}",
-      "default": "{String}"
-    },
-    {
-      "key": "styles",
-      "description": "A string that describes the index/attribute of each map will be used. The style quantity must be the same of maps defined in query.\nUsage: '1,1,1,1'",
-      "type": ["String"]
-    },
-    {
-      "key": "updateAutomatically",
-      "description": "Flag to control the calculations delay after a widget update/change by user interaction.\n\n'True' to start calculations immediately and 'False' otherwise.\n\n*PS: Only applicable to 'calculate' maps.\nUsage: {updateAutomatically: true}",
-      "type": "{Boolean}",
-      "default": "false"
-    },
-    {
-      "key": "visible",
-      "description": "Defines initial map visibility, True to start visible, False otherwise.\nUsage: {visible: false}",
-      "type": "{Boolean}",
-      "default": "true"
-    },
-    {
-      "key": "opacity",
-      "description": "Defines initial map opacity.\nUsage: {opacity: 0.8}",
-      "type": "{Numeric}",
-      "default": "1"
-    },
-    {
-      "key": "priority",
-      "description": "Defines map listing order priority. The higher this value, the higher its placement in the layer list.\nUsage: {priority: 1}",
-      "type": "{Numeric}",
-      "default": "0"
-    },
-    {
-      "key": "beforeCalc",
-      "description": "Function called before each expression calculation.\nPs: Maps even without 'expression' function will call the 'beforeCalc' function on an input update.\nPs2: This function is called synchronously and the context is the map layer.\nUsage: beforeCalc: function(inputs){}",
-      "type": "{Function}({{inputs}})",
-      "default": "null"
-    },
-    {
-      "key": "afterCalc",
-      "description": "Function called after each expression calculation.\nPs: Maps even without 'expression' function will call the 'afterCalc' function on an input update.\nPs2: This function is called synchronously and the context is the map layer.\nUsage: afterCalc: function(inputs){}",
-      "type": "{Function}({{inputs}})",
-      "default": "null"
-    },
-    {
-      "key": "expression",
-      "description": "Function to process each layer pixels to the resulting map.\n\n@param layersValue {Array} Array with the layers values, each layer in one position of the array.\n@param inputs {Object} Inputs defined to interact with the map.\n@return {*} Value of each processed pixel.\nUsage: { expression: function(layersVals, inputs) {return layersVals[0];} }",
-      "type": "{Function}({{layersVals}}, {{inputs}})",
-      "default": "null"
+      "key": "getLayerLegend",
+      "description": "Get the associated layer legend content by its index.\r\rPS: The legend format is the same as expected by the composedLayer.setCalculateLegend function.\rUsage:this.setCalculateLegend(ExtjsUtils.Layer.getLayerLegend(composedLayer, 0));\n@param composedLayer {OpenLayers.Layer.Composed} Layer composed.\n@param index {Numeric} Index of the inside layer.",
+      "type": "function(composedLayer, index) : Array"
     },
     {
       "key": "functions",
-      "description": " Allows to create custom functions on the context of each layer. These functions can be used in any tool callbacks, in the tool callback must use the same name in this 'functions' property.\n PS1: Functions only visible inside this layer.\n PS2: Functions accessed by tools callbacks using his property name as:  (this.functions.['onClick']) to refer the following onClick function:\n functions: {\n   onClick: function() {\n     ExtjsUtils.ALERTIFY.log(\"Clicked Button\");\n   }\n }",
-      "type": "{Object}",
-      "default": "null"
+      "description": "Allows to create custom functions on the context of each layer. These functions can be used in any tool callbacks, in the tool callback must use the same name in this 'functions' property.\nPS1: Functions only visible inside this layer.\nPS2: Functions accessed by tools callbacks using his property name as:  (this.functions.['onClick']) to refer the following onClick function:\nfunctions: {\n  onClick: function() {\n    ExtjsUtils.ALERTIFY.log(\"Clicked Button\");\n  }\n}",
+      "type": "Array|null"
     },
     {
-      "key": "group",
-      "description": "Defines this layer as part of a group of exclusively visible, when one is shown all others will become hidden.",
-      "type": "{String}",
-      "default": "null"
+      "key": "extents",
+      "description": "Override the map extents with a custom one.\rExtents must be in EPSG:4326 (coordinates in lat,long) array: [minX, minY, maxX, maxY]\r\rPS: All tiles within area will be requested.",
+      "type": "Array",
+      "examples": [
+        "[-180.0000, -90.0000, 180.0000, 90.0000] for full world."
+      ]
+    },
+    {
+      "key": "legendColor",
+      "description": "Function to treat the color associated to each value/category.\r\rPS: This function callback is called in layer context.\n@param color {Array} Three numbers (0 to 255) to define the RGB color.\n@param inputs {Array} Array of widgets.\n@param lastValue {String} Last maximum title.\n@param currentValue {String} Current maximum title.\n@param ruleIndex {Numeric} Rule input index.",
+      "type": "function",
+      "examples": [
+        "{\r     ...,\r     legendColor: function(color, inputs, lastValue, currentValue, ruleIndex) {\r         return [0,0,0];\r     },\r     ...\r}"
+      ]
+    },
+    {
+      "key": "onInputsReady",
+      "description": "Callback function called after all inputs ready and loaded.\r\rPS: Its called even when the map is listed but not showing.\n@param inputs {Object} Inputs defined to interact with the map.",
+      "type": "function",
+      "examples": [
+        "{\r    ...,\r    onInputsReady: function (inputs) {\r         console.table(inputs);\r         console.log(\"All inputs are ready and loaded!\");\r    },\r    ...\r}"
+      ]
+    },
+    {
+      "key": "insideOpacity",
+      "description": "Set the inside layers opacity Array of 0~1 values one per layer.",
+      "type": "Array",
+      "examples": [
+        "{\r     ...,\r     insideOpacity: [1.0, 0.1, 0.5],\r     ...\r}"
+      ],
+      "default": "[1, 1, 1, ...]"
+    },
+    {
+      "key": "type",
+      "description": "Use as data source in any of supported types: 'load', 'csv', 'json' or 'default'.\r'load': Function to use as callback on 'loadData' property. The user is responsible for load data directly on layer.\r'csv': Url address to load csv file from.\r'json': Json data directly itself.\r'jsonurl': Url address to load json from",
+      "type": "String",
+      "default": "\"json\""
+    },
+    {
+      "key": "popupTemplate",
+      "description": "Function on popup. on callback param.",
+      "type": "String",
+      "examples": [
+        "<a target=\"_blank\" href=\"{link}\">{description}</a>"
+      ]
+    },
+    {
+      "key": "popupCallback",
+      "description": "Function on popup. on callback param.\r(attributes, inputs)\rScope in layer.\n@param attributes {Array} undefined\n@param inputs {Array} undefined",
+      "type": "function",
+      "examples": [
+        "{\r     ...,\r     popupCallback: function (attributes, inputs) {\r         \r     },\r     ...\r}"
+      ]
+    },
+    {
+      "key": "styleMap",
+      "description": "This attribute allows you to customize the layer visualization.\rIt can be: undefined, a Config Object or an OpenLayers.StyleMap.",
+      "type": "Object"
+    },
+    {
+      "key": "toggleHandler",
+      "description": "Handler is the callback when the ToggleButton is clicked.\nOverwrite to call a custom function.\n\nPS: Using custom function ignore the associatedButtonID \"It doesnt have to even exists\".",
+      "type": "function()",
+      "examples": [
+        "{\r    name:'LAYER_NAME',\r    paramsButtonConfig:[{\r      associatedButtonID: 'ignore',\r      enableToggle: false,\r      toggleHandler: function(btn, state) {\r        alert(\"BTN Clicked\" + btn + \" toggleState: \" + state);\r      }\r    }]\r  }]"
+      ]
+    },
+    {
+      "key": "handler",
+      "description": "Handler is the callback when the button is clicked.\nOverwrite to call a custom function.\n\nPS: Using custom function ignore the associatedButtonID \"It doesnt have to even exists\".",
+      "type": "function()",
+      "examples": [
+        "{\r    name:'LAYER_NAME',\r    paramsButtonConfig:[{\r      associatedButtonID: 'ignore',\r      enableToggle: false,\r      handler: function(btn) {\r        alert(\"BTN Clicked\" + btn);\r      }\r    }]\r  }]"
+      ]
+    },
+    {
+      "key": "hideLegendButton",
+      "description": "True to hide the subtittles container.",
+      "type": "boolean"
+    },
+    {
+      "key": "paramsButtonConfig",
+      "description": "Define custom buttons to be shown on the layer representation.\n\nThere are multiple types of buttons, there are some commum properties and some special properties:\n\nCommom properties:\n{\n  iconCls: {String} The class to add on the button. Ex: \"icon-timeline-slider\"\n  pressed: {Boolean} True to indicate if the button starts pressed, False otherwise. Ex: true,\n  toggleGroup: {String} Identify a group by name where only one button of the group can be pressed. Ex: 'onlyOneAtTime'\n}\n\n\nTypes:\nassociated: {associatedButtonID: 'ANOTHER_BUTTON_ID', type: 'associated'}\n Treat the layer button and the associated as the same button, so no matter which one is clicked both will\n  receive the click event.\nquery: {type: 'query'}\n This configuration allows the user to change the default query button behavior overriting his definition.\ndownload: {type: 'download', layerIndex: 0}\n Set what layer should be downloaded when more than one layer is shown by its internal layer index.\nmetadata: {type: 'metadata', layerIndex: 0}\n Set the metadata button to show one of the inside composite layer by his index.\n\n\nPS: The layerIndex is from 0 to the quantity of layers in a composed map.\nPS2: The properties are aditional, so the common must always be present, and for each type his\n corresponding property must be added.",
+      "type": "Object",
+      "examples": [
+        "{\r     ...,\r     paramsButtonConfig: {\r          associatedButtonID: \"button-02\",\r          iconCls: \"icon-timeline-slider\",\r          pressed: true,\r          toggleGroup: undefined\r     },\r     ...\r}"
+      ]
+    },
+    {
+      "key": "startLegendOpen",
+      "description": "Show layer with it legend container opened.",
+      "type": "Boolean"
+    },
+    {
+      "key": "onClickViewGroup",
+      "description": "Layer configuration to use layer group click callback.\r\rPS: Function executed in the node context.\rPS2: this.expanded True when its openned False otherwise.",
+      "type": "function"
+    },
+    {
+      "key": "onToggleViewGroup",
+      "description": "Layer property to use the group toggle callback.\r\rPS: Function executed in the node context.\rPS2: this.expanded True when its openned False otherwise.",
+      "type": "function"
+    },
+    {
+      "key": "openGroup",
+      "description": "Define the group initial status.\r\rTrue to start expanded False otherwise.",
+      "type": "Boolean"
+    },
+    {
+      "key": "hideListing",
+      "description": "True to does not list this layer on the top menu, false otherwise.",
+      "type": "Boolean"
+    },
+    {
+      "key": "closedGroup",
+      "description": "Defines a group that will not be initially open.",
+      "type": "Boolean"
     }
   ],
   "LayerInternal": [
@@ -177,16 +172,17 @@
       "name": "Layer internal functions"
     },
     {
-      "key": "changeLayers",
-      "description": "Change a internal layer in a given index by another.\n\nPS: Its highly recommended to pass multiple configuration in a array, avoid call this function multiple\n times in the same callback.\n@param newConfig {Array|Object} One or more layers configurations with a property 'index' indicating the replacing layer.\n Each config object must contain at least the following properties:\n  [{name: 'MAP_FULL_NAME', styles: 'MAP_STYLE', index: 'MAP_INDEX_TO_CHANGE'}, ... ]\n@param force {Boolean} Force redraw even if no change is done when the layer is the same.\nUsage: (layer.changeLayers({name:'CSR:estados', index:1} ))",
-      "type": "{Array{Object} }",
-      "default": "undefined"
+      "key": "otherNames",
+      "description": "Define adittional maps to be available for the query, wich will be listed in the filtered stored capabilities.\r\rPS: This property is to use along with the 'capabilities' option, wich filter the GetCapabilities cache only the maps in use. (Performance Optimization, faster loading).",
+      "type": "String",
+      "examples": [
+        "{\r     name: \"CSR:estados,CSR:airports\",\r     otherNames: \"CSR:municipios,CSR:rodovias\",\r     beforeCalc: function(layerVals, inputVals) {\r         this.changeLayers([{name: 'CSR:municipios', styles: fMapName + \"_1\", index: 0},\r             {name: 'CSR:rodovias', styles: 'rodovias_1', index: 1}]);\r     }\r  }\r\r  Change layer needs the definition of the 4 maps: 'estados', 'airports', 'municipios' and 'rodovias'. If the othernames is not defined only the maps at 'name' property will be available and the changeLayers for 'municipios' and 'rodovias' will not know about these maps.\r  PS: (This issue only works outside of the editor because editor never use the filtered GetCapabilities response.)"
+      ]
     },
     {
-      "key": "setCalculateLegend",
-      "description": "Defines the current map legend, so it prevents from a new legends calculation process.\n\nPS: Can be called inside the 'beforeCalculate' callback, which is the time right before the new legend calculation.\nPS2: Can be called on a tool callback.\n\n@param legendEntries {Array{{String|Array{Number, Number, Number} }, {Object}, {String} } } Array with the legends sorted entries in ascending order, the ones out of order will be ignored.\nUsage: layer.setCalculateLegend([['00FF00', 10, 'lower Bound'], ['F100F3',50,'higher Bound']]);",
-      "type": ["{Function}({{legendEntries}})"],
-      "default": "undefined"
+      "key": "changeLayers",
+      "description": "Change a internal layer in a given index by another.\r\rPS: Its highly recommended to pass multiple configuration in a array, avoid call this function multiple\r times in the same callback.\n@param newConfig {Array|Object} One or more layers configurations with a property 'index' indicating the replacing layer.\r Each config object must contain at least the following properties:\r  [{name: 'MAP_FULL_NAME', styles: 'MAP_STYLE', index: 'MAP_INDEX_TO_CHANGE'}, ... ]\n@param force {Boolean} Force redraw even if no change is done when the layer is the same.",
+      "type": "function(newConfig, force)"
     }
   ],
   "Button": [
@@ -195,24 +191,6 @@
       "completeAPI": "This button is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.Button' target='_blank'>Button.Configs</a>.\nOnly some properties are listed in <a href='/api/#category_Button'>API here</a>.",
       "description": "Create a simple button to user interact with the map.",
       "name": "Button widget"
-    },
-    {
-      "key": "handler",
-      "description": "{{Function}} called, on layer scope, when the button is clicked. \n{{Component}}: This button.\n{{EventObject}}: The click event.\nUsage: |handler=function() {alert('btn on layer: ' + this.name + ' was clicked.');}|",
-      "type": ["{Function}({Component}, {EventObject})"],
-      "default": "null"
-    },
-    {
-      "key": "toggleHandler",
-      "description": "Function called when a Button with {enableToggle} set to true is clicked. \n{{Component}}: This button.\n{{EventObject}}: The click event.\nUsage: |toggleHandler=function(c,e) {alert('Btn pressed ' + e);}",
-      "type": ["{Function}({{Component}}, {{EventObject}})"],
-      "default": "null"
-    },
-    {
-      "key": "enableToggle",
-      "description": "{{Function}} called when the button is clicked. \n{Component}: This button.\n{EventObject}: The click event.\nUsage: |enableToggle=true|",
-      "type": ["{Boolean}"],
-      "default": "false"
     }
   ],
   "Combobox": [
@@ -221,18 +199,6 @@
       "completeAPI": "This button is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.form.ComboBox' target='_blank'>Ext.form.ComboBox</a> for customized properties click on <a href='/api/#category_Combobox'>API here</a>.",
       "description": "It creates an input of ComboBox tool where the value is selectable from a list.\nUsage: '\\{\\combobox\\}\\}' or <a href='/elements/combobox-widget/'>examples</a>.",
       "name": "Combobox widget"
-    },
-    {
-      "key": "onSelect",
-      "description": "Fires when a list item is selected. \n@param element {Element} This combobox.\n@param value {Record}: The record which was selected.\n@param index {Numeric} Index of the selected item.\n\nUsage: |onSelect= function(e,v) {alert('Selected ' + v);}|",
-      "type": ["{Function}({{element}}, {{value}}, {{index}})\n"],
-      "default": "undefined"
-    },
-    {
-      "key": "width",
-      "description": "Define element initial width in pixels.\nUsage: |width=200|",
-      "type": ["{Number}"],
-      "default": "190"
     }
   ],
   "Hoverpixel": [
@@ -243,16 +209,13 @@
       "name": "HoverPixel tool"
     },
     {
-      "key": "runOnClick",
-      "description": "Fires when a pixel is clicked.  CallBack parameters (layer, layersValue, inputs, coordinates, clickEvt, lastInfo)                       \n layer: {Layer} Current layer.                                                                           \n layersValue: {Array} One value for each layer at the given point.                                       \n inputs: {Object} Object with all the layer inputs.                                                      \n coordinates: {Openlayers.LatLon} Coordinate of the click in the map.                                    \n clickEvt: {EventObject} Mouse click event.                                                              \n lastInfo: {click: {LatLon}, hover: {LatLon} } A object with the last click and hover latLon positions.\nUsage: onClick=function(){alert('i found a click')}  ",
-      "type": ["{Function}({{layer}}, {{layersValue}}, {{inputs}}, {{coordinates}}, {{clickEvt}}, {{lastInfo}}"],
-      "default": "undefined"
-    },
-    {
-      "key": "runOnHover",
-      "description": "Fires when is hovering a pixel.  CallBack parameters (layer, layersValue, inputs, coordinates, clickEvt, lastInfo)                       \n layer: {Layer} Current layer.                                                                           \n layersValue: {Array} One value for each layer at the given point.                                       \n inputs: {Object} Object with all the layer inputs.                                                      \n coordinates: {Openlayers.LatLon} Coordinate of the click in the map.                                    \n clickEvt: {EventObject} Mouse click event.                                                              \n lastInfo: {click: {LatLon}, hover: {LatLon} } A object with the last click and hover latLon positions.\nUsage: onClick=function(){alert('i found a click')}  ",
-      "type": ["{Function}({{layer}}, {{layersValue}}, {{inputs}}, {{coordinates}}, {{clickEvt}}, {{lastInfo}}"],
-      "default": "undefined"
+      "key": "checked",
+      "description": "True to start the hoverPixel enable, false otherwise.",
+      "type": "Boolean",
+      "examples": [
+        "|checked = true|"
+      ],
+      "default": "false"
     }
   ],
   "TooltipHelper": [
@@ -261,34 +224,22 @@
       "completeAPI": "View the complete TooltipHelper <a href='/api/#category_TooltipHelper'>API here</a>.",
       "description": "Functions to create tooltips on elements, at fixed positions and at mouse events.\nUsage: ExtjsUtils.TooltipHelper",
       "name": "Tooltip helper"
-    },
-    {
-      "key": "CreateTooltipThumb",
-      "description": "Create a tooltip which follows the mouse on hovering an element with title, description and thumbnail.\n\nPS: The description content is shown until three break lines in sequence and the rest of the content is thrown away.\n\n@param title {String} Tooltip title.\n@param description {String} Tooltip content.\n@param target {DOM} DOM object to create the tooltip.\n@param thumbUrl {String} URL of the thumbnail.\n@param showDelay {Numeric} Define how many seconds until hide the tooltip.\n@returns {Ext.ToolTip} Created tooltip with the properties.\nUsage: ExtjsUtils.TooltipHelper.CreateTooltipThumb()",
-      "type": ["({{title}}, {{description}}, {{target}}, {{thumbUrl}}, {{showDelay}})"]
-    },
-    {
-      "key": "CreateTooltipOnPosition",
-      "description": "Create a tooltip at a fixed position.\n\nIf the position is the mouse event, the tooltip will be at the right side and below the pointer.\nIf the position is a array[x,y] will anchor the top left at this point.\n\n@param title {String} Tooltip title.\n@param contentHtml {String} Tooltip HTML content.\n@param position {Event|Array[Number, Number]}} Defines the top left position of the tooltip.\n@param additionalConfig {Object} Additional configuration for the tooltip.\n@returns {Ext.Tooltip} A tooltip anchored at the given position.\nUsage: ExtjsUtils.TooltipHelper.CreateTooltipOnPosition('title', 'My <span>tooltip</span> content', [0, 0])",
-      "type": ["({{title}}, {{contentHtml}}, {{position}}, {{additionalConfig}})"]
     }
   ],
   "Extjs": [
     {
       "key": "_information",
       "completeAPI": "View the full <a target='_blank' href=\"https://docs.sencha.com/extjs/3.4.0\">Extjs API 3.4 click here</a>.\n*Only the functions which where used in CSR projects are listed <a href='/api/#category_Extjs'>here</a>.",
-      "description": "Calling core Extjs functions allows fine control over the map internal elements.",
+      "description": "Calling core Extjs functions allows fine control over the CSR Maps internal elements.",
       "name": "Extjs 3.4"
     },
     {
-      "key": "getCmp",
-      "description": "Get a Extjs object by his ID.\n{{objId}}: The Id which object will be returned.\nUsage: Ext.getCmp('myId');",
-      "type": ["({{objId}}) => {Ext.Component}"]
-    },
-    {
-      "key": "getId",
-      "description": "Returns the id of this component or automatically generates and returns an id if not defined yet <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.Component-method-getId' target='_blank'> view detailed documentation Ext.Component.getId()</a>.\nUsage: Ext.Component.getId()",
-      "type": ["() => {String}"]
+      "key": "getHighchartById",
+      "description": "Get the hichart by its DOM id.\n@param id {String} Id of the highchart.",
+      "type": "function(id) : Object",
+      "examples": [
+        "Extjs.getHighchartById(\"highchart-01\");"
+      ]
     }
   ],
   "Alertify": [
@@ -300,8 +251,13 @@
     },
     {
       "key": "log",
-      "description": "Shows an user notification (if enabled).\n\nPS: The messages before layer loading are delayed, when it finishes only the last message will be shown.\n\n@param msg {String} Notification HTML content.\n@param config {Object} Message configuration parameters.\n {force: {Boolean} Force to show notification even when disabled.\n  func: {Callback} Callback function when the notification is clicked.\n  onlyMsg: {Boolean} True to only show message and hide the close and the stop notifications, False otherwise.\n }\nUsage: ExtjsUtils.ALERTIFY.log('test msg', {force:true})",
-      "type": ["{Function}({{msg}},{{config}})"]
+      "description": "Shows an user notification (if enabled).\r\rPS: The messages before layer loading are delayed, when it finishes only the last message will be shown.\n@param msg {String} Notification HTML content.\n@param config {Object} Message configuration parameters.\r {force: {Boolean} Force to show notification even when disabled.\r  func: {Callback} Callback function when the notification is clicked.\r  onlyMsg: {Boolean} True to only show message and hide the close and the stop notifications, False otherwise.\r  delay: {Numeric} Amout of time in milisseconds before the message hide.\r }",
+      "type": "function(msg, config)"
+    },
+    {
+      "key": "alert",
+      "description": "Shows an user non blocking alert.\r\rPS: If layer is loading only the last message will be shown after load end.\n@param msg {String} Notification HTML content.",
+      "type": "function(msg)"
     }
   ],
   "InputManager": [
@@ -310,21 +266,6 @@
       "completeAPI": "View the complete InputManager <a href='/api/#category_InputManager'>API here</a>.",
       "description": "Tool to store local variables to be used in others functions callbacks.\nPS: DOM elements cannot be used in 'expression' context, because them cannot be sent to WebWorkers (javascript language limitation).\nUsage: '\\{\\{inputmanager\\}\\}'",
       "name": "InputManager tool"
-    },
-    {
-      "key": "getValue",
-      "description": "Get the stored value by his property name, if it does not exists returns null.\n\n@param key {String} Stored property name.\n@returns {*} Desired stored property when it exists or null otherwise.\nUsage: (inputs.id['id'].getValue('name'))",
-      "type": ["({String}) => {Object}"]
-    },
-    {
-      "key": "forceRecalc",
-      "description": "Force a legend map recalculation.\nUsage: (inputs.id['id'].forceRecalc())",
-      "type": ["()"]
-    },
-    {
-      "key": "setValues",
-      "description": "Stores object properties for later usage.\n\nPS: If has name property collision the older is replaced.\n@param obj {Object} Object with the properties to be stored.\n@param cancelUpdate {Boolean} False if this change must cause layer recalculation, True otherwise.\n@param local {Boolean} True to store the property locally, False otherwise. The local properties aren't sent to 'expression' calbacks. (i.e. If a element is recursive or have DOM elements, it must local avoid stringify errors on 'expression' callbacks)\nUsage: (inputs.id['id'].setValues({toStore:5}, ))('name'))",
-      "type": ["({{obj}}, {{cancelUpdate}}, {{local}})"]
     }
   ],
   "RawMaps": [
@@ -335,9 +276,9 @@
       "name": "Web Raw Maps"
     },
     {
-      "key": "operation",
-      "description": "A string that describe the RAW MAPS operations, each operation identifier da must be separated by a comma.\nPS: The operations must be one for each defined map.\n\nRaw Maps operations:\n\n'normal' (NORMAL): A normal map is a map with each cell representing a legend/color and aren't a RAW Maps type.\n'raw' (RAW): Each cell in resulting map has the value of ther most centered cell in aggregated region.\n'rgba' (RGBA): Each cell in resulting map has a integer value representing the RGBA composition.\n  PS: Tanto o resultado como o input são inteiros representando valores RGBA.\n'sum' (SUM): Each resulting cell is the weighted sum of cells in the covering region.\n  PS: The weight used is the proportion of the covered area against the total area of the cell i.e. VALUE * COVERED_PERCENTAGE.\n'average' (AVERAGE): Each cell is the resulting of the weighted mean of cell in the covered region.\n  i.e. Sum(A) / Sum(B) : A is CELL_VALUE * COVERED_PROPORTION, B is COVERED_PROPORTION.\n  Example: A full covered cell the COVERED_PROPORTION is 1, and the half covered cell the proportion is 0.5 .\n'max' (MAX): Each resulting cell is the greater cell that is at least partially covered in the given region.\n'min' (MIN): Each resulting cell is the smaller cell that is at least partially covered in the given region.\n'integral' (INTEGRAL): A technique that allows to calculate the sum in a region just inspecting the cells on the\n  boundaries of a retangular area i.e. calculate sum in a region using only 4 points.\n'areaintegral' (AREAINTEGRAL): ?\n'area' (AREA): Each cell carry the original map area in the aggregated region.\n  ?PS: Esse simplificador agrupa as áreas do mapa original e permite avialiar a área do mapa minimizando erros de\n   calculos de área causados pela reprojeção uma vez q a própria célula armazena esse valor.\n'cells' (CELLS): Weighted sum of the cell quantity in a given region.\nExemplo: 'min,max,raw,integral'",
-      "type": ["{String})"]
+      "key": "description",
+      "description": "Raw Maps operations:\r\r'normal' (NORMAL): A normal map is a map with each cell representing a legend/color and aren't a RAW Maps type.\r'raw' (RAW): Each cell in resulting map has the value of ther most centered cell in aggregated region.\r'rgba' (RGBA): Each cell in resulting map has a integer value representing the RGBA composition.\r  PS: Tanto o resultado como o input são inteiros representando valores RGBA.\r'sum' (SUM): Each resulting cell is the weighted sum of cells in the covering region.\r  PS: The weight used is the proportion of the covered area against the total area of the cell i.e. VALUE * COVERED_PERCENTAGE.\r'average' (AVERAGE): Each cell is the resulting of the weighted mean of cell in the covered region.\r  i.e. Sum(A) / Sum(B) : A is CELL_VALUE * COVERED_PROPORTION, B is COVERED_PROPORTION.\r  Example: A full covered cell the COVERED_PROPORTION is 1, and the half covered cell the proportion is 0.5 .\r'max' (MAX): Each resulting cell is the greater cell that is at least partially covered in the given region.\r'min' (MIN): Each resulting cell is the smaller cell that is at least partially covered in the given region.\r'integral' (INTEGRAL): A technique that allows to calculate the sum in a region just inspecting the cells on the\r  boundaries of a retangular area i.e. calculate sum in a region using only 4 points.\r'areaintegral' (AREAINTEGRAL): ?\r'area' (AREA): Each cell carry the original map area in the aggregated region.\r  ?PS: Esse simplificador agrupa as áreas do mapa original e permite avialiar a área do mapa minimizando erros de\r   calculos de área causados pela reprojeção uma vez q a própria célula armazena esse valor.\r'cells' (CELLS): Weighted sum of the cell quantity in a given region.",
+      "type": "Object"
     }
   ],
   "QUERY": [
@@ -348,14 +289,14 @@
       "name": "Query utils"
     },
     {
-      "key": "runOnceLayerVisible",
-      "description": "A function that assure that a function will be called only when the layers is/became visible.\nlayer: {Openlayers.Layer} A reference to the map layer.\ncallback: {Function} A function that will be called instantly if the layer is already visible, or when the layer became visible.\nUsage: ExtjsUtils.QUERY.runOnceLayerVisible(this, function(){alert('Layer Visible.')}); ",
-      "type": ["({{layer}}, {{callback}})"]
+      "key": "setQueryGlobalProperties",
+      "description": "Function to add custom remote servers.\n@param wmsDefinitions {Object} A object with all custom WMS definitions.\r The object could contain the following properties:\r *url: {String} Url of the source (Mandatory).\r ?cors: {Boolean} True to accept (Cross Domain Request Security) CORS for servers without permission, False otherwise.\r ?updateWMS: {Boolean} True to purge the WMS cache and get the updated content, False otherwise. (Usefull to avoid long waitings)\r ?storage: {String} Name of the storage service, supported services so far: 'github'.\r Storage type tips:\r     'github': The Github contenct directly.\r     'jsdelivr': The jsDelivr cache the results to force a instantly update the user could use different release version.\r         Tutorial about creating releases: https://help.github.com/en/articles/creating-releases\r         After creating the user could append @VERSION_NUMBER to the URL to force updating the map cache.\n@param QUERY_DESCRIPTION {ConfigLayer} Array Array of layers in the query.\rUsage: ExtjsUtils.QUERY.setQueryGlobalProperties({globalCount: 0}) && QUERY_DESCRIPTION",
+      "type": "function(wmsDefinitions, QUERY_DESCRIPTION) : boolean"
     },
     {
       "key": "setQueryGlobalProperties",
-      "description": "A function that allows to define custom global functions that can be used in order to define properties or even inside the functions callbacks. \nglobalProperties: {Object} The object that all his functions will became globals, each property can be a value or a object or evan a function.\nPS: All properties defined here are added to the global scope and are removed when the query is changed.\n@param QUERY_DESCRIPTION {Array{ConfigLayer} } Array of layers in the query.\nUsage: ExtjsUtils.QUERY.setQueryGlobalProperties({globalCount: 0}) && QUERY_DESCRIPTION",
-      "type": ["{Function}({{globalProperties}}) && {{QUERY_DESCRIPTION}}"]
+      "description": "A function that allows to define custom global functions that can be used in order to define properties or even inside the functions callbacks.\rPS: All properties defined here are added to the global scope and are removed when the query is changed.\n@param globalProperties {Object} Object The object that all his functions will became globals, each property can be a value or a object or evan a function.\n@param QUERY_DESCRIPTION {ConfigLayer} Array Array of layers in the query.\rUsage: ExtjsUtils.QUERY.setQueryGlobalProperties({globalCount: 0}) && QUERY_DESCRIPTION",
+      "type": "function(globalProperties, QUERY_DESCRIPTION) : bool"
     }
   ],
   "LegendHtml": [
@@ -363,6 +304,54 @@
       "key": "_information",
       "description": "Create a tool with the map legends at any place of the query description.\nUsage: '\\{\\{legendhtml\\}\\}'",
       "name": "Map Legend HTML"
+    },
+    {
+      "key": "reverseLegend",
+      "description": "Sort the legend on the decreasing order.",
+      "type": "Boolean",
+      "examples": [
+        "|reverseLegend = true|"
+      ],
+      "default": "false"
+    },
+    {
+      "key": "filterLayers",
+      "description": "Allows to filter layers from displaying its legend.",
+      "type": "Array",
+      "examples": [
+        "|filterLayers = [0]|"
+      ],
+      "default": "undefined"
+    },
+    {
+      "key": "preventClick",
+      "description": "Ignore the filter toggle by mouse clicks on legends.",
+      "type": "Boolean",
+      "examples": [
+        "|preventClick = true|"
+      ],
+      "default": "undefined"
+    },
+    {
+      "key": "preventClick",
+      "description": "Set True to disable the interaction of filtering map by clicking at legend, False otherwise.",
+      "type": "Boolean",
+      "default": "false"
+    },
+    {
+      "key": "filterLayers",
+      "description": "Array of indexes of layers to be included in map legend (from 0 to quantity of layers).\nIf not defined, all layer legends are shown. Otherwise only the indexes according to layer are included.\n\nEx: A composed layer with three maps:\nname: \"CSR:estados,CSR:roads,CSR:municipalities\",\nIf pass 'filterLayers=[1,2] only the legends of 'CSR:roads' and 'CSR:municipalities' are shown.",
+      "type": "Array",
+      "examples": [
+        "[0, 1]"
+      ],
+      "default": "null"
+    },
+    {
+      "key": "legendId",
+      "description": "Keep the legend container ID. (Use this id to toggle each legend filter individually.)",
+      "type": "String",
+      "default": "null"
     }
   ],
   "OpacitySlider": [
@@ -378,26 +367,6 @@
       "completeAPI": "View the complete LoadCSV <a href='/api/#category_LoadCsv'>API here</a>.",
       "description": "Describes the API to read and manipulate ExtjsUtils.CSV.CsvTable files from URL.",
       "name": "Csv manager tool"
-    },
-    {
-      "key": "getValue",
-      "description": "Get a value by the matrix index and column.\n@param column {Number} Column index (First index is 0).\n@param line {Number} Line index (First index is 0).\n@return {String} Get the cell value.\nUsage: inputs.id['loadjson'](0,0)",
-      "type": ["{Function}({{column}}, {{line}}) => {String}"]
-    },
-    {
-      "key": "columnNameToInd",
-      "description": "Get the index of a column with the 'columnName' name.\n@param columnName {String} Column name to search for.\n@return {Number} When it exists returns the column index, otherwise -1.\nUsage: inputs.id['loadjson']('total_ha')",
-      "type": ["{Function}({{columnName}}) => {Numeric}"]
-    },
-    {
-      "key": "setValue",
-      "description": "Change a cell value by its cell index.\n\n@param column {Numeric} Column index.\n@param line {Numeric} Line index to change (ignore the header information when it exists).\n@param value {*} New value to replace the older value.\nUsage: inputs.id['loadjson'].setValue(2,2, 'myValue')",
-      "type": ["{function}({{column}}, {{line}}, {{value}}) "]
-    },
-    {
-      "key": "getLines",
-      "description": "Get all lines that 'column' has the value equals to 'value'.\n\nPS: To use the 'column' as index, it must be numeric, when the 'column' is a text the index is searched on header by its name.\nPS: To filter multiple column each value and index one must be added to the 'columns' and 'values' arrays.\nEx: ([1,4,2], [\"FIRST_COLUMN_VALUE\",\"FORTH_COLUMN_VALUE\", SECOND_COLUMN_VALUE])\n\n@param columns {Array} (Optional) Array of indexes/names of the filtered columns.\n@param values {Array} {Opcional) Array of values to match each column.\n@returns {Array} If the parameters 'column' and 'value' aren't defined return all lines, otherwise returns only the matched lines.\nUsage: (inputs.id['id'].getLines([1,2,4], [20, 'blue', false], false);)",
-      "type": ["{Function}({{columns}}, {{values}}, {{includeHeader}})"]
     }
   ],
   "Slider": [
@@ -408,34 +377,25 @@
       "name": "Slider tool"
     },
     {
-      "key": "plugins.tip",
-      "description": "Shows a tooltip with any html content with the value while dragging.\nUsage: |plugins=tip=Filter {0}% of total cells|",
-      "type": ["{String}"]
-    },
-    {
-      "key": "minValue",
-      "description": "Defines the minimum acceptable value to slider.\nUsage: |minValue=0|",
-      "type": ["{Numeric}"]
-    },
-    {
-      "key": "maxValue",
-      "description": "Defines the maximum acceptable value to slider.\nUsage: |maxValue=0|",
-      "type": ["{Numeric}"]
-    },
-    {
-      "key": "value",
-      "description": "Defines the initial value to slider with only one thumb.\nUsage: |value=0|",
-      "type": ["{Numeric}"]
-    },
-    {
       "key": "values",
-      "description": "Property to use two or more thumbs, each value is the initial thumb value\n@type {Array} Array of initial values.\nUsage: |values=[0,100]|",
-      "type": ["{Array}"]
+      "description": "Property to define the slider interval limits",
+      "type": "Array",
+      "examples": [
+        "|values = [0, 250]|"
+      ]
+    }
+  ],
+  "ZOOM": [
+    {
+      "key": "_information",
+      "completeAPI": "",
+      "description": "Functions to control zoom.",
+      "name": "Zoom"
     },
     {
-      "key": "backgroundColors",
-      "description": "Array of colors of background slider values, to define background slider color based in slider value.\nThe values are defined from most to minimum with two properties each:\n  - color: {String} CSS color definition for the current interval. i.e. 'red','black','#FF0000', '#000000'.\n  - startValue: {Numeric} If defined define the initial value which above will apply this color, otherwise use theminimum slider value as default.\n\nEx.:\n backgroundColors: [\n     {\n         // Define background color to red when slider has value above 75.\n         color: \"red\",\n         startValue: 75\n     },\n     {\n         // Define background color starting from value 0.\n         // That results two intervals, from 0 to 75 as blue, and from 76 to 100 as red.\n         color: \"blue\",\n         startValue: 0\n     }\n ]\nUsage: |backgroundColors=[{color:'red',startValue:75},{color:'blue'}]|",
-      "type": ["{Array}"]
+      "key": "limitZoomLevel",
+      "description": "Sets the maximum zoom level.",
+      "type": "function()"
     }
   ],
   "Textfield": [
@@ -447,23 +407,35 @@
     },
     {
       "key": "value",
-      "description": "Set the initial tool content.\nUsage: |value=text|",
-      "type": ["{String}"]
+      "description": "Set the initial tool content.",
+      "type": "String",
+      "examples": [
+        "|value = text|"
+      ]
     },
     {
       "key": "isnumeric",
-      "description": "Assures that the text content is a numeric string.\nUsage: |isnumeric|",
-      "type": ["{String}"]
+      "description": "Assures that the text content is a numeric string.",
+      "type": "String",
+      "examples": [
+        "|isnumeric|"
+      ]
     },
     {
       "key": "fieldLabel",
-      "description": "Field description.\nUsage: |fieldLabel=Field description.|",
-      "type": ["{String}"]
+      "description": "Field label.",
+      "type": "String",
+      "examples": [
+        "|fieldLabel = This is the field label|"
+      ]
     },
     {
       "key": "style",
-      "description": "Element style description.\nUsage: |style=color:black;|",
-      "type": ["{String}"]
+      "description": "Element style properties.",
+      "type": "String",
+      "examples": [
+        "|style = color:black;|"
+      ]
     }
   ],
   "Label": [
@@ -472,11 +444,6 @@
       "completeAPI": "This label is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.form.Label' target='_blank'>Ext.form.Label</a>.\nOnly some properties are <a href='/api/#category_Label'>listed here</a>.",
       "description": "Create a simple label element to display some text.\nUsage: \\{\\{label|\\}\\}",
       "name": "Label element tool 'label'"
-    },
-    {
-      "key": "text",
-      "description": "The label text content.\nUsage: |text=content|",
-      "type": ["{String}"]
     }
   ],
   "HTML": [
@@ -503,24 +470,38 @@
       "name": "PickPoint tool"
     },
     {
-      "key": "text",
-      "description": "Text associated with the pickpoint activation button.\nUsage: |text: 'Descibe pickpoint action'|",
-      "type": ["{String}"]
+      "key": "pointVisibility",
+      "description": "Default true to show where the last click was. (True to show, False to Hide)",
+      "type": "Boolean",
+      "examples": [
+        "|pointVisibility = false|"
+      ],
+      "default": "true"
+    },
+    {
+      "key": "unselect",
+      "description": "Set if automatically disable after each click. (Default True, set False to not automatically disable).",
+      "type": "Boolean",
+      "examples": [
+        "|unselect = true|"
+      ],
+      "default": "true"
     },
     {
       "key": "markLayerInd",
-      "description": "Set the index of the internal layer to be drawn when a region is selected.\nUsage: |markLayerInd=1|",
-      "type": ["{Numeric}"]
+      "description": "The layer index of the layer to draw his geometry.",
+      "type": "Number",
+      "examples": [
+        "|markLayerInd = 0|"
+      ]
     },
     {
-      "key": "lat",
-      "description": "Initial latitude of the pickpoint pointer.\nUsage: |lat=10|",
-      "type": ["{Numeric}"]
-    },
-    {
-      "key": "lon",
-      "description": "Initial longitude of the pickpoint pointer.\nUsage: |lon=10|",
-      "type": ["{Numeric}"]
+      "key": "onefeature",
+      "description": "Keep only the last feature selected.",
+      "type": "boolean",
+      "examples": [
+        "|onefeature = false|"
+      ]
     }
   ],
   "Timeline": [
@@ -531,14 +512,13 @@
       "name": "Timeline tool"
     },
     {
-      "key": "nextStepInterval",
-      "description": "Sets the delay in seconds between steps when timeline is playing.\nUsage: |nextStepInterval={Numeric}|",
-      "type": ["{Numeric}"]
-    },
-    {
-      "key": "steps",
-      "description": "Array of all timeline steps where each element is a tuple of [VALUE,'Title']. The value is a mandatory parameter for the step, the title give a optional custom representation to value.\n Usage: |steps=[[1918, 'World War 1'], [1939, 'World War 2']]|",
-      "type": ["{Array{Array} }"]
+      "key": "preloadTiles",
+      "description": "Defines if the timeline should load the tiles of the next steps to get smoother transictions.",
+      "type": "Boolean",
+      "examples": [
+        "|preloadTiles = true|"
+      ],
+      "default": "false"
     }
   ],
   "AsyncLoader": [
@@ -549,7 +529,7 @@
       "name": "Asynchronous resource loader"
     }
   ],
-  "Highcharts" : [
+  "Highcharts": [
     {
       "key": "_information",
       "completeAPI": "Highcharts JS has a complete set of examples and a nice documentation that can be <a target='_blank' href='https://www.highcharts.com/demo'>accessed here</a>.",
@@ -579,9 +559,207 @@
       "name": "Summed Area tool"
     },
     {
-      "key": "value",
-      "description": "Initial latitude of the pickpoint pointer.\nUsage: |lat=10|",
-      "type": ["{Numeric}"]
+      "key": "description",
+      "description": "Create an input of summatory in any arbitrary area.\r\rCallBack parameters (context {OpenLayers.Layer}, layersValues {Array[Number]}, inputs {[Object]}, feature {Geometry})\rrunOnClick {Function}  Callback called exactly after sum the map region.,\r\rPS: 'layersValues' return the sum of each internal layer and an adittional value which is the sum of all pixels of resulting layer.\n@param name {String} Input name \"summedarea\".\n@param config {Object} Properties to customize the element.\n@param layer {OpenLayers.Layer} Layer which the widget is defined.\n@param parameters {Array} Array de parametros antes do processamento para o input.",
+      "type": "function(name, config, layer, parameters) : Ext.Container"
+    }
+  ],
+  "Window": [
+    {
+      "key": "_information",
+      "completeAPI": "This tool is created from <a href='https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.Window' target='_blank'>Ext.Window</a>.",
+      "description": "Creates an interactive floating window that can only be shown when the layer is visible.",
+      "name": "Floating Window",
+      "examples": [
+        "{{window|id=UNIQUE_ID|startVisible=true|underButtons=true}}"
+      ]
+    },
+    {
+      "key": "height",
+      "description": "The window initial height.",
+      "type": "number",
+      "examples": [
+        "|height = 600px|"
+      ]
+    },
+    {
+      "key": "onBeforeHide",
+      "description": "Callback function to be called before hiding the floating window.\n@param layer {Object} Scope of the layer\n@param data {Array} [window, button, windowConfig] \rwindow: Window object;\rbutton: Button created;\rwindowConfig: Window object configuration",
+      "type": "function",
+      "examples": [
+        "|onBeforeHide = function (layer, [window, button, windowConfig]){\r console.log(layer);\r console.log([window, button, windowConfig]);\r}| "
+      ]
+    },
+    {
+      "key": "width",
+      "description": "The window initial width.",
+      "type": "number",
+      "examples": [
+        "|width = 600px|"
+      ]
+    },
+    {
+      "key": "title",
+      "description": "The title of the window.",
+      "type": "String",
+      "examples": [
+        "|title = Title of the Window|"
+      ],
+      "default": "Window"
+    },
+    {
+      "key": "id",
+      "description": "The id of the div of the window (where the content can be drawn).",
+      "type": "String",
+      "examples": [
+        "|id = window-div-id|"
+      ]
+    },
+    {
+      "key": "text",
+      "description": "Define the button text.",
+      "type": "string",
+      "examples": [
+        "|text = I am a button|"
+      ],
+      "default": "Show/Hide Window"
+    },
+    {
+      "key": "btnID",
+      "description": "Define the id of the button that controls the window visibility.",
+      "type": "String",
+      "examples": [
+        "|btnID = window-button-id|"
+      ]
+    },
+    {
+      "key": "windowID",
+      "description": "Defines the window ID.",
+      "type": "String",
+      "examples": [
+        "|windowID = window-id|"
+      ]
+    },
+    {
+      "key": "startVisible",
+      "description": "True if the window should start visible or false otherwise.",
+      "type": "Boolean",
+      "examples": [
+        "|startVisible = false|"
+      ]
+    },
+    {
+      "key": "ignoreVisibility",
+      "description": "Ignore the layer visibility toggle. True to window show or hide ignoring the layer visibility, False otherwise.\r\rPS: This 'ignoreVisibility' is not compatible with the 'associatedButtonID' property, when both are used together this value is ignored.",
+      "type": "Boolean",
+      "examples": [
+        "|ignoreVisibility = false|"
+      ]
+    },
+    {
+      "key": "x",
+      "description": "Initial absolute X position of the window.\r\rPS: Can be overwritten if defined together with 'underButtons' property.",
+      "type": "Number"
+    },
+    {
+      "key": "y",
+      "description": "Initial absolute Y position of the window.\r\rPS: Can be overwritten if defined together with 'underButtons' property.",
+      "type": "Number"
+    },
+    {
+      "key": "resize",
+      "description": "Callback function to be called when the floating window is resized.",
+      "type": "function",
+      "examples": [
+        "|resize = function (){\r console.log(\"I was resized!\");\r}|"
+      ]
+    }
+  ],
+  "Layer": [
+    {
+      "key": "_information",
+      "description": "Layer object.",
+      "name": "Layer"
+    },
+    {
+      "key": "getLayerDataFromName",
+      "description": "Gets data about a layer from its full name.\r\rPS: Parameter must be the full layer name such as: 'CSR:estados' or 'CSR:altimetria'.\n@param layerName {String} Full layer name.",
+      "type": "function(layerName) : Object|Null",
+      "examples": [
+        "Layer.getLayerDataFromName(\"CSR:estados\");"
+      ]
+    }
+  ],
+  "Number": [
+    {
+      "key": "_information",
+      "description": "Number object to help formating numbers.",
+      "name": "Number"
+    },
+    {
+      "key": "abbreviateNumber",
+      "description": "Auxiliary function to shorten the display of numbers.\r\rPS: The number loses a little precision but becomes more meaningful.\n@param value {Number} Value to be displayed.\n@param useFixed {Number} If set it will limit the number of decimal places, otherwise it will use the default value.\n@param abbreviateNumbers {Array} Number suffix name.",
+      "type": "function(value, useFixed, abbreviateNumbers) : String"
+    }
+  ],
+  "SourceConfig": [
+    {
+      "key": "_information",
+      "description": "Source object.",
+      "name": "Source"
+    },
+    {
+      "key": "onLoad",
+      "description": "Função de callback quando o store é carregado com sucesso.",
+      "type": "function"
+    },
+    {
+      "key": "onError",
+      "description": "Função de callback quando o store falha o carregamento.",
+      "type": "function"
+    }
+  ],
+  "Request": [
+    {
+      "key": "_information",
+      "description": "Request object.",
+      "name": "Request"
+    },
+    {
+      "key": "isLocalUrl",
+      "description": "Identify if the 'url' is from the localhost or is from the maps.csr.ufmg.br domain.\r\rPS: If url is left blank it uses the current site url.\n@param url {String} String with the url to be checked.",
+      "type": "function(url) : Boolean",
+      "examples": [
+        "ExtjsUtils.REQUEST.isLocalUrl() // true",
+        "ExtjsUtils.REQUEST.isLocalUrl(\"www.google.com\") // false"
+      ]
+    }
+  ],
+  "TimelineWidget": [
+    {
+      "key": "_information",
+      "examples": [
+        "{{timeline|nextStepInterval=1000|id=ANY_UNIQUE_ID|steps=[[“01”, “January”], [“02”, “February”], [“March”], [“April”]]}}"
+      ],
+      "description": "Creates a tool to display the variation in a given interval of time using maps to represent each scenary in time.",
+      "name": "Timeline Panel"
+    },
+    {
+      "key": "onPlayToggle",
+      "description": "Callback function when the timeline start/stop playing.\n@param pressed {Boolean} True if the button was pressed, False otherwise.\n@param layer {Object} The layer associated to this timeline.\n@param timeline {Object} The timeline associated.\n@param playBtn {Object} The button changed.",
+      "type": "function",
+      "examples": [
+        "|onPlayToggle = function (pressed, layer, timeline, playBtn) {\r     let text = \"The timeline just \";\r     text += pressed ? \"stopped \" : \"started \";\r     text += \"playing!\";\r     console.log(text);\r}|"
+      ]
+    },
+    {
+      "key": "renderHidden",
+      "description": "True to start with the timeline hidden.",
+      "type": "boolean",
+      "examples": [
+        "|renderHidden = true|"
+      ],
+      "default": "false"
     }
   ]
 }

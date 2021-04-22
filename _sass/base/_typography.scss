@@ -100,3 +100,12 @@ pre {
     border: 0;
   }
 }
+
+.text-primary{
+  color: $primary;
+}
+
+.link-primary:hover{
+  cursor: pointer;
+  color: $primary;
+}
