@@ -28,6 +28,11 @@
     transform: translateY(-120%);
     transition: transform .3s;
   }
+
+  &.disable-fix{
+    position: relative !important;
+    transform: translateY(0%) !important;
+  }
 }
 
 .header__logo {

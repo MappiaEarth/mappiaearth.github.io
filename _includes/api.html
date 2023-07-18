@@ -1,4 +1,5 @@
-{% assign api = include.api | default: page.api %}
+{% assign api_groups = include.api | default: page.api %}
+{% assign api = include.api | page.api %}
 {% if api %}
 {% include prevent-selection.html selector=".property-key" %}
 <div class="api-toolbar">
@@ -6,135 +7,167 @@
     <h2>Mappia API</h2>
   </div>
   <div class="api-toolbar__right-panel">
-    <input id="filter-members" class="filter-members" type="search" placeholder="Filter members"
-      oninput="DocUtils.API.filterVisibleProperties()">
-    <span id="toggle-all-properties" class="toggle-all-properties" onclick="DocUtils.API.toggleAllProperties()"
+    <div class="toggle-all-container">
+      <div id="toggle-all-name">Expand All</div>
+      <span id="toggle-all-properties" class="toggle-all-properties" onclick="DocUtils.API.toggleAllProperties()"
       title="Expand all properties">&nbsp;</span>
+    </div>
+    <div class="input-container">
+      <div class="icon-container hidden" id="loading-icon">
+        <i class="loader"></i>
+      </div>
+      <input id="filter-members" class="filter-members" type="search" placeholder="Filter members"
+      oninput="DocUtils.API.filterVisibleProperties()">
+    </div>
   </div>
 </div>
 <div id="api-container" class="d-flex">
-  <div class="position-sticky overflow-auto" style="width: 300px; height: 100vh; top: 0px; padding: 15px;">
-    {% for category in api %}
-    {% assign key = category.key | default: category %}
-    {% assign tags = site.data.api[key] %}
-    {% assign info = tags[0] %}
-    {% assign name = info.name %}
-    <div class="link-primary index-item" key="{{key}}" style="font-size: 18px; margin-bottom: 15px;"
-      onclick="DocUtils.API.filterById(this)">{{name}}</div>
+  <div class="position-sticky overflow-auto" style="width: 300px; height: 90vh; top: 10vh; padding: 15px;">
+    {% for groupID in api_groups %}
+    <div>
+      <h4 class="group-title link-primary" key="{{groupID}}" onclick="DocUtils.API.scrollToElement(this)">
+        {{groupID}}
+      </h4>
+      {% for category in site.data.api[groupID] %}
+      {% assign category_name = category[0] %}
+      {% assign key = category_name %}
+      {% unless category_name == "_information" %}
+      {% assign info = category[1][0] %}
+      {% assign name = info.name %}
+      <div class="link-primary index-item" key="{{key}}" style="font-size: 18px; padding-top: 7px; padding-bottom: 7px; padding-left: 5px; border-left: rgba(39, 124, 234, 0.3) solid 1px;"
+      onclick="DocUtils.API.scrollToElement(this)">{{name}}</div>
+      {% endunless %}
+      {% endfor %}
+    </div>
     {% endfor %}
   </div>
   <div style="flex: 0 0 auto; width: calc(100% - 300px); padding: 20px 0 0 20px;">
     <div id="empty-filter-results" class="hidden">No results found.</div>
-    {% for category in api %}
-    {% assign key = category.key | default: category %}
-    {% assign tags = site.data.api[key] %}
-    {% assign informationData = site.data.api[key] | where: "key", "_information" | first %}
-    {% assign informationTags = "_description, _name" | split: ", " %}
-    {% assign apiConfig = page.apiConfig | default: nil %}
+    {% for groupID in api_groups %}
+      {% for category in site.data.api[groupID] %}
+        {% assign category_name = category[0] %}
+        {% if category_name == "_information" %}
+        {% assign info = site.data.api[groupID]["_information"] %}
+        {% assign description = info.description %}
+        <div class="group-container" id="group_{{ groupID }}">
+        <h3>{{ groupID }}</h3>
+          <pre class="group-description">{{ description }}</pre>
 
-    {% if category.tags or category.exclude %}
-    {% assign hasIncompleteAPI = false %}
-    {% if category.tags %}
-    {% assign informationToFilter = category.tags | where_exp: "tag", "tag contains '_'" %}
-    {% if category.tags != informationToFilter %}
-    {% assign hasIncompleteAPI = true %}
-    {% endif %}
-    {% endif %}
-    {% if category.exclude and hasIncompleteAPI == false %}
-    {% assign informationToFilter = category.exclude | where_exp: "tag", "tag contains '_'" %}
-    {% if informationToFilter != category.exclude %}
-    {% assign hasIncompleteAPI = true %}
-    {% endif %}
-    {% endif %}
+        {% else %}
+        {% assign key = category_name %}
+        {% assign tags = site.data.api[groupID][category_name] %}
+        {% assign informationData = site.data.api[groupID][category_name] | where: "key", "_information" | first %}
+        {% assign informationTags = "_description, _name" | split: ", " %}
+        {% assign apiConfig = page.apiConfig | default: nil %}
 
-    {% if hasIncompleteAPI == true %}
-    {% assign informationTags = informationTags | push: "_completeAPI" %}
-    {% endif %}
-    {% endif %}
-
-    {% if category.tags %}
-    {% assign informationTags = category.tags | where_exp: "tag", "tag contains '_'" | default: informationTags %}
-    {% if category.tags != informationTags %}
-    {% assign tags = tags | where_exp: "tag", "category.tags contains tag.key" %}
-    {% endif %}
-    {% endif %}
-
-    {% if category.exclude %}
-    {% assign filteredTags = '' | split: '' %}
-    {% for tag in tags %}
-    {% unless category.exclude contains tag.key %}
-    {% assign filteredTags = filteredTags | push: tag %}
-    {% endunless %}
-    {% endfor %}
-    {% assign tags = filteredTags %}
-
-    {% assign filteredInformation = '' | split: '' %}
-    {% for informationTag in informationTags %}
-    {% unless category.exclude contains informationTag %}
-    {% assign filteredInformation = filteredInformation | push: informationTag %}
-    {% endunless %}
-    {% endfor %}
-
-    {% assign informationTags = filteredInformation %}
-    {% endif %}
-
-    {% assign tagsWithoutMetadata = '' | split: '' %}
-    {% for tag in tags %}
-    {% unless tag.key contains '_' %}
-    {% assign tagsWithoutMetadata = tagsWithoutMetadata | push: tag %}
-    {% endunless %}
-    {% endfor %}
-    {% assign tags = tagsWithoutMetadata | uniq %}
-    <div class="property-category {% if apiConfig and apiConfig.startPropertiesOpen %}open{% endif %}"
-      id="category_{{ key }}">
-      <div class="property-category__metadata {% if apiConfig and apiConfig.startPropertiesOpen %}open{% endif %}">
-        <a class="left-anchor" onclick="DocUtils.API.toggleCategoryOpen(this)">
-          <span class="arrow">&nbsp;</span>
-        </a>
-        {% if informationTags contains "_name" %}
-        <span class="property-category__metadata__name" onclick="DocUtils.API.toggleCategoryOpen(this)">{{
-          informationData.name }}</span>
-        {% endif %}
-
-        {% if informationTags contains "_description" %}
-        <p class="property-category__metadata__description">{{ informationData.description | newline_to_br }}
-        </p>
-        {% endif %}
-
-        {% if informationTags contains "_completeAPI" %}
-        <p class="property-category__metadata__completeAPI">{{ informationData.completeAPI | newline_to_br }}
-        </p>
-        {% endif %}
-      </div>
-      <div class="properties-container">
-        {% for tag in tags %}
-        <div class="property">
-          <a class="left-anchor" onclick="DocUtils.API.togglePropertyOpen(this)">
-            <span class="arrow">&nbsp;</span>
-          </a>
-          <h3 class="property__title">
-            <span>
-              <span class="property-key" onclick="DocUtils.API.togglePropertyOpen(this)">{{ tag.key
-                }}</span>: <span class="property_type">{{ tag.type }}</span>
-            </span>
-            {% if tag.required %}
-            <span class="property-required">required</span>
+        {% if category.tags or category.exclude %}
+          {% assign hasIncompleteAPI = false %}
+          {% if category.tags %}
+            {% assign informationToFilter = category.tags | where_exp: "tag", "tag contains '_'" %}
+            {% if category.tags != informationToFilter %}
+              {% assign hasIncompleteAPI = true %}
             {% endif %}
-          </h3>
-          <p>{{ tag.description | newline_to_br }}</p>
-          <div class="property__expanded">
-            {% for example in tag.examples %}
-            <div style="margin-bottom: 5px;"><b>Example:</b></div>
-            <pre><code>{{ example }}</code></pre>
-            {% endfor %}
-            {% if tag.default %}
-            <span>Defaults to <code>{{ tag.default }}</code></span>
+          {% endif %}
+          {% if category.exclude and hasIncompleteAPI == false %}
+            {% assign informationToFilter = category.exclude | where_exp: "tag", "tag contains '_'" %}
+            {% if informationToFilter != category.exclude %}
+              {% assign hasIncompleteAPI = true %}
+            {% endif %}
+          {% endif %}
+
+          {% if hasIncompleteAPI == true %}
+            {% assign informationTags = informationTags | push: "_completeAPI" %}
+          {% endif %}
+        {% endif %}
+
+        {% if category.tags %}
+          {% assign informationTags = category.tags | where_exp: "tag", "tag contains '_'" | default: informationTags %}
+          {% if category.tags != informationTags %}
+            {% assign tags = tags | where_exp: "tag", "category.tags contains tag.key" %}
+          {% endif %}
+        {% endif %}
+
+        {% if category.exclude %}
+          {% assign filteredTags = '' | split: '' %}
+          {% for tag in tags %}
+            {% unless category.exclude contains tag.key %}
+              {% assign filteredTags = filteredTags | push: tag %}
+            {% endunless %}
+          {% endfor %}
+          {% assign tags = filteredTags %}
+
+          {% assign filteredInformation = '' | split: '' %}
+            {% for informationTag in informationTags %}
+            {% unless category.exclude contains informationTag %}
+              {% assign filteredInformation = filteredInformation | push: informationTag %}
+            {% endunless %}
+          {% endfor %}
+
+          {% assign informationTags = filteredInformation %}
+        {% endif %}
+
+        {% assign tagsWithoutMetadata = '' | split: '' %}
+        {% for tag in tags %}
+          {% unless tag.key contains '_' %}
+            {% assign tagsWithoutMetadata = tagsWithoutMetadata | push: tag %}
+          {% endunless %}
+        {% endfor %}
+        {% assign tags = tagsWithoutMetadata | uniq %}
+        <div class="property-category {% if apiConfig and apiConfig.startPropertiesOpen %}open{% endif %}"
+          id="category_{{ key }}">
+          <div class="property-category__metadata {% if apiConfig and apiConfig.startPropertiesOpen %}open{% endif %}">
+            <a class="left-anchor" onclick="DocUtils.API.toggleCategoryOpen(this)">
+              <span class="arrow">&nbsp;</span>
+            </a>
+            {% if informationTags contains "_name" %}
+              <span class="property-category__metadata__name" onclick="DocUtils.API.toggleCategoryOpen(this)">{{
+                informationData.name }}</span>
+            {% endif %}
+
+            {% if informationTags contains "_description" %}
+              <p class="property-category__metadata__description">{{ informationData.description | newline_to_br }}
+              </p>
+            {% endif %}
+
+            {% if informationTags contains "_completeAPI" %}
+              <p class="property-category__metadata__completeAPI">{{ informationData.completeAPI | newline_to_br }}
+              </p>
             {% endif %}
           </div>
+          <div class="properties-container">
+            {% for tag in tags %}
+            <div class="property">
+              <a class="left-anchor" onclick="DocUtils.API.togglePropertyOpen(this)">
+                <span class="arrow">&nbsp;</span>
+              </a>
+              <h3 class="property__title">
+                <span>
+                  <span class="property-key" onclick="DocUtils.API.togglePropertyOpen(this)">{{ tag.key | xml_escape }}</span>:
+                  <span class="property_type">{{ tag.type | xml_escape }}</span>
+                </span>
+                {% if tag.required %}
+                  <span class="property-required">required</span>
+                {% endif %}
+              </h3>
+              <pre class="element-description">
+                <p>{{ tag.description | xml_escape }}</p>
+              </pre>
+              <div class="property__expanded">
+                {% for example in tag.examples %}
+                  <div style="margin-bottom: 5px;"><b>Example:</b></div>
+                  <pre><code>{{ example }}</code></pre>
+                {% endfor %}
+                {% if tag.default %}
+                  <span>Defaults to <code>{{ tag.default }}</code></span>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
         </div>
-        {% endfor %}
+        {% endif %}
+      {% endfor %}
       </div>
-    </div>
     {% endfor %}
   </div>
 </div>
@@ -143,7 +176,8 @@
 </script>
 <script>
   window.addEventListener("load", function () {
-    document.addEventListener('scroll', DocUtils.API.scrollUpdate);
+    document.addEventListener('scroll', DocUtils.API.colorCurrentTopic);
   });
+  document.getElementsByClassName('header')[0].classList.add("disable-fix");
 </script>
 {% endif %}
