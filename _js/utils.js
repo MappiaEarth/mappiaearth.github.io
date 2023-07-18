@@ -1,3 +1,6 @@
+var headerProportion= 10;
+var apiHeaderSize= window.innerHeight/headerProportion;
+
 window.DocUtils = {
 
     HOST: "https://maps.csr.ufmg.br",
@@ -74,9 +77,9 @@ window.DocUtils = {
          * Toggle na classe CSS "open" de uma categoria para exibir ou esconder
          * as propriedades pertencentes a ela.
          *
-         * @param {HTMLElement} element Elemento presente na árvore da 
+         * @param {HTMLElement} element Elemento presente na árvore da
          *   categoria que se deseja alterar.
-         * @param {boolean} state Opcional. Caso seja definido, irá forçar 
+         * @param {boolean} state Opcional. Caso seja definido, irá forçar
          *   a categoria a abrir ou fechar, conforme o valor. True para abrir e
          *   false para fechar.
          */
@@ -87,23 +90,26 @@ window.DocUtils = {
 
         /**
          * Expande ou recolhe todas as propriedades de uma vez.
-         * 
-         * @param {boolean} state Opcional. Caso seja definido, irá forçar 
+         *
+         * @param {boolean} state Opcional. Caso seja definido, irá forçar
          *   todas as propriedades a abrir ou fechar, conforme o valor. True para
          *   abrir e false para fechar.
          */
         toggleAllProperties: function (state) {
             var toggleAllElement = $("#toggle-all-properties");
             var openAllProperties = state !== undefined ? state : !toggleAllElement.hasClass("open");
-            var childrenSelector = $(".api-container").find(".property, .property-category, .property-category__metadata");
+            var childrenSelector = $("#api-container").find(".property, .property-category, .property-category__metadata");
             var title = openAllProperties ? "Collapse all properties" : "Expand all properties";
             toggleAllElement.toggleClass("open", openAllProperties);
             toggleAllElement.attr("title", title);
             if (openAllProperties) {
                 childrenSelector.addClass("open");
+                document.getElementById("toggle-all-name").innerHTML="Collapse all"
             } else {
                 childrenSelector.removeClass("open");
+                document.getElementById("toggle-all-name").innerHTML="Expand all"
             }
+
         },
 
         /**
@@ -116,8 +122,10 @@ window.DocUtils = {
             var propertySelector = $("#api-container").find(".property");
             var categorySelector = $("#api-container").find(".property-category");
             var emptyResultsElement = $("#empty-filter-results");
+            var loadingIcon = $("#loading-icon");
             return function filterVisibleProperties() {
                 clearTimeout(eventTimeout);
+                loadingIcon.removeClass("hidden");
                 eventTimeout = setTimeout(function () {
                     propertySelector.removeClass("lastVisible");
                     var filterText = $("#filter-members").val();
@@ -157,76 +165,90 @@ window.DocUtils = {
                         filteredCategories.filter(":not( .open )").each(function (index, element) {
                             DocUtils.API.toggleCategoryOpen(element, true);
                         });
+
                     }
+                    loadingIcon.addClass("hidden");
+                    DocUtils.API.checkGroup();
                 }, 500);
             }
         }(),
-
-        /**
-         * Apenas permite visualizar a propriedade instanciada. Caso a visualização já 
-         * seja apenas desta proprieade, volta a mostrar todas as outras. 
-         */
-        filterById: function (element) {
+        
+        scrollToElement: function (element) {
 
             //  Obtem o nó relativo a este elemento na API
             let key = element.getAttribute("key");
             let filteredNodeId = "category_" + key;
             let filteredNode = document.getElementById(filteredNodeId);
 
-            //  Obtem todos os nós pais da API
-            let allNodes = Array.from(document.getElementsByClassName("property-category"));
-
-            //  Verifica se todos os outros nós não estão visiveis
-            let allNodesNotVisible = allNodes.every(el => (el.id != filteredNodeId && el.classList.contains("hidden")) || el.id == filteredNodeId);
-
-            //  Aplica ou retira a classe "hiden" para,
-            //  respectivamente, esconder ou mostrar o elemento
-            allNodes.forEach((el) => {
-                if (allNodesNotVisible) {
-                    el.classList.remove("hidden");
-                } else {
-                    el.classList.add("hidden");
-                }
-            })
-
-            //  Remove a cor primária de todos os elementos do indice
-            let indexItems = Array.from(document.getElementsByClassName("index-item"));
-            indexItems.forEach(el => el.classList.remove("text-primary"));
-
-            //  Quando a filtragem for feita
-            if (!allNodesNotVisible) {
-                //  Permite a visualização unica do elemento
-                filteredNode.classList.remove("hidden")
-
-                //  Adiciona a cor primária no 
-                //  elemento selecionado do indice
-                element.classList.add("text-primary")
+            //Caso o nó for um grupo
+            if(!filteredNode){
+                filteredNodeId = "group_" + key;
+                filteredNode = document.getElementById(filteredNodeId);
             }
+
+            let offsetTop = filteredNode.offsetTop - apiHeaderSize;
+            const smallOffsetForUsability = 10;
+            // 15 torna melhor visualmente
+            $("html, body").animate({ scrollTop: offsetTop - smallOffsetForUsability }, "fast");
         },
-
-        /**
-         * Faz o rolamento do indice lateral acompanhar o da página 
+        /*
+         * Colore tópico atual
+         *
          */
-        scrollUpdate: function (event) {
-            //  Obtem o primeiro container visivel na tela 
-            let containers = document.querySelectorAll(".property-category");
-            for(let i = 0; i < containers.length; i++){
-                var container = containers[i];
-                if(container.offsetTop > window.pageYOffset && i > 0){
-                    container = containers[i - 1];
-                    break;
+        colorCurrentTopic: function(event) {
+            let filtered = document.querySelectorAll(".property-category.hidden").length > 0;
+            if (!filtered) {
+                //  Obtem o primeiro container visivel na tela
+                let containers = document.querySelectorAll(".property-category");
+                for (let i = 0; i < containers.length; i++) {
+                    var container = containers[i];
+                    const smallOffsetForUsability = 15;
+                    var containerTopIsInPage = container.offsetTop > window.pageYOffset + smallOffsetForUsability + apiHeaderSize;
+                    if (containerTopIsInPage && i > 0) {
+                        var lastContainer = containers[i - 1];
+                        var lastIsVisible = (window.pageYOffset + apiHeaderSize) < ( lastContainer.offsetHeight + lastContainer.offsetTop );
+                        if (lastIsVisible) {
+                            container = lastContainer;
+                        } else {
+                            container = containers[i];
+                        }
+                        break;
+                    }
+                }
+                //  Obtem o elemento do indice referente ao container
+                let id = container.id;
+                let keyArray = id.split("_");
+                let key = keyArray[keyArray.length - 1];
+                let filterNode = document.querySelector(`[key="${key}"]`);
+                const oldSelected = document.getElementsByClassName("currentApiTopic");
+                for (let i = 0; i < oldSelected.length; i++) {
+                    oldSelected[i].classList.remove("currentApiTopic");
+                }
+                filterNode.classList.add("currentApiTopic");
+            } else {
+                const oldSelected = document.getElementsByClassName("currentApiTopic");
+                for (let i = 0; i < oldSelected.length; i++) {
+                    oldSelected[i].classList.remove("currentApiTopic");
                 }
             }
 
-            //  Obtem o elemento do indice referente ao container
-            let id = container.id;
-            let keyArray = id.split("_");
-            let key = keyArray[keyArray.length - 1];
-            let filterNode = document.querySelector(`[key="${key}"]`);
+        },
+        checkGroup: function() {
+            const groups = document.getElementsByClassName("group-container");
+            for (let i = 0; i < groups.length; i++) {
+                let group = groups[i];
+                group.classList.remove("hidden");
+            }
 
-            //  Move o scroll para que o elemento do indice seja visivel
-            let parentNode = filterNode.parentElement;
-            parentNode.scrollTop = filterNode.offsetTop;
+            for (let i = 0; i < groups.length; i++) {
+                let group = groups[i];
+                let categories = group.getElementsByClassName("property-category");
+                let hiddenCategories = group.getElementsByClassName("property-category hidden");
+                if (categories.length == hiddenCategories.length) {
+                    group.classList.add("hidden");
+                }
+            }
         }
+
     }
 };
