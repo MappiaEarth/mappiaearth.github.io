@@ -49,9 +49,13 @@
         {% if category_name == "_information" %}
         {% assign info = site.data.api[groupID]["_information"] %}
         {% assign description = info.description %}
+        {% assign example = info.example %}
         <div class="group-container" id="group_{{ groupID }}">
         <h3>{{ groupID }}</h3>
           <pre class="group-description">{{ description }}</pre>
+          {% if example %}
+            <pre><code>{{ example }}</code></pre>
+          {% endif %}
 
         {% else %}
         {% assign key = category_name %}
