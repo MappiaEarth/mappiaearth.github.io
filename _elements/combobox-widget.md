@@ -6,6 +6,9 @@ categories: [Combobox, Opacity, LegendHtml]
 featured-img: combobox-widget
 type: Element
 examples:
+    - title: Simple Combobox Example
+      map-link: tools=layerchooser,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened,capabilities&extent=&visiblelayers=1&zoomlevels=10&queryid=466
+      featured-img: combobox-widget-simple-example
     - title: Filter Style
       map-link: lang=eng&map=&queryid=115&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries,capabilities&visiblelayers=10
       featured-img: combobox-widget

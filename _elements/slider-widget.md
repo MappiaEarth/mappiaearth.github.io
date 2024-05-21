@@ -6,8 +6,8 @@ categories: [Slider, Label]
 featured-img: slider-widget
 type: Element
 examples:
-    - title: Losses of biodiversity filter
-      map-link: lang=eng&map=&queryid=111&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries&visiblelayers=custom
+    - title: Simple Slider Example
+      map-link: lang=eng&map=&queryid=472&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries,capabilities&visiblelayers=custom
       featured-img: slider-widget
 api: 
     - key: Slider
