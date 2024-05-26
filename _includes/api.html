@@ -50,7 +50,7 @@
         {% assign info = site.data.api[groupID]["_information"] %}
         {% assign description = info.description %}
         {% assign example = info.example %}
-        <div class="group-container" id="group_{{ groupID }}">
+        <div class="group-container" id="group_{{ groupID | replace: ' ', '_'  }}">
         <h3>{{ groupID }}</h3>
           <pre class="group-description">{{ description }}</pre>
           {% if example %}
@@ -136,6 +136,10 @@
             {% if informationTags contains "_completeAPI" %}
               <p class="property-category__metadata__completeAPI">{{ informationData.completeAPI | newline_to_br }}
               </p>
+            {% endif %}
+            
+            {% if informationData.example %}
+              <pre class="property-category__metadata__example"><code>{{ informationData.example | newline_to_br }}</code></pre>
             {% endif %}
           </div>
           <div class="properties-container">
