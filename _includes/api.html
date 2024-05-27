@@ -139,7 +139,7 @@
             {% endif %}
             
             {% if informationData.example %}
-              <pre class="property-category__metadata__example"><code>{{ informationData.example | newline_to_br }}</code></pre>
+              <pre class="property-category__metadata__example"><code>{{ informationData.example }}</code></pre>
             {% endif %}
           </div>
           <div class="properties-container">
@@ -161,6 +161,9 @@
                 <p>{{ tag.description | xml_escape }}</p>
               </pre>
               <div class="property__expanded">
+                {% for see in tag.see %}
+                  <pre class="element-description">{{- see | markdownify -}}</pre>
+                {% endfor %}
                 {% for example in tag.examples %}
                   <div style="margin-bottom: 5px;"><b>Example:</b></div>
                   <pre><code>{{ example }}</code></pre>
