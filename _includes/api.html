@@ -54,7 +54,7 @@
         <h3>{{ groupID }}</h3>
           <pre class="group-description">{{ description }}</pre>
           {% if example %}
-            <pre><code>{{ example }}</code></pre>
+            {% highlight js %}{{ example }}{% endhighlight %}
           {% endif %}
 
         {% else %}
@@ -166,7 +166,7 @@
                 {% endfor %}
                 {% for example in tag.examples %}
                   <div style="margin-bottom: 5px;"><b>Example:</b></div>
-                  <pre><code>{{ example }}</code></pre>
+                  {% highlight js %}{{ example }}{% endhighlight %}
                 {% endfor %}
                 {% if tag.default %}
                   <span>Defaults to <code>{{ tag.default }}</code></span>
