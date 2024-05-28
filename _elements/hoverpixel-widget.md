@@ -6,6 +6,9 @@ categories: [Hoverpixel, Functions, TooltipHelper, RawMap, GetCmp]
 featured-img: hoverpixel-widget
 type: Element
 examples:
+    - title: Simple Hoverpixel Example
+      map-link: tools=layerchooser,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened,capabilities&extent=&visiblelayers=custom&zoomlevels=10&queryid=467
+      featured-img: hoverpixel-widget-simple-example
     - title: Hoverpixel - View pixel value on Hovering
       map-link: lang=eng&map=&queryid=118&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries,capabilities&visiblelayers=custom
       featured-img: hoverpixel_hovering
