@@ -1,0 +1,3 @@
+<h1>{{ page.version_name }} <span style="font-size: 0.5em;">{{ page.date | date_to_string }}</span></h1> 
+{% assign content_with_class = page.content | replace: 'id', 'class' %}
+<p style="white-space: pre-wrap;">{{ content_with_class | markdownify }}</p>

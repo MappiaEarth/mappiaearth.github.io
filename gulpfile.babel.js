@@ -236,8 +236,10 @@ gulp.task( "watch", function() {
     '_elements/*.md',
     '_examples/*.md',
     '_raw_maps/*.md',
+    '_change_logs/*.md',
     '_data/api.json',
     '_includes/*.js',
+    'change_log.md',
     "_posts/*.md",
     "pages_/*.md"
   ], gulp.series( "rebuild" ) );

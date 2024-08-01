@@ -1,0 +1,34 @@
+{% assign sorted_change_logs = include.change_log %}
+
+
+{% if sorted_change_logs %}
+<div id="changelog-container">
+
+    <div id="current-change"></div>
+
+    <div id="change-card-container">
+    {% for change in sorted_change_logs %}
+        <div class="change-card" onclick="loadMarkdown('{{ change.url }}')">
+        {{ change.output }}
+        </div>
+    {% endfor %}
+    </div>
+
+</div>
+
+<script>
+    function loadMarkdown(url) {
+    url = "../" + url;
+    fetch(url)
+        .then(response => response.text())
+        .then(html => {
+        document.getElementById('current-change').innerHTML = html;
+        })
+        .catch(error => console.error('Error fetching Markdown file:', error));
+    }
+
+    {% assign default_change_log = sorted_change_logs | first %}
+    loadMarkdown("{{ default_change_log.url }}")
+</script>
+
+{% endif sorted_change_logs %}
