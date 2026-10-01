@@ -15,7 +15,7 @@ api:
     - key: AsyncLoader
     - key: Timeline
     - key: Combobox
-    - key: ConfigUrl
+    - key: URLProperties
       tags: ['options', 'tools', 'visiblelayers']
     - key: InputManager
     - key: Highcharts

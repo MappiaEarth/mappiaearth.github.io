@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your page, with a Mappia map in it</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex; flex-direction: column;
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color: #1f2430; background: #f4f5f7;
+  }
+  header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px; background: #fff; border-bottom: 1px solid #dfe3e8;
+  }
+  header h1 { margin: 0; font-size: 16px; }
+  #status { font-size: 12px; color: #6b7280; }
+  #status.ready { color: #15803d; }
+  main { flex: 1; display: flex; min-height: 0; }
+  aside {
+    width: 340px; flex: none; overflow-y: auto;
+    padding: 14px; background: #fff; border-right: 1px solid #dfe3e8;
+  }
+  section { margin-bottom: 18px; }
+  h2 { margin: 0 0 8px; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: #6b7280; }
+  .row { display: flex; gap: 6px; margin-bottom: 6px; }
+  select { flex: 1; min-width: 0; padding: 6px; border: 1px solid #dfe3e8; border-radius: 6px; font: inherit; }
+  button {
+    padding: 6px 10px; border: 1px solid #2563eb; border-radius: 6px;
+    background: #2563eb; color: #fff; font: inherit; cursor: pointer;
+  }
+  button:hover { background: #1d4ed8; }
+  button:disabled { background: #cbd2d9; border-color: #cbd2d9; cursor: default; }
+  #from-map {
+    min-height: 3em; padding: 8px 10px; border-radius: 6px;
+    background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d;
+  }
+  #log { margin: 0; padding: 0; list-style: none; font: 12px/1.4 ui-monospace, Consolas, monospace; }
+  #log li { padding: 4px 0; border-bottom: 1px solid #eef0f3; word-break: break-word; }
+  #log .direction { display: inline-block; width: 88px; font-weight: 600; }
+  #log .out .direction { color: #2563eb; }
+  #log .in .direction { color: #15803d; }
+  #log .notice { color: #6b7280; }
+  iframe { flex: 1; min-width: 0; border: 0; background: #fff; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Your page</h1>
+  <span id="status">Connecting to the map...</span>
+</header>
+<main>
+  <aside>
+    <section>
+      <h2>Your buttons drive the map</h2>
+      <div class="row">
+        <select id="city" aria-label="City"><option>Belo Horizonte</option></select>
+        <button id="show" disabled>Show on the map</button>
+      </div>
+      <div class="row">
+        <button id="list" disabled>List the cities</button>
+        <button id="add" disabled>Add Recife</button>
+      </div>
+    </section>
+    <section>
+      <h2>The map tells your page</h2>
+      <div id="from-map">Click a city on the map, or press the button in the map's panel.</div>
+    </section>
+    <section>
+      <h2>Messages</h2>
+      <ol id="log"></ol>
+    </section>
+  </aside>
+  <iframe id="mappia" title="Mappia map"></iframe>
+</main>
+
+<!--
+  The map server. In your page these are two fixed tags:
+    <iframe id="mappia" src="https://maps.csr.ufmg.br/calculator/?lang=eng&options=scale"></iframe>
+    <script src="https://maps.csr.ufmg.br/mappia_io.js"></script>
+  Here they are built from the address, so ?mappia_origin=https://localhost runs this page
+  against a local Mappia.
+-->
+<script>
+  var MAPPIA = new URLSearchParams(location.search).get("mappia_origin") || "https://maps.csr.ufmg.br";
+  document.getElementById("mappia").src = MAPPIA + "/calculator/?lang=eng&options=scale";
+  var library = document.createElement("script");
+  library.src = MAPPIA + "/mappia_io.js";
+  library.onload = start;
+  document.head.appendChild(library);
+
+  function start() {
+    // true: keep listening after the handshake - this page talks with the map all along
+    var mappia = MappiaIO("mappia", true);
+    var citySelect = document.getElementById("city");
+    var showButton = document.getElementById("show");
+    var listButton = document.getElementById("list");
+    var addButton = document.getElementById("add");
+    var fromMap = document.getElementById("from-map");
+    var waiting = {};
+    var lastId = 0;
+
+    // Every message, both ways, in the log.
+    function write(className, direction, message) {
+      var item = document.createElement("li");
+      item.className = className;
+      var label = document.createElement("span");
+      label.className = "direction";
+      label.textContent = direction;
+      item.appendChild(label);
+      item.appendChild(document.createTextNode(typeof message === "string" ? message : JSON.stringify(message)));
+      document.getElementById("log").prepend(item);
+    }
+
+    // page -> map
+    function send(message) {
+      write("out", "page → map", message);
+      mappia.send(message);
+    }
+
+    // page -> map, and wait for the answer: the query echoes the requestId back.
+    function ask(operation, message) {
+      var requestId = "request-" + (++lastId);
+      return new Promise(function (resolve) {
+        waiting[requestId] = resolve;
+        send({ operation: operation, message: message, requestId: requestId });
+      });
+    }
+
+    function refreshCities() {
+      return ask("list_cities").then(function (answer) {
+        var chosen = citySelect.value;
+        citySelect.innerHTML = "";
+        answer.message.forEach(function (city) {
+          citySelect.add(new Option(city.name, city.name, false, city.name === chosen));
+        });
+        fromMap.textContent = answer.message.length + " cities on the map.";
+      });
+    }
+
+    // map -> page: what the query posts with ExtjsUtils.QUERY.postMessage
+    mappia.addOnMessageCallback(function (msg) {
+      if (typeof msg === "string") { // the platform's own notices: "mappia__..."
+        write("notice", "map → page", msg);
+        if (msg === "mappia__queryApplied") {
+          document.getElementById("status").textContent = "Connected: the map is ready";
+          document.getElementById("status").className = "ready";
+          [showButton, listButton, addButton].forEach(function (button) { button.disabled = false; });
+          refreshCities();
+        }
+        return;
+      }
+      write("in", "map → page", msg);
+      if (msg.requestId && waiting[msg.requestId]) { // the answer to an ask()
+        waiting[msg.requestId](msg);
+        delete waiting[msg.requestId];
+      } else if (msg.operation === "city_clicked") {
+        citySelect.value = msg.message.name;
+        fromMap.textContent = "You clicked " + msg.message.name + " on the map: " +
+          msg.message.population.toLocaleString("en") + " inhabitants.";
+      } else if (msg.operation === "cities_in_view") {
+        fromMap.textContent = msg.message.cities.length + " cities in view at zoom " + msg.message.zoom +
+          ": " + msg.message.cities.join(", ") + ".";
+      } else if (msg.operation === "city_shown") {
+        fromMap.textContent = msg.message.found ? "The map is showing " + msg.message.name + "." : msg.message.name + " is not on the map.";
+      } else if (msg.operation === "city_added") {
+        fromMap.textContent = msg.message.name + " added: " + msg.message.count + " cities on the map.";
+        refreshCities();
+      }
+    });
+
+    // Your page's buttons
+    showButton.addEventListener("click", function () {
+      send({ operation: "show_city", message: { name: citySelect.value } });
+    });
+    listButton.addEventListener("click", refreshCities);
+    addButton.addEventListener("click", function () {
+      addButton.disabled = true; // once: a second Recife would be a second point
+      send({ operation: "add_city", message: { name: "Recife", lon: -34.88, lat: -8.05, population: 1488920 } });
+    });
+
+    // The query lives next to this page; it is applied as soon as the map listens.
+    mappia.addReadyCallback(function () {
+      mappia.applyQueryFromUrl("cities-query.js");
+    });
+  }
+</script>
+</body>
+</html>

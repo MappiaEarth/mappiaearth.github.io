@@ -14,7 +14,6 @@
   <meta name="theme-color" content="#ffffff">
 
   {% if page.hasYoutube %}
-  <script src="https://www.youtube.com/iframe_api" type="text/javascript"></script>
   <script type="text/javascript">
   window.Youtube = {
     callbacks: [],
@@ -28,6 +27,8 @@
     }
   }
   </script>
+  {% comment %} async, after the callback above exists: the video must not hold up the first paint. {% endcomment %}
+  <script async src="https://www.youtube.com/iframe_api"></script>
   {% endif %}
 
   {% if site.google_tag_manager %}

@@ -32,8 +32,13 @@ layout: compress
           {% else %}
             {% assign categories = page.categories %}
           {% endif %}
+          {% comment %} Only a real api.json group has a target in /api/; other tags stay plain labels. {% endcomment %}
           {% for category in categories %}
-            <a class="label" href="{{site.baseurl}}/api/#category_{{category|slugize}}">{{category}}</a>
+            {% if site.data.api_groups contains category %}
+              <a class="label" href="{{site.baseurl}}/api/#category_{{category}}">{{category}}</a>
+            {% else %}
+              <span class="label label--plain">{{category}}</span>
+            {% endif %}
             {% unless forloop.last %}&nbsp;{% endunless %}
           {% endfor %}
         </div>
@@ -42,6 +47,7 @@ layout: compress
     </div>
   </div>
 
+  {% include docs-nav.html %}
   <main class="site__content">
     <div class="container">
       <article class="post-content" itemprop="articleBody">
@@ -50,7 +56,7 @@ layout: compress
 
         {{ content }}
 
-        {% include api.html %}
+        {% include api-groups.html %}
 
       </article>
 

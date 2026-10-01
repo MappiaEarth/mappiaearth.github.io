@@ -1,0 +1,38 @@
+# Mappia
+
+> Mappia publishes interactive maps: a map platform where a "query" - one JavaScript expression - defines the layers, the interface widgets and the map algebra a page runs in the browser. This reference explains how the platform reads a query and what it can contain.
+
+Each page below is also served as markdown at the same path under /assets/reference/.
+
+## Writing a query
+
+- [How a query is evaluated](https://mappia.earth/assets/reference/query-language.md): A query is plain JavaScript - one expression whose value is the list of layers to show. This page is the contract around it: how the platform evaluates it, where state lives, and which parts of it run in a worker instead of on the page.
+- [Execution model](https://mappia.earth/assets/reference/execution-model.md): What the platform does between reading a query and painting a tile — when each callback runs, what waits for what, and which code crosses into the calculation worker.
+
+## Model
+
+- [The layer and group model](https://mappia.earth/assets/reference/layer-and-group-model.md): The vocabulary a query is written in — the kinds of layer, how groups nest them, how a calculated layer reads several maps at once, and where the full property list lives.
+- [Layer and group property catalogue](https://mappia.earth/assets/reference/property-catalogue.md): Every property a layer, a group or a layer-row button accepts, generated from the platform source: the declared API of a query's layer definitions.
+
+## Tools
+
+- [The widget markup language](https://mappia.earth/assets/reference/markup-widgets.md): The double-brace markup that puts sliders, buttons, pickers and loaders inside a layer's panel - every tag, the parameter grammar, how callbacks are resolved and what each widget's value holds.
+- [Widget catalogue](https://mappia.earth/assets/reference/widget-catalogue.md): Every widget the markup accepts, with its parameters, its runtime methods and the shape of the value it contributes to a calculation - generated from the platform source.
+
+## Integration
+
+- [Embedding a map and talking to it](https://mappia.earth/assets/reference/embedding-and-messages.md): How a page embeds a Mappia map in an iframe with mappia_io.js, applies a query into it at runtime, and exchanges messages with the query running inside — the envelope, the handshake, the queueing and the failure modes.
+
+## Practical guidance
+
+- [Pitfalls, and properties that do nothing](https://mappia.earth/assets/reference/pitfalls.md): The mistakes that make a query fail silently, the keys that have been copied between queries for years without ever being read, and the handful of parameters the platform accepts but does not honour.
+
+## Generated API reference
+
+- [api.json](https://mappia.earth/assets/api.json): every documented member of the query API (829 entries: layer and group properties, widget parameters, URL options, helper functions), generated from the platform source.
+- [Browsable API](https://mappia.earth/api/): the same data as a page.
+
+## Optional
+
+- [Whole reference in one file](https://mappia.earth/llms-full.txt): every page above concatenated.
+- [Examples](https://mappia.earth/documentation/): working maps, each with the query that produced it.

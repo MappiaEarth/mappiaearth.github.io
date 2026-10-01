@@ -1,9 +1,9 @@
 <div class="post-card map-card" itemprop="blogPosts" itemscope="" itemtype="http://schema.org/BlogPosting">
-  <a href="#mapTitle" onclick="DocUtils.QUERY.changeIframeURL('{{ post.map-link }}', '{{ post.title }}')">
+  <a href="#mapTitle" onclick="DocUtils.QUERY.changeIframeURL('{{ post.map-link }}', '{{ post.title }}'); var frame = document.querySelector('.post-map__frame'); if (frame) { frame.classList.add('is-loaded'); }">
     {% if post.featured-img %}
       <figure class="post-card__thumb">
         <img
-          src="{{ site.baseurl }}/assets/img/posts/{{post.featured-img}}_placehold.jpg",
+          src="{{ site.baseurl }}/assets/img/posts/{{post.featured-img}}_placehold.jpg"
           class="lazyload blur"
           alt="{{post.title}}"
         />

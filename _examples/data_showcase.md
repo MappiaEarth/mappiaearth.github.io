@@ -6,16 +6,18 @@ categories: [setQueryGlobalProperties, Timeline, QGIS, useLayerTooltip, LoadCsv,
 featured-img: laurel_data_integration
 type: Example
 map-link: lang=eng&map=&queryid=57&extent=&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened,capabilities&visiblelayers=custom
-api: 
+api:
   - key: QUERY
     tags: ['setQueryGlobalProperties']
   - key: Timeline
   - key: QGIS
   - key: Slider
   - key: ConfigLayer
-    tags: ['useLayerTooltip', 'hideLegendButton', 'visibility']
+    tags: ['useLayerTooltip']
   - key: LoadCsv
   - key: Highcharts
   - key: LegendHtml
+  - key: LayersProperties
+    tags: ['hideLegendButton', 'visibility']
 ---
 Example of map publishing using layout created in QGIS.

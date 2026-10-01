@@ -24,6 +24,7 @@ layout: compress
         <h1 class="hero__title">{{ page.title }}</h1>
       </div>
     </div>
+    {% if page.docs_nav %}{% include docs-nav.html %}{% endif %}
     <main class="site__content">
       {{ content }}
     </main>

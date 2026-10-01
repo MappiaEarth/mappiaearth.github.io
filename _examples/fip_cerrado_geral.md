@@ -6,12 +6,13 @@ categories: [Timeline, setQueryGlobalProperties, paramsButtonConfig, InputManage
 featured-img: fip_cerrado_geral
 type: Example
 map-link: lang=pt&map=&queryid=156&extent=&tools=helpintro,customzoom,getfeature&options=enablequeries,scale,startopened,capabilities&visiblelayers=custom
-api: 
+api:
   - key: Timeline
   - key: QUERY
     tags: ['setQueryGlobalProperties']
-  - key: ConfigLayer
-    tags: ['paramsButtonConfig', 'visibility']
   - key: InputManager
+  - key: paramsButtonConfigProperties
+  - key: LayersProperties
+    tags: ['visibility']
 ---
 Display fire risks in the Cerrado biome.

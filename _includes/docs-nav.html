@@ -1,0 +1,33 @@
+{% comment %}
+  The documentation tab bar, shown on every documentation page so each part is one click
+  away without crowding the top menu. The current tab is worked out from the page URL:
+  widget pages live under /elements/, showcase maps under /examples/ and /raw_maps/.
+{% endcomment %}
+{% assign docsUrl = page.url %}
+{% assign docsCurrent = "" %}
+{% if docsUrl == "/documentation/" %}{% assign docsCurrent = "overview" %}
+{% elsif docsUrl contains "/tools/" or docsUrl contains "/elements/" %}{% assign docsCurrent = "tools" %}
+{% elsif docsUrl contains "/examples/" or docsUrl contains "/raw_maps/" %}{% assign docsCurrent = "examples" %}
+{% elsif docsUrl contains "/reference/" %}{% assign docsCurrent = "reference" %}
+{% elsif docsUrl contains "/api/" %}{% assign docsCurrent = "api" %}
+{% endif %}
+<nav class="docs-nav" aria-label="Documentation sections">
+  <div class="container docs-nav__inner">
+    <a class="docs-nav__tab{% if docsCurrent == 'overview' %} is-current{% endif %}" href="{{ '/documentation/' | relative_url }}">Overview</a>
+    <a class="docs-nav__tab{% if docsCurrent == 'tools' %} is-current{% endif %}" href="{{ '/tools/' | relative_url }}">Tools</a>
+    <a class="docs-nav__tab{% if docsCurrent == 'examples' %} is-current{% endif %}" href="{{ '/examples/' | relative_url }}">Examples</a>
+    <a class="docs-nav__tab{% if docsCurrent == 'reference' %} is-current{% endif %}" href="{{ '/reference/' | relative_url }}">Reference</a>
+    <a class="docs-nav__tab{% if docsCurrent == 'api' %} is-current{% endif %}" href="{{ '/api/' | relative_url }}">API</a>
+  </div>
+</nav>
+{% include breadcrumb.html %}
+<style>
+  .docs-nav { border-bottom: 1px solid #e5e7eb; background: #fff; position: relative; z-index: 2; }
+  .docs-nav__inner { display: flex; gap: 4px; overflow-x: auto; padding-top: 0; padding-bottom: 0; }
+  .docs-nav__tab { padding: 12px 16px; font-weight: 600; font-size: 15px; color: #4b5563; border-bottom: 3px solid transparent; white-space: nowrap; }
+  .docs-nav__tab:hover { color: #277cea; }
+  .docs-nav__tab.is-current { color: #277cea; border-bottom-color: #277cea; }
+  .docs-nav__inner { scrollbar-width: none; }
+  .docs-nav__inner::-webkit-scrollbar { display: none; }
+  @media (max-width: 600px) { .docs-nav__tab { padding: 11px 8px; font-size: 14px; } }
+</style>

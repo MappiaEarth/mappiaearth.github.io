@@ -1,0 +1,7 @@
+[
+  { "id": "inputs", "title": "Inputs", "intro": "Controls in a layer's panel whose values feed the calculation: move a slider, type a value, pick from a list." },
+  { "id": "map", "title": "Reading the map", "intro": "Click, hover or draw on the map to read values, sum areas, or pick and edit features." },
+  { "id": "results", "title": "Showing results", "intro": "Legends, side-by-side comparisons, animations, charts, windows and messages." },
+  { "id": "data", "title": "Data and layers", "intro": "Bring data in: CSV and JSON files, GeoJSON, tile services, overlays and basemaps." },
+  { "id": "page", "title": "Page and integration", "intro": "The layer row, the toolbar, offline use, and the markup rules every tool shares." }
+]

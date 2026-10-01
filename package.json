@@ -13,18 +13,20 @@
     "velocity-animate": "^1.5.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.25.2",
     "babel-core": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babelify": "^8.0.0",
     "browser-sync": "^2.26.7",
     "browserify": "^15.2.0",
     "critical": "^1.3.9",
-    "eslint": "^4.15.0",
+    "eslint": "^4.19.1",
     "eslint-config-jquery": "^1.0.1",
     "eslint-plugin-dollar-sign": "^1.0.1",
-    "eslint-plugin-jquery": "^1.3.0",
+    "eslint-plugin-jquery": "^1.5.1",
     "gulp": "^4.0.0",
     "gulp-autoprefixer": "^4.0.0",
+    "gulp-babel": "^8.0.0",
     "gulp-clean": "^0.4.0",
     "gulp-htmlmin": "^3.0.0",
     "gulp-imagemin": "^4.0.0",
@@ -40,7 +42,14 @@
     "workbox-build": "^5.1.3"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "bundle exec jekyll serve --livereload --config _config.yml,_config_dev.yml",
+    "build": "bundle exec jekyll build && node script/check-html.js",
+    "check:html": "node script/check-html.js",
+    "start:gulp": "bundle exec gulp",
+    "build:gulp": "bundle exec gulp build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sw": "node script/update-sw-precache.js",
+    "images:examples": "node script/example-images.js"
   },
   "repository": {
     "type": "git",

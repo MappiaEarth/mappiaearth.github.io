@@ -1,3 +1,8 @@
 <h1>{{ page.version_name }} <span style="font-size: 0.5em;">{{ page.date | date_to_string }}</span></h1> 
-{% assign content_with_class = page.content | replace: 'id', 'class' %}
-<p style="white-space: pre-wrap;">{{ content_with_class | markdownify }}</p>
+{% comment %}
+  Heading ids become classes (several versions share the same headings, ids must be unique).
+  Only the attribute is renamed: replacing every "id" also rewrote words ("hidden" -> "hclassden").
+  A div, not a p: the content is headings and lists, which a p cannot hold.
+{% endcomment %}
+{% assign content_with_class = page.content | replace: ' id="', ' class="' %}
+<div class="change-log__content">{{ content_with_class | markdownify }}</div>

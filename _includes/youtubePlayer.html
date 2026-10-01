@@ -43,7 +43,9 @@
                 loop: 0,
                 branding: 0,
                 rel: 0,
-                autohide: 0
+                autohide: 0,
+                // the page origin, so the player and this page agree on where their messages go
+                origin: window.location.origin
             },
             events: {
                 onReady: function onPlayerReady(event) {
@@ -78,7 +80,8 @@
 
     window.toggleVideoAudio = function (newState) {
         window.player && window.player.playVideo && window.player.playVideo();
-        if (!window.player && !window.player.isMuted) return;
+        // the player does not exist until the YouTube API has loaded (or ever, when a blocker stops it)
+        if (!window.player || !window.player.isMuted) return;
         if (newState !== undefined)
             window.player.mute();
         else
@@ -100,5 +103,8 @@
 
 {% endif %}
 
+{% comment %} The header variant already closed video_content above, before its buttons. {% endcomment %}
+{% unless include.isHeader %}
     </div>
+{% endunless %}
 </div>

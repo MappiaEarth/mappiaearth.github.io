@@ -9,8 +9,9 @@
       <h3 class="icon-card_title">{{ intro.title | strip_html }}</h3>
       <p class="icon-card_text">{{ intro.content | strip_html }}</p>
     </div>
+  </div>
+  {% comment %} The link wraps the whole card, so it closes after it. {% endcomment %}
   {% if intro.url != '' %}
   </a>
   {% endif %}
-  </div>
 </div>

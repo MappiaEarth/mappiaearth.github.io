@@ -1,4 +1,5 @@
 ---
+docs_nav: true
 layout: page-uncentered
 title: API
 permalink: /api/

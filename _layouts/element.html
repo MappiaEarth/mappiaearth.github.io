@@ -19,8 +19,18 @@ layout: compress
 
 {% include header.html %}
 
-  {% if page.featured-img %}
-  <div class="hero--small lazyload" data-bg="{{ site.url }}{{ site.baseurl }}/assets/img/posts/{{ page.featured-img }}.jpg">
+  {% comment %} The example of the page: its query and its screenshot (see the Example section below). {% endcomment %}
+  {% assign toolId = page.slug %}
+  {% assign toolExample = site.data.widget_examples[toolId] %}
+  {% assign pictureId = page.example_picture | default: toolId %}
+  {% assign shotPath = '/assets/img/examples/' | append: pictureId | append: '.jpg' %}
+  {% assign thumbPath = '/assets/img/examples/' | append: pictureId | append: '_thumb.jpg' %}
+  {% assign shot = site.static_files | where: "path", shotPath | first %}
+  {% comment %} A page with its own picture keeps the hero plain: the picture right below is the map. {% endcomment %}
+  {% assign heroImg = page.featured-img %}
+  {% if shot %}{% assign heroImg = nil %}{% endif %}
+  {% if heroImg %}
+  <div class="hero--small lazyload" data-bg="{{ site.url }}{{ site.baseurl }}/assets/img/posts/{{ heroImg }}.jpg">
   {% else %}
   <div class="hero--small dark-bg">
   {% endif %}
@@ -31,42 +41,295 @@ layout: compress
         {% else %}
           {% assign categories = page.categories %}
         {% endif %}
+        {% comment %} Only a real api.json group has a target in /api/; other tags stay plain labels. {% endcomment %}
         {% for category in categories %}
-          <a class="label" href="{{site.baseurl}}/api/#category_{{category|slugize}}">{{category}}</a>
+          {% if site.data.api_groups contains category %}
+            <a class="label" href="{{site.baseurl}}/api/#category_{{category}}">{{category}}</a>
+          {% else %}
+            <span class="label label--plain">{{category}}</span>
+          {% endif %}
           {% unless forloop.last %}&nbsp;{% endunless %}
         {% endfor %}
       </div>
       <h1 class="hero__title">{{ page.title }}</h1>
+      {% if page.markup_tags %}
+        <p class="hero__meta">Markup: {% for tag in page.markup_tags %}<code>&#123;&#123;{{ tag }}&#125;&#125;</code>{% unless forloop.last %} {% endunless %}{% endfor %}</p>
+      {% endif %}
     </div>
   </div>
 
+  {% comment %}
+    The tool page, in the order a reader needs it (agreed by design, development and readers):
+      1. Quick start - the picture of the example, "Run it live", and three steps: copy, run, try.
+      2. Key parameters - the few that most people change (front matter key_params).
+      3. The complete example - the query file the picture and the tests come from.
+      4. Customize it - the page body: more options, events, patterns, pitfalls.
+      5. Real maps using it, then the generated reference (every parameter).
+    The example query is MappiaExplorer's examples/widgets/<page id>.query.js (published into
+    _data/widget_examples.json); the picture is its screenshot, cropped to the panel and the map
+    area of the effect (assets/img/examples/<page id>.jpg). Styles stay in the layout because
+    assets/css/main.css is a built artifact.
+  {% endcomment %}
+  <style>
+    .tool-onpage { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 22px; font-size: 14px; }
+    .tool-onpage a { color: #4b5563; border-bottom: 1px dotted #9ca3af; }
+    .tool-onpage a:hover { color: #277cea; border-bottom-color: #277cea; }
+    .tool-section { margin: 0 0 40px; }
+    .tool-section > h2 { font-size: 24px; margin: 0 0 14px; }
+    .tool-quick { display: grid; grid-template-columns: minmax(0, 3fr) minmax(260px, 2fr); gap: 22px; align-items: start; }
+    @media (max-width: 900px) { .tool-quick { grid-template-columns: 1fr; } }
+    .tool-example__stage { position: relative; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;
+      box-shadow: 0 6px 22px rgba(17, 24, 39, .10); background: #eef2f7; }
+    .tool-example__stage--empty { aspect-ratio: 16 / 9; }
+    .tool-example__shot { display: block; }
+    .tool-example__shot img { display: block; width: 100%; height: auto; }
+    button.tool-example__shot { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+    button.tool-example__shot:hover img { filter: brightness(.95); }
+    button.tool-example__shot:focus-visible { outline: 3px solid #f39c12; outline-offset: -3px; }
+    .tool-example__caption a { color: #6b7280; text-decoration: underline; }
+    .tool-disabled { margin: 0 0 26px; padding: 14px 18px; border-left: 4px solid #f39c12; background: #fff8eb; border-radius: 4px; }
+    .tool-disabled strong { display: block; margin-bottom: 2px; }
+    .tool-example__map { display: block; width: 100%; aspect-ratio: 16 / 9; min-height: 380px; border: 0; background: #fff; }
+    .tool-example__map[hidden] { display: none; }
+    .tool-example__stage.is-live .tool-example__shot { display: none; }
+    .tool-example__run { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); padding: 10px 20px;
+      border: 0; border-radius: 24px; background: #277cea; color: #fff; font-weight: 600; font-size: 15px; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(39, 124, 234, .35); white-space: nowrap; }
+    .tool-example__stage--empty .tool-example__run { bottom: auto; top: 50%; transform: translate(-50%, -50%); }
+    .tool-example__run:hover { background: #1f66c4; }
+    .tool-example__run:focus-visible { outline: 3px solid #f39c12; outline-offset: 2px; }
+    .tool-example__caption { margin: 8px 0 0; font-size: 13px; color: #6b7280; }
+    .tool-steps { list-style: none; counter-reset: step; margin: 0; padding: 0; }
+    .tool-steps > li { position: relative; padding: 0 0 16px 40px; }
+    .tool-steps > li::before { counter-increment: step; content: counter(step); position: absolute; left: 0; top: 0;
+      width: 26px; height: 26px; border-radius: 50%; background: #277cea; color: #fff; font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; justify-content: center; }
+    .tool-steps strong { display: block; color: #111827; }
+    .tool-steps p, .tool-steps ul { margin: 2px 0 0; font-size: 15px; color: #374151; }
+    .tool-steps ul { padding-left: 18px; }
+    .tool-steps .tool-button { display: inline-block; margin-top: 6px; padding: 4px 12px; border: 1px solid #277cea; border-radius: 6px;
+      background: #fff; color: #277cea; font-weight: 600; font-size: 14px; cursor: pointer; }
+    .tool-steps .tool-button:hover { background: #eff6ff; }
+    .tool-params { width: 100%; border-collapse: collapse; font-size: 15px; }
+    .tool-params th, .tool-params td { text-align: left; vertical-align: top; padding: 8px 12px 8px 0; border-bottom: 1px solid #eef0f3; }
+    .tool-params th { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; }
+    .tool-params td:first-child code { font-weight: 600; }
+    .tool-more { font-size: 14px; color: #4b5563; margin-top: 8px; }
+    .tool-example__query { position: relative; border: 1px solid #e5e7eb; border-radius: 8px; background: #fafafa; }
+    .tool-example__query > summary { cursor: pointer; padding: 10px 14px; font-weight: 600; color: #111827; }
+    .tool-example__query > summary:focus-visible { outline: 2px solid #277cea; outline-offset: 2px; }
+    .tool-example__hint { font-weight: 400; color: #6b7280; font-size: 14px; margin-left: 6px; }
+    .tool-example__query[open] > summary { border-bottom: 1px solid #e5e7eb; }
+    .tool-example__query .highlight, .tool-example__query pre { margin: 0; border-radius: 0 0 8px 8px; }
+    .tool-example__query pre { max-height: 30em; overflow: auto; }
+    .tool-example__copy { position: absolute; top: 7px; right: 10px; padding: 3px 12px; font-size: 13px;
+      border: 1px solid #d1d5db; border-radius: 6px; background: #fff; cursor: pointer; }
+    .tool-example__copy:hover { border-color: #277cea; color: #277cea; }
+    .hero__meta code { background: rgba(255, 255, 255, .14); color: #fff; padding: 1px 6px; border-radius: 4px; }
+    .post-map--lazy .post-map__frame { position: relative; background: #eef2f7; border-radius: 8px; }
+    .post-map--lazy iframe { display: block; border: 0; }
+    .post-map--lazy .post-map__frame:not(.is-loaded) iframe { height: 170px; }
+    .post-map__load { position: absolute; inset: 0; margin: auto; width: 220px; height: 48px; border: 0; border-radius: 24px;
+      background: #277cea; color: #fff; font-weight: 600; font-size: 16px; cursor: pointer; box-shadow: 0 4px 14px rgba(39, 124, 234, .35); }
+    .post-map__frame.is-loaded .post-map__load { display: none; }
+  </style>
+
+  {% include docs-nav.html %}
   <main class="site__content">
     <div class="container">
-      <article class="post-content" itemprop="articleBody">
+      <article class="post-content tool-page" itemprop="articleBody">
 
+        {% comment %} A page with its own live map (page.playground) shows its example there instead. {% endcomment %}
+        {% assign runLive = false %}
+        {% if toolExample %}{% assign runLive = true %}{% endif %}
+        {% if page.playground %}{% assign toolExample = nil %}{% assign shot = nil %}{% assign runLive = false %}{% endif %}
+        {% comment %} disabled: true in front matter - the tool cannot run here right now (disabled_reason says why). {% endcomment %}
+        {% if page.disabled %}{% assign shot = nil %}{% assign runLive = false %}{% endif %}
         {% capture elementCategory %}{{ categories | first }}{% endcapture %}
+        {% assign liveMaps = site.examples | concat: site.raw_maps | where_exp:"post", "post.categories contains elementCategory" %}
+        {% if page.examples != empty %}{% assign liveMaps = page.examples | concat: liveMaps %}{% endif %}
 
-        {% assign examples = site.examples | concat: site.raw_maps | where_exp:"post", "post.categories contains elementCategory" %}
-        {% if page.examples != empty %}
-          {% assign examples = page.examples | concat: examples %}
+        {% if page.disabled %}
+        <div class="tool-disabled" role="note">
+          <strong>Not available in this documentation right now.</strong>
+          {{ page.disabled_reason }}
+        </div>
         {% endif %}
-        {% if examples != empty %}
-          <h1 style="text-decoration: underline;"> {{ page.title }} </h1>
-          {% assign post = examples[0] %}
-          {% include map.html %}
-          <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
-            {% if examples.size > 1 %}
-              {% for post in examples %}
+
+        {% if toolExample or shot %}
+        <nav class="tool-onpage" aria-label="On this page">
+          {% unless page.disabled %}<a href="#quick-start">Quick start</a>{% endunless %}
+          {% if page.key_params %}<a href="#key-parameters">Key parameters</a>{% endif %}
+          {% if toolExample %}<a href="#complete-example">Complete example</a>{% endif %}
+          <a href="#customize">Customize it</a>
+          {% if liveMaps != empty %}<a href="#live-maps">Real maps</a>{% endif %}
+          <a href="#reference">Reference</a>
+        </nav>
+
+        {% unless page.disabled %}
+        <section class="tool-section" id="quick-start" aria-labelledby="quick-start-title">
+          <h2 id="quick-start-title">Quick start</h2>
+          <div class="tool-quick">
+            <div>
+              {% if shot or runLive %}
+              <div class="tool-example__stage{% unless shot %} tool-example__stage--empty{% endunless %}" id="tool-live">
+                {% if shot %}
+                  {% capture shotImage %}<img src="{{ thumbPath | relative_url }}"
+                         srcset="{{ thumbPath | relative_url }} 800w, {{ shotPath | relative_url }} 1600w"
+                         sizes="(max-width: 900px) 100vw, 640px"
+                         loading="lazy"
+                         alt="{{ page.title }}: the example of this page running in the Mappia calculator">{% endcapture %}
+                  {% if runLive %}
+                    <button type="button" class="tool-example__shot" title="Run it live">{{ shotImage }}</button>
+                  {% else %}
+                    <a class="tool-example__shot" href="{{ shotPath | relative_url }}" title="Open the full-size picture">{{ shotImage }}</a>
+                  {% endif %}
+                {% endif %}
+                {% if runLive %}
+                  <iframe class="tool-example__map" title="Live map running the example of {{ page.title }}" hidden></iframe>
+                  <button type="button" class="tool-example__run">&#9654; Run it live</button>
+                {% endif %}
+              </div>
+              <p class="tool-example__caption" role="status" aria-live="polite">
+                {% if shot %}The example below, running in the Mappia calculator{% if runLive %} - click it to run it live{% endif %}. <a href="{{ shotPath | relative_url }}" target="_blank" rel="noopener">Full-size picture</a>{% else %}No picture of this example yet.{% endif %}
+              </p>
+              {% endif %}
+            </div>
+            <ol class="tool-steps">
+              {% if toolExample %}
+              <li><strong>Copy the example</strong>
+                <p>The complete query is <a href="#complete-example">below</a>.</p>
+                <button type="button" class="tool-button" data-copy="tool-example-code">Copy the query</button>
+              </li>
+              <li><strong>Run it</strong>
+                <p>Press <em>Run it live</em> on the picture, paste it into the <a href="{{ site.maps.editor }}" target="_blank" rel="noopener">Mappia editor</a>, or
+                  <a href="{{ '/elements/mappia-io/' | relative_url }}?example={{ toolId }}#try-it">edit it in the playground</a>.</p>
+              </li>
+              {% endif %}
+              <li><strong>Try it</strong>
+                {% if page.try %}
+                  <ul>{% for step in page.try %}<li>{{ step | markdownify | remove: '<p>' | remove: '</p>' | strip }}</li>{% endfor %}</ul>
+                {% else %}
+                  <p>{{ page.summary }}</p>
+                {% endif %}
+              </li>
+            </ol>
+          </div>
+        </section>
+        {% endunless %}
+        {% endif %}
+
+        {% if page.key_params %}
+        <section class="tool-section" id="key-parameters" aria-labelledby="key-parameters-title">
+          <h2 id="key-parameters-title">Key parameters</h2>
+          <table class="tool-params">
+            <thead><tr><th scope="col">Parameter</th><th scope="col">Example</th><th scope="col">What it does</th></tr></thead>
+            <tbody>
+              {% for param in page.key_params %}
+              <tr>
+                <td><code>{{ param.name | xml_escape }}</code></td>
+                <td><code>{{ param.example | xml_escape }}</code></td>
+                <td>{{ param.does | markdownify | remove: '<p>' | remove: '</p>' | strip }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <p class="tool-more">Every parameter, with its type and default, is in the <a href="#reference">reference</a> at the end of this page.</p>
+        </section>
+        {% endif %}
+
+        {% if toolExample %}
+        {% assign queryLines = toolExample.query | newline_to_br | split: "<br />" | size %}
+        <section class="tool-section" id="complete-example" aria-labelledby="complete-example-title">
+          <h2 id="complete-example-title">Complete example</h2>
+          <details class="tool-example__query" open>
+            <summary>The query <span class="tool-example__hint">{{ queryLines }} lines &middot; runs as is</span></summary>
+            <button type="button" class="tool-example__copy" data-copy="tool-example-code">Copy</button>
+            <div id="tool-example-code">{% highlight javascript %}{{ toolExample.query }}{% endhighlight %}</div>
+          </details>
+        </section>
+        {% endif %}
+
+        <section class="tool-section" id="customize" aria-labelledby="customize-title">
+          {% if toolExample or shot %}<h2 id="customize-title">Customize it</h2>{% endif %}
+          {{ content }}
+        </section>
+
+        {% if liveMaps != empty %}
+        <section class="tool-section" id="live-maps" aria-labelledby="live-maps-title">
+          <h2 id="live-maps-title">Real maps that use it</h2>
+          {% assign post = liveMaps[0] %}
+          {% include map.html lazy=true %}
+          {% if liveMaps.size > 1 %}
+            <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
+              {% for post in liveMaps %}
                 {% include map-card.html %}
               {% endfor %}
-            {% endif %}
-          </div>
+            </div>
+          {% endif %}
+        </section>
         {% endif %}
 
-        {{ content }}
+        <section class="tool-section" id="reference">
+          {% include api-groups.html %}
+        </section>
 
-        {% include api.html %}
-
+        {% if toolExample %}
+        <script>
+          (function () {
+            Array.prototype.forEach.call(document.querySelectorAll("[data-copy]"), function (button) {
+              var picture = stage.querySelector("button.tool-example__shot");
+              if (picture) {
+                picture.addEventListener("click", function () { button.click(); });
+              }
+              button.addEventListener("click", function () {
+                var code = document.getElementById(button.getAttribute("data-copy"));
+                var label = button.textContent;
+                navigator.clipboard.writeText(code.textContent.trim()).then(function () {
+                  button.textContent = "Copied";
+                  setTimeout(function () { button.textContent = label; }, 1500);
+                });
+              });
+            });
+          })();
+        </script>
+        {% endif %}
+        {% if runLive %}
+        <script type="application/json" id="tool-example-query">{{ toolExample.query | jsonify }}</script>
+        <script src="{{ '/assets/js/mappia-live.js' | relative_url }}"></script>
+        <script>
+          (function () {
+            var stage = document.getElementById("tool-live");
+            var button = stage.querySelector(".tool-example__run");
+            var frame = stage.querySelector(".tool-example__map");
+            var caption = document.querySelector(".tool-example__caption");
+            var originalCaption = caption.innerHTML;
+            var query = JSON.parse(document.getElementById("tool-example-query").textContent);
+            button.addEventListener("click", function () {
+              button.hidden = true;
+              frame.hidden = false;
+              stage.classList.add("is-live");
+              caption.textContent = "Loading the map...";
+              MappiaLive.connect(frame)
+                .then(function (live) {
+                  caption.textContent = "Applying the example query...";
+                  return live.apply(query);
+                })
+                .then(function () {
+                  caption.textContent = "Live: the query below, applied with MappiaIO.applyQuery. Nothing is saved.";
+                })
+                .catch(function (error) {
+                  stage.classList.remove("is-live");
+                  frame.hidden = true;
+                  frame.removeAttribute("src");
+                  button.hidden = false;
+                  caption.innerHTML = originalCaption;
+                  caption.insertAdjacentText("afterbegin", "The live map did not answer (" + error.message + "). ");
+                });
+            });
+          })();
+        </script>
+        {% endif %}
       </article>
 
       {% include pagination-footer.html %}

@@ -55,11 +55,26 @@ exclude:
   - vendor
   - npm-debug.log
   - gulpfile.js
+  # Local-only files and folders: not site content, and some are large.
+  # lixo/ holds a stray copy of node_modules (~29k files) that Jekyll otherwise reads and
+  # copies into _site on every build - the main reason builds were slow.
+  - lixo
+  - gulpfile.babel.js
+  - jekyll-sleek.gemspec
+  - start.bat
+  - install.bat
+  - debug.log
+  - 5.4.0
+  # Image sources for gulp (and the raw widget screenshots): never site content, and writing
+  # a screenshot there made a running `jekyll serve` regenerate the whole site each time.
+  - _img
 
 include: ['_pages']
 permalink: /:title/
 
 collections:
+  reference:
+    output: true
   examples:
     output: true
   elements:
@@ -74,6 +89,20 @@ defaults:
       path: "_change_logs"
     values:
       layout: "change_log_default"
+  - scope:
+      path: "_elements"
+      type: "elements"
+    values:
+      # Their bodies are raw blocks (they show widget markup), which Jekyll cannot excerpt.
+      excerpt_separator: ""
+  - scope:
+      path: "_reference"
+      type: "reference"
+    values:
+      layout: "reference"
+      # The chapter bodies are wrapped in a raw block (the markup they document is also
+      # Liquid), which Jekyll cannot excerpt - and nothing on the site uses the excerpt.
+      excerpt_separator: ""
 
 future: true
 

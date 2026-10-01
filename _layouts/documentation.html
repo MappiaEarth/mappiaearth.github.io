@@ -17,6 +17,28 @@ layout: compress
 
     {% endif %}
 
+    {% comment %}
+      The documentation landing: it routes rather than lists. The tools, the example maps and
+      the reference each have their own page (/tools/, /examples/, /reference/), reached from
+      here and from the tab bar every documentation page shares.
+    {% endcomment %}
+    <style>
+      .docs-landing__lead { max-width: 46em; font-size: 17px; margin: 28px 0 26px; }
+      .docs-doors { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin: 0 0 34px; }
+      .docs-door { display: block; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px 22px; background: #fff;
+        transition: box-shadow .15s, border-color .15s; color: inherit; }
+      .docs-door:hover { border-color: #277cea; box-shadow: 0 4px 14px rgba(39, 124, 234, .15); }
+      .docs-door__kicker { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #277cea; font-weight: 700; }
+      .docs-door__title { display: block; font-size: 22px; font-weight: 700; margin: 4px 0 6px; color: #111827; }
+      .docs-door__text { color: #4b5563; font-size: 15px; }
+      .docs-steps { max-width: 52em; counter-reset: step; list-style: none; padding: 0; }
+      .docs-steps li { position: relative; padding: 0 0 14px 44px; }
+      .docs-steps li::before { counter-increment: step; content: counter(step); position: absolute; left: 0; top: -2px;
+        width: 28px; height: 28px; border-radius: 50%; background: #277cea; color: #fff; font-weight: 700;
+        display: flex; align-items: center; justify-content: center; font-size: 14px; }
+      .docs-machine { max-width: 52em; color: #4b5563; }
+    </style>
+
     {% include header.html %}
 
     <div class="hero lazyload" data-bg="{{ site.url }}{{ site.baseurl }}/assets/img/{{ site.hero_img }}">
@@ -26,78 +48,64 @@ layout: compress
       </div>
     </div>
 
+    {% include docs-nav.html %}
+
     <main class="site__content">
-      <section class="blog">
-        <div class="category-section">
-          <div id="examples" class="container">
-            <h2 class="post-category">What can Mappia do?</h2>
-            <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
+      <div class="container">
+        <p class="docs-landing__lead">
+          A Mappia map is defined by a <strong>query</strong>: plain JavaScript that lists the layers to
+          show, the tools its users get and the arithmetic that runs over the pixels. Start where your
+          question is:
+        </p>
 
-              {% assign sortedExamples = site.examples | sort: 'title' %}
-              {% for post in sortedExamples %}
-                {% include card.html %}
-              {% endfor %}
-
-              <!-- {% include pagination.html %} -->
-            </div>
-          </div>
+        <div class="docs-doors">
+          <a class="docs-door" href="{{ '/tools/' | relative_url }}">
+            <span class="docs-door__kicker">Build</span>
+            <span class="docs-door__title">Tools</span>
+            <span class="docs-door__text">Sliders, pickers, charts, drawing, split views - every tool a map can offer, each with a working example and its picture.</span>
+          </a>
+          <a class="docs-door" href="{{ '/examples/' | relative_url }}">
+            <span class="docs-door__kicker">See</span>
+            <span class="docs-door__title">Examples</span>
+            <span class="docs-door__text">Real maps built with Mappia, opened live - the features used at full scale.</span>
+          </a>
+          <a class="docs-door" href="{{ '/reference/' | relative_url }}">
+            <span class="docs-door__kicker">Learn</span>
+            <span class="docs-door__title">Reference</span>
+            <span class="docs-door__text">How the platform reads a query: evaluation, execution, the layer model, widgets, embedding, pitfalls.</span>
+          </a>
+          <a class="docs-door" href="{{ '/api/' | relative_url }}">
+            <span class="docs-door__kicker">Look up</span>
+            <span class="docs-door__title">API</span>
+            <span class="docs-door__text">Every property, widget parameter and helper function, generated from the platform source.</span>
+          </a>
         </div>
 
-        <div class="category-section">
-          <div id="elements" class="container">
-            <h2 class="post-category">Available interaction tools</h2>
-            <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
+        <h2 class="post-category">Start here</h2>
+        <ol class="docs-steps">
+          <li><strong>Publish your maps.</strong> Upload data and styles from QGIS -
+            <a href="{{ '/mappia_publisher/' | relative_url }}">the publishing tutorial</a>.</li>
+          <li><strong>Write your first query.</strong> It can be one line -
+            <a href="{{ '/reference/query-language/' | relative_url }}">how a query is evaluated</a>.</li>
+          <li><strong>Add tools.</strong> Pick one from <a href="{{ '/tools/' | relative_url }}">Tools</a>, copy its
+            example, then adapt it - <a href="{{ '/reference/markup-widgets/' | relative_url }}">the widget markup language</a>
+            explains the rules.</li>
+          <li><strong>Calculate new maps.</strong> Combine published maps pixel by pixel -
+            <a href="{{ '/reference/execution-model/' | relative_url }}">the execution model</a>.</li>
+          <li><strong>Embed it.</strong> Put the map in your own site and talk to it -
+            <a href="{{ '/reference/embedding-and-messages/' | relative_url }}">embedding a map</a>.
+            Stuck? <a href="{{ '/reference/pitfalls/' | relative_url }}">Pitfalls, and properties that do nothing</a>.</li>
+        </ol>
 
-              {% assign sortedElements = site.elements | sort: 'title' %}
-              {% for post in sortedElements %}
-                {% include card.html %}
-              {% endfor %}
-
-              <!-- {% include pagination.html %} -->
-            </div>
-          </div>
-        </div>
-
-        <div class="category-section">
-          <div class="container">
-            <h2 class="post-category">Raw Maps</h2>
-            <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
-
-              <p>Soon</p>
-              <!--
-              {% assign sortedRawMaps = site.raw_maps | sort: 'title' %}
-              {% for post in sortedRawMaps %}
-                {% include card.html %}
-              {% endfor %}
-              -->
-              <!-- {% include pagination.html %} -->
-            </div>
-          </div>
-        </div>
-
-        <div class="category-section">
-          <div id="tutorial" class="container">
-            <h2 class="post-category">Tutorials</h2>
-            <div class="post-list" itemscope="" itemtype="http://schema.org/Blog">
-
-              <ul>
-                <li>Steps to easily publish yourself maps: <a href="/mappia_publisher">Checkout the tutorial</a>.</li>
-                <li>How customize the maps by visual edition: Soon.</li>
-                <li>How customize the maps by code edition: Soon.</li>
-              </ul>
-              <!--
-              {% assign sortedRawMaps = site.raw_maps | sort: 'title' %}
-              {% for post in sortedRawMaps %}
-                {% include card.html %}
-              {% endfor %}
-              -->
-              <!-- {% include pagination.html %} -->
-            </div>
-          </div>
-        </div>
-
-
-      </section>
+        <h2 class="post-category">For scripts and AI assistants</h2>
+        <p class="docs-machine">
+          The whole documentation is also published as plain text:
+          <a href="{{ '/llms.txt' | relative_url }}">llms.txt</a> (the index),
+          <a href="{{ '/llms-full.txt' | relative_url }}">llms-full.txt</a> (every reference chapter in one file),
+          <a href="{{ '/assets/api.json' | relative_url }}">api.json</a> (the generated API), and each chapter as
+          markdown under <code>/assets/reference/</code>.
+        </p>
+      </div>
     </main>
 
     {% include footer.html %}

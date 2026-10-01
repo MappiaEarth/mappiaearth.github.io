@@ -26,7 +26,15 @@ document.getElementById('scriptBundle').addEventListener('load', function () {
     {% include hoverswap.js %}
 });
 </script>
-{% if site.service_worker %}
+{% comment %}
+  The service worker precaches every page, stylesheet and image and serves them cache-first.
+  That is what the published site wants (fast repeat visits, offline reading), and exactly what
+  a local preview must not do: the browser would keep showing the pages it cached instead of
+  the ones Jekyll just rebuilt. So it is registered only in the production build (GitHub Pages
+  builds with JEKYLL_ENV=production); a development build (npm start / jekyll serve) instead
+  removes any worker and caches a previous visit left in the browser.
+{% endcomment %}
+{% if site.service_worker and jekyll.environment == "production" %}
 <script async>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('{{ "/sw.js" | relative_url }}').then(function( registration ) {
@@ -34,6 +42,23 @@ document.getElementById('scriptBundle').addEventListener('load', function () {
     })
     .catch(function(error) {
       console.log('ServiceWorker registration failed: ', error);
+    });
+  }
+</script>
+{% elsif site.service_worker %}
+<script async>
+  // Development build: no service worker, and remove one a previous visit may have installed.
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function (registrations) {
+      registrations.forEach(function (registration) { registration.unregister(); });
+      if (registrations.length) {
+        console.log('[dev] Removed ' + registrations.length + ' service worker(s): pages now come straight from jekyll serve.');
+      }
+    });
+  }
+  if (window.caches) {
+    caches.keys().then(function (names) {
+      names.forEach(function (name) { caches.delete(name); });
     });
   }
 </script>

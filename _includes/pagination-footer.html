@@ -4,10 +4,10 @@
     {% if page.title == sameTypePosts.first.title %}
       {% assign previousPage = nil %}
     {% elsif page.title == sameTypePosts.last.title %}
-      {% assign nextPage = site.elements | sort: 'title' | first %}
+      {% assign nextPage = site.elements | where_exp: "e", "e.disabled != true" | sort: 'title' | first %}
     {% endif %}
   {% elsif page.type == 'Element' %}
-    {% assign sameTypePosts = site.elements | sort: 'title' %}
+    {% assign sameTypePosts = site.elements | where_exp: "e", "e.disabled != true" | sort: 'title' %}
     {% if page.title == sameTypePosts.first.title %}
       {% assign previousPage = site.examples | sort: 'title' | last %}
     {% elsif page.title == sameTypePosts.last.title %}
@@ -16,7 +16,7 @@
   {% else %}
     {% assign sameTypePosts = site.raw_maps | sort: 'title' %}
     {% if page.title == sameTypePosts.first.title %}
-      {% assign previousPage = site.elements | sort: 'title' | last %}
+      {% assign previousPage = site.elements | where_exp: "e", "e.disabled != true" | sort: 'title' | last %}
     {% elsif page.title == sameTypePosts.last.title %}
       {% assign nextPage = nil %}
     {% endif %}
@@ -39,9 +39,16 @@
 
   <div>
     {% if previousPage.url %}
+    {%- assign previousShot = '/assets/img/examples/' | append: previousPage.slug | append: '_thumb.jpg' -%}
+    {%- assign previousShotFile = site.static_files | where: "path", previousShot | first -%}
+    {%- if previousShotFile -%}
+    <a href="{{previousPage.url | relative_url }}">
+      <img src="{{ previousShot | relative_url }}" loading="lazy" style="height: 100px;" title="{{previousPage.title}}" alt="">
+    </a>
+    {%- elsif previousPage['featured-img'] -%}
     <a href="{{previousPage.url | relative_url }}">
       <img
-      src="{{ site.baseurl }}/assets/img/posts/{{previousPage.featured-img}}_placehold.jpg",
+      src="{{ site.baseurl }}/assets/img/posts/{{previousPage.featured-img}}_placehold.jpg"
       data-srcset="{{ site.baseurl }}/assets/img/posts/{{previousPage.featured-img}}_placehold.jpg, {{ site.url }}{{ site.baseurl }}/assets/img/posts/{{previousPage.featured-img}}_thumb@2x.jpg 2x"
       class="lazyload blur"
       style="height: 100px;"
@@ -49,6 +56,7 @@
       alt=""
       >
     </a>
+    {%- endif %}
     <div class="controls__item prev">
         <span>Previous</span>
         <a href="{{previousPage.url | relative_url }}">
@@ -76,9 +84,16 @@
           </span>
       </a>
     </div>
+    {%- assign nextShot = '/assets/img/examples/' | append: nextPage.slug | append: '_thumb.jpg' -%}
+    {%- assign nextShotFile = site.static_files | where: "path", nextShot | first -%}
+    {%- if nextShotFile -%}
+    <a href="{{nextPage.url | relative_url }}">
+      <img src="{{ nextShot | relative_url }}" loading="lazy" style="height: 100px;" title="{{nextPage.title}}" alt="">
+    </a>
+    {%- elsif nextPage['featured-img'] -%}
     <a href="{{nextPage.url | relative_url }}">
       <img
-        src="{{ site.baseurl }}/assets/img/posts/{{nextPage.featured-img}}_placehold.jpg",
+        src="{{ site.baseurl }}/assets/img/posts/{{nextPage.featured-img}}_placehold.jpg"
         data-srcset="{{ site.baseurl }}/assets/img/posts/{{nextPage.featured-img}}_placehold.jpg, {{ site.url }}{{ site.baseurl }}/assets/img/posts/{{nextPage.featured-img}}_thumb@2x.jpg 2x"
         class="lazyload blur"
         style="height: 100px;"
@@ -86,6 +101,7 @@
         alt=""
       >
     </a>
+    {%- endif %}
     {% endif %}
   </div>
 </div>

@@ -1,0 +1,81 @@
+{% comment %}
+  Where a documentation page sits: Documentation > part > group > page. Worked out from the
+  URL and the page's own data (tool_group for a tool, section for a reference chapter), so a
+  new page needs nothing extra. Included by docs-nav.html, right under the tabs; the overview
+  page itself shows none. Also published as schema.org BreadcrumbList for search engines.
+{% endcomment %}
+{%- assign crumbNames = "" | split: "" -%}
+{%- assign crumbUrls = "" | split: "" -%}
+{%- assign crumbUrl = page.url -%}
+{%- if crumbUrl contains "/tools/" or crumbUrl contains "/elements/" -%}
+  {%- assign crumbNames = crumbNames | push: "Tools" -%}{%- assign crumbUrls = crumbUrls | push: "/tools/" -%}
+  {%- if page.tool_group -%}
+    {%- assign crumbGroup = site.data.tool_groups | where: "id", page.tool_group | first -%}
+    {%- if crumbGroup -%}
+      {%- assign crumbGroupUrl = crumbGroup.id | prepend: "/tools/#" -%}
+      {%- assign crumbNames = crumbNames | push: crumbGroup.title -%}{%- assign crumbUrls = crumbUrls | push: crumbGroupUrl -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- elsif crumbUrl contains "/examples/" or crumbUrl contains "/raw_maps/" -%}
+  {%- assign crumbNames = crumbNames | push: "Examples" -%}{%- assign crumbUrls = crumbUrls | push: "/examples/" -%}
+  {%- if crumbUrl contains "/raw_maps/" -%}
+    {%- assign crumbNames = crumbNames | push: "Raw maps" -%}{%- assign crumbUrls = crumbUrls | push: "/examples/#raw-maps" -%}
+  {%- elsif crumbUrl != "/examples/" -%}
+    {%- assign crumbNames = crumbNames | push: "Interactive analyses" -%}{%- assign crumbUrls = crumbUrls | push: "/examples/#interactive" -%}
+  {%- endif -%}
+{%- elsif crumbUrl contains "/reference/" -%}
+  {%- assign crumbNames = crumbNames | push: "Reference" -%}{%- assign crumbUrls = crumbUrls | push: "/reference/" -%}
+  {%- if page.section -%}
+    {%- assign crumbSectionUrl = page.section | slugify | prepend: "/reference/#" -%}
+    {%- assign crumbNames = crumbNames | push: page.section -%}{%- assign crumbUrls = crumbUrls | push: crumbSectionUrl -%}
+  {%- endif -%}
+{%- elsif crumbUrl contains "/api/" -%}
+  {%- assign crumbNames = crumbNames | push: "API" -%}{%- assign crumbUrls = crumbUrls | push: "/api/" -%}
+{%- endif -%}
+{%- assign crumbIsIndex = false -%}
+{%- assign crumbLastUrl = crumbUrls | last -%}
+{%- if crumbLastUrl == crumbUrl -%}{%- assign crumbIsIndex = true -%}{%- endif -%}
+{%- if crumbNames.size > 0 -%}
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <div class="container">
+    <ol class="breadcrumb__list">
+      <li><a href="{{ '/documentation/' | relative_url }}">Documentation</a></li>
+      {%- for name in crumbNames -%}
+        {%- assign index = forloop.index0 -%}
+        {%- if forloop.last and crumbIsIndex -%}
+          <li aria-current="page">{{ name }}</li>
+        {%- else -%}
+          <li><a href="{{ crumbUrls[index] | relative_url }}">{{ name }}</a></li>
+        {%- endif -%}
+      {%- endfor -%}
+      {%- unless crumbIsIndex -%}
+        <li aria-current="page">{{ page.title }}</li>
+      {%- endunless -%}
+    </ol>
+  </div>
+</nav>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Documentation", "item": "{{ site.url }}{{ '/documentation/' | relative_url }}" }
+    {%- for name in crumbNames -%}
+    {%- assign index = forloop.index0 -%}
+    ,{ "@type": "ListItem", "position": {{ forloop.index | plus: 1 }}, "name": {{ name | jsonify }}, "item": "{{ site.url }}{{ crumbUrls[index] | relative_url }}" }
+    {%- endfor -%}
+    {%- unless crumbIsIndex -%}
+    ,{ "@type": "ListItem", "position": {{ crumbNames.size | plus: 2 }}, "name": {{ page.title | jsonify }} }
+    {%- endunless %}
+  ]
+}
+</script>
+<style>
+  .breadcrumb { background: #f8fafc; border-bottom: 1px solid #eef0f3; font-size: 14px; }
+  .breadcrumb__list { list-style: none; display: flex; flex-wrap: wrap; align-items: center; margin: 0; padding: 8px 0; gap: 2px; }
+  .breadcrumb__list li { display: inline-flex; align-items: center; color: #4b5563; }
+  .breadcrumb__list li + li::before { content: "\203A"; margin: 0 8px; color: #9ca3af; }
+  .breadcrumb__list a { color: #277cea; }
+  .breadcrumb__list [aria-current="page"] { color: #111827; font-weight: 600; }
+</style>
+{%- endif -%}

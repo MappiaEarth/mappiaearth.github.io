@@ -8,7 +8,7 @@
   <div class="goup-card_inner hovergoup">
     <figure class="goup-card_image">
       <img
-              src="{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_placehold.{{intro.featured-img[1]}}",
+              src="{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_placehold.{{intro.featured-img[1]}}"
               data-srcset="{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_goup.{{intro.featured-img[1]}}"
               class="lazyload blur"
               alt="{{intro.title}}"
@@ -16,8 +16,9 @@
       <noscript><img src="{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb.{{intro.featured-img[1]}}" alt="{{ intro.content }}"></noscript>
       <p class="goup-card_text">{{intro.content}}</p>
     </figure>
+  </div>
+  {% comment %} The link wraps the title and the picture, so it closes after both. {% endcomment %}
   {% if intro.url != '' %}
   </a>
   {% endif %}
-  </div>
 </div>

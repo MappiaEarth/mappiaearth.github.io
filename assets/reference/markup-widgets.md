@@ -1,0 +1,296 @@
+# The widget markup language
+
+> The double-brace markup that puts sliders, buttons, pickers and loaders inside a layer's panel - every tag, the parameter grammar, how callbacks are resolved and what each widget's value holds.
+
+Mappia reference, section "Tools". Page: https://mappia.earth/reference/markup-widgets/
+Generated API entries: MarkupSyntax, Slider, Textfield, Combobox, Button, Checkbox, Label, Window, Timeline, PickPoint, Hoverpixel, SummedArea, AreaIntegral, InputManager, ZoomLevel, LoadCsv, LoadJson, FileField, LegendHtml, OpacitySlider, LiveComposedSplit, LayersProperties.descriptionHtml (https://mappia.earth/assets/api.json)
+
+A layer's `descriptionHtml` is free HTML with one addition: text in double braces becomes
+an interface element. This is the language of that markup - a small one, with its own
+parameter grammar, its own escaping and its own rules for finding the function a widget
+should call.
+
+Widgets that collect a value also feed the layer's calculation, which is what makes a
+Mappia map interactive: a slider moved by the user re-runs the arithmetic over the pixels.
+The full parameter list of every widget is in the [API reference](/api/) under **Tools**;
+this page is the language and the behaviour around it.
+
+Use these tools inside a layer’s `descriptionHtml`. Parameters are pipe-separated:
+
+```text
+{{toolName|param=value|other=value}}
+```
+
+HTML and multiple tools can be concatenated:
+
+```javascript
+descriptionHtml:
+  '<p>Intro</p>' +
+  '{{label|text=Year:}}' +
+  '{{slider|id=year|minValue=2000|maxValue=2020|value=2010}}' +
+  '{{button|id=run|text=Run|handler=onRun}}'
+```
+
+Open the query panel with `paramsButtonConfig: [{ type: 'query', pressed: true }]` when the user must see the tools.
+
+**Input order:** tools that act as inputs (slider, textfield, combobox, timeline, zoomlevel, pickpoint, hoverpixel, summedarea, areaintegral, loadcsv, loadjson, filefield, inputmanager, window) feed `expression` / `beforeCalc` / `afterCalc` as `inputs[0]`, `inputs[1]`, … in **markup order**. When they have an `id` they are also `inputs.id[ID]` — **on the page only** (`beforeCalc`, `onInputsReady`, `afterCalc`, `functions`): inside `expression` the inputs arrive as a JSON copy of the array, which drops the `id` map, so `expression` must use positions. `button`, `checkbox`, `label`, `legendhtml`, `opacityslider`, `livecomposedsplit` are **not** inputs.
+
+**Callback names** (`handler=`, `toggleHandler=`, `runOnClick=`, `runOnHover=`, `onMark=`, `onPlayToggle=`, `_onChange=`, …) resolve in this order: **(1)** `layer.functions[name]` → **(2)** a global `window[name]` (from `setQueryGlobalProperties`) → **(3)** the text itself evaluated as a function (a full `function(){…}` or a bare statement body). `this` inside is the layer (exceptions per widget below). `{{combobox|onSelect=}}` skips step 2. Prefer `functions: { onRun: function() { … } }` on the layer.
+
+---
+
+## Catalog (all `Mark.create` tags)
+
+| Tag | Purpose | Key params (see `api.json` → Tools → group for the full list) |
+|-----|---------|-------------------------------------------|
+| `label` | Static text / HTML | `text`, `html` (verbatim up to next `\|`), `cls`, `style`, `forId` |
+| `button` | Click / toggle action | `id`, `text`, `handler` / `toggleHandler`, `enableToggle`, `pressed`, `hidden`. `toggle=` is an alias moved to `toggleHandler`; with `enableToggle=true` and no `toggleHandler`, `handler` becomes the toggle handler |
+| `checkbox` | Boolean switch — **not an input**: `handler(checkbox, checked)` runs on every toggle (also once with `false` when the layer is removed) | `id`, `text`, `checked`, `handler`, `labelBefore`, `iconCls`; runtime `Ext.getCmp(id).toggle(state?)`, `setBoxLabel(txt)` |
+| `textfield` | Single-line text / number input | `id`, `value`, `fieldLabel`, `isnumeric` (validator only — value stays a string), `hideLabel`, `afteredit` |
+| `combobox` | Select from list | `id`, `data` (`[["value"], …]` - one value per entry, shown as is), `fieldLabel`, `editable`, `hideLabel`, `onSelect(combo, record, index)` |
+| `slider` | Numeric range input | `id`, `minValue`, `maxValue`, `value` / `values` (range), `increment`, `plugins=tip={0}%`, `gradient`, `backgroundColors` |
+| `opacityslider` | Layer opacity | `value` (only when the layer has no `opacity`), `inverse`, `complementaryLayer`, `changeVisibility` |
+| `legendhtml` | Inline map legend | `reverseLegend`, `filterLayers`, `legendId`, `preventClick`, `useScaleParameter`, `autoWidth` |
+| `timeline` | Play through style / scenario steps | `id`, `steps`, `nextStepInterval`, `preloadTiles`, `onPlayToggle` (**must return truthy** — a falsy return vetoes the play/stop), `fieldLabel`; many runtime methods (`setSteps`, `getValue`, `startAnimationStep`, …) |
+| `livecomposedsplit` | Split-screen compare of two composed styles | `displayNames`, `layerNames`, `baseName`, `leftDefault`, `rightDefault`, `id`, `layout` (`compact`\|`inline`) |
+| `window` | Floating Ext window | `id`, `title`, `text`/`html`, `startVisible`, `width`, `height`, `x`, `y`, `items`, `onBeforeHide`, `ignoreVisibility` |
+| `filefield` | Local file picker | `id`, `fieldLabel`, `ignoreUpdate`, `_on<event>=` for any Ext field event in `eventNames` (`_onChange=onSelectFile`, case-insensitive) |
+| `loadcsv` | Load remote CSV → `CsvTable` | `id`, `url`, `cors`, `removeEmptyLines`; `trim` is accepted but **ignored by the parser** (trim cells yourself) |
+| `loadjson` | Load remote JSON | `id`, `url`, `cors` |
+| `pickpoint` | Click map → feature attributes per layer | `id`, `checked`, `onefeature`, `geometryColor`, `onMark` (≡ `runOnClick`; `onMark` wins), `runOnHover`, `lat`/`lon`, `markLayerInd`, `notify`, `unselect` |
+| `hoverpixel` | Pixel value under cursor / on click | `id`, `text`, `runOnHover`, `runOnClick`, `runOnHoverOutside`, `runOnClickOutside`, `checked`, `notify` — moving/clicking does **not** recalculate the layer |
+| `summedarea` | Draw polygon → sum raster values | `id`, `text`, `runOnClick(layersValues, inputs, feature)`, `notify`, `unselect`. Its `inputs.id[ID]` value is **never filled** — use the callback |
+| `areaintegral` | Two clicks → rectangle sum via summed-area (`integral`) maps | `id`, `text`, `runOnClick(layersValues, inputs, boundingBox, pixel, lastInfo)`, `notify`, `unselect`, `iconCls`, `labelBefore`. Was broken for a long time - it registered its input under a name that did not exist and never set `lastInfo` - and now works |
+| `inputmanager` | Named bag of values for callbacks | `id`; runtime `getValue`, `setValues(obj, cancelUpdate, local)`, `setDefaultValues(obj, local)`, `forceRecalc()` |
+| `zoomlevel` | Hidden input = current map zoom | `id` (required; renders nothing) |
+
+Also allowed in `descriptionHtml`: raw **HTML** (not a `{{…}}` tag).
+
+---
+
+## Markup syntax (all tools) — `api.json` → Tools → `MarkupSyntax`
+
+| Rule | Effect |
+|------|--------|
+| `param=value` | Numbers become JS numbers; `param=` (empty) is `""`; anything else stays a string (`true` is the string `"true"`, truthy). Arrays/objects (`data`, `steps`, `values`, `filterLayers`) are parsed by the tool as JSON |
+| `param=false` | Rewritten to `param=` (falsy) — the only way to switch off a default-true flag (`unselect=false`, `notify=false`) |
+| `\|isnumeric\|` | Bare key = `""`, except the special keys (`isnumeric`) |
+| `a=b=c` | Nested object `{a: {b: c}}` — `plugins=tip={0}%` (slider tip), `scope=getid=ID` |
+| `\=` | Literal `=` inside a value (URLs with query strings); double the backslash inside a JS string. `html=` is exempt (verbatim) |
+| `cls=` | Repeating `cls` **concatenates** (no separator); other repeated keys keep the last value |
+| `getid=ID` | Reference an element created **earlier** in the same description; `getid=ID\|getid=on_<event>=<code>` attaches an Ext listener to it (`this` = that element; evaluated directly, no `functions`/globals lookup) |
+| `function=<body>` | A function from raw text (`param=function=<body>` to assign it); rarely needed — callback params already accept names or inline text |
+
+## Input values — what `inputs.id[ID]` holds and what triggers a recalculation
+
+From the `<Widget>.value` entries in `api.json` (read the entry for details):
+
+| Widget | `inputs.id[ID]` holds | Layer recalculates on |
+|---|---|---|
+| `slider` | number, or `[lower, upper]` with `values` | slider `change` (thumb released / set from code) |
+| `textfield` | the raw text (**string**, even with `isnumeric` — `parseFloat` it) | every `keyup` |
+| `combobox` | selected `data` value as a string (first entry initially) | `select` |
+| `timeline` | key of the current step (first element of the `steps` entry, string) | `change` (thumb moved, animation) — after the step style is applied |
+| `zoomlevel` | current zoom (number) | map `moveend`, only when the zoom changed |
+| `loadcsv` | `ExtjsUtils.CSV.CsvTable` (header = row 0); `undefined` until loaded | resource `waitend` — the layer waits, so `beforeCalc` can rely on it |
+| `loadjson` | parsed JSON (object/array; `[]` on empty body) | resource `waitend` |
+| `pickpoint` | the `PointAttributeManager` (`getAttributes(mapIndex)`, `searchAttribute`, `getPointPos`, `getLastEvent`, `removeAll`, …) — holds map features: extract plain values in `beforeCalc`, never send to `expression` | `onmark` (after every click, once all layers' feature info arrived) |
+| `hoverpixel` | `lastInfo` `{click: {lon, lat}, hover: {lon, lat}}` (EPSG:4326, `null` before first event; updated in place, so always current when read) | **nothing** — registered on `forceupdatelayer`, which nothing fires; react in `runOnClick`/`runOnHover` |
+| `summedarea` | an array meant for the last sums — **stays empty** (never filled); use `runOnClick` | `forceupdatelayer` of the switch (`Ext.getCmp(id).items.get(0).forceUpdateLayer()`) |
+| `areaintegral` | `layersValues` of the last rectangle (one sum per inner layer; updated in place) | `forceupdatelayer` — not fired by the tool; call `forceUpdateLayer()` inside `runOnClick` |
+| `inputmanager` | the manager (`getValue`, `setValues`, `setDefaultValues`, `forceRecalc`, `.global` bucket). Only `global` reaches `expression`; `local=true` values may hold DOM/Ext objects | its `change` — fired by `setValues` (unless `cancelUpdate`) and `forceRecalc` |
+| `filefield` | a **getter function**: `inputs.id[ID]()` → the `File` or `undefined` | input `change` (new file) unless `ignoreUpdate=true` |
+| `window` | handle `{getIds, getWindow, getButton, getContainer}` (components — not for `expression`), stored under the **button's id**: `inputs.id[btnID]`, not the markup `id` (set `btnID` to know it) | once, on window `afterrender` |
+| `opacityslider` | not an input (`value` = initial opacity %) | — |
+
+Caveats worth repeating: `LoadCsv.trim` is a no-op; `SummedArea.value` is never filled; `Hoverpixel` never recalculates by itself (`lastInfo` is still always current); `Timeline.onPlayToggle` must return truthy (a bare statement body returns `true`).
+
+---
+
+## How to choose a tool
+
+| Need | Prefer |
+|------|--------|
+| Show text / HTML | `label` or raw HTML |
+| User runs a named function | `button` (+ `functions`) |
+| Numeric parameter for `expression` | `slider` or `textfield\|isnumeric=true` |
+| Discrete choice | `combobox\|data=…` |
+| Boolean switch that runs code | `checkbox` (+ `handler`; store the state with an `inputmanager` if `expression` needs it) |
+| Opacity control | `opacityslider` |
+| Show legend in panel | `legendhtml` |
+| Animate styles over time | `timeline` |
+| Compare two composed styles live | `livecomposedsplit` |
+| Click map for value / geometry | `pickpoint` |
+| Continuous pixel read | `hoverpixel` |
+| Area sum / integral | `summedarea` / `areaintegral` |
+| Upload local file | `filefield` |
+| Fetch remote CSV/JSON | `loadcsv` / `loadjson` |
+| Extra floating UI | `window` |
+
+---
+
+## Minimal patterns (copy / adapt)
+
+### Button + handler
+
+```javascript
+{
+  title: 'Demo',
+  name: 'CSR:estados',
+  source: 'calculate',
+  visibility: true,
+  paramsButtonConfig: [{ type: 'query', pressed: true }],
+  descriptionHtml: '{{button|id=say_hi|text=Say hi|handler=onHi}}',
+  functions: {
+    onHi: function() {
+      ExtjsUtils.ALERTIFY.log('hi');
+    }
+  }
+}
+```
+
+### Slider as `expression` input
+
+```javascript
+{
+  title: 'Threshold',
+  name: 'CSR:altimetria',
+  source: 'calculate',
+  visibility: true,
+  paramsButtonConfig: [{ type: 'query', pressed: true }],
+  descriptionHtml: '{{slider|id=thr|minValue=0|maxValue=100|value=50}}',
+  expression: function(layerVals, inputs) {
+    var thr = inputs[0];
+    return layerVals[0] > thr ? 1 : undefined;
+  }
+}
+```
+
+### Combobox
+
+```text
+{{combobox|id=month|fieldLabel=Month|data=[["Jan"],["Feb"]]|editable=false}}
+```
+
+`data` is a list of one-element arrays: each value is both what the list shows and what the input holds. A second element (`["01", "Jan"]`) is ignored - the store has a single `value` field.
+
+### Timeline
+
+```text
+{{timeline|id=lu_tl|nextStepInterval=1000|steps=[["01","January"],["02","February"]]}}
+```
+
+Pairs with composed / calculate layers that change styles per step. See `api.json` → Timeline (`onPlayToggle`, `preloadTiles`, …).
+
+### Pickpoint / hoverpixel
+
+```text
+{{pickpoint|id=pick|fieldLabel=Pick|checked=false|onefeature=true|onMark=onPicked}}
+{{hoverpixel|id=hp|text=Value|runOnHover=onHoverValue|runOnClick=onClickValue}}
+```
+
+```javascript
+functions: {
+  onPicked: function (evt) { /* evt.type 'add'|'remove', evt.features[layerIdx][i].data; this = the pickpoint checkbox, this.value = PointAttributeManager */ },
+  onHoverValue: function (layerVals, inputs, coordinates, mouseEvt, lastCoordinates) { /* this = layer */ },
+  onClickValue: function (layerVals, inputs, coordinates, clickEvt, lastCoordinates) { /* this = layer */ }
+}
+```
+
+`pickpoint` recalculates the layer after every click (`onmark`); `hoverpixel` never does — use the callbacks (they receive the map values) or force a recalculation.
+
+### Checkbox (handler, not an input)
+
+```text
+{{checkbox|id=show_details|text=Show details|checked=true|handler=onToggleDetails}}{{inputmanager|id=state}}
+```
+
+```javascript
+functions: {
+  onToggleDetails: function (checkbox, checked) {
+    this.getInputs().id["state"].setValues({ details: checked }); // recalculates the layer
+  }
+}
+```
+
+### Area integral (two-click rectangle; needs maps published with the `integral` operation)
+
+```text
+{{areaintegral|id=integral_tool|text=Sum a rectangle|runOnClick=onAreaSummed}}
+```
+
+```javascript
+functions: {
+  onAreaSummed: function (layersValues, inputs, boundingBox, pixel, lastInfo) {
+    // boundingBox = [minLon, minLat, maxLon, maxLat] (EPSG:4326); lastInfo = {first:{lon,lat}, second:{lon,lat}}
+    ExtjsUtils.ALERTIFY.log("Sum: " + layersValues[0]);
+    Ext.getCmp("integral_tool").items.get(0).forceUpdateLayer(); // only if beforeCalc must see inputs.id["integral_tool"]
+  }
+}
+```
+
+`summedarea` is the free-polygon sibling: `runOnClick(layersValues, inputs, feature)`; its `inputs` value is never filled.
+
+### Opacity + legend
+
+```text
+{{opacityslider}}{{legendhtml|reverseLegend=false}}
+```
+
+### Live composed split
+
+Requires a calculated layer built from two styles of the same map (often the same name twice with two `styles` entries). The parameters are listed in the [API reference](/api/) under **Tools -> LiveComposedSplit**.
+
+```text
+{{livecomposedsplit|id=split1|displayNames=A,B|layerNames=style_a,style_b|baseName=CSR:estados|leftDefault=A|rightDefault=B}}
+```
+
+### Window
+
+```text
+{{window|id=help_win|title=Help|text=Read me|startVisible=false|width=320|height=200}}
+```
+
+### File / CSV / JSON
+
+```text
+{{filefield|fieldLabel=Load SHP|id=loadshp|_onChange=onSelectFile}}
+{{loadcsv|id=tbl|url=https://example.com/data.csv?v\=2|removeEmptyLines=true|cors=true}}
+{{loadjson|id=cfg|url=https://example.com/config.json}}
+```
+
+With stable `id`s, the layer's callbacks read **`inputs.id["tbl"]`** (a CSV table object), **`inputs.id["cfg"]`** (parsed JSON) and **`inputs.id["loadshp"]()`** (the selected file). When each of these becomes available, and why a layer waits for them, is described in [the execution model](/reference/execution-model/).
+
+### Zoom level (hidden input)
+
+```text
+{{zoomlevel|id=z}}
+```
+
+`inputs.id["z"]` = current zoom (number); refreshed when the map stops moving, and it recalculates the layer only when the zoom actually changed.
+
+### Timeline with a play veto
+
+```text
+{{timeline|id=tl|steps=[["1990","1990"],["2000","2000"]]|onPlayToggle=onPlay}}
+```
+
+```javascript
+functions: {
+  onPlay: function (pressed, layer, timeline, playBtn) { return !window.stillLoading; } // falsy = veto
+}
+```
+
+---
+
+## Authoring checklist
+
+1. Put tools only in `descriptionHtml` (not as top-level QUERY keys).
+2. Use the exact tag from the catalog (`livecomposedsplit`, not `LiveComposedSplit`).
+3. Give interactive tools stable `id`s when other code or inputs must find them.
+4. Wire `handler` / `toggleHandler` / `runOnClick` names to `functions: { … }` on the same layer (regular `function`, not arrows — `this` is the layer).
+5. Remember **input order** for `expression(layerVals, inputs)`, and that only plain data reaches `expression`.
+6. For a side-by-side comparison use `livecomposedsplit`; there is no second split API.
+7. Prefer `api.json` → Tools → `<Name>` when a parameter’s type/default is unclear; `<Name>.value` says what the input holds.
+8. Panels with several widgets, the layer-row buttons (`paramsButtonConfig`) and page chrome belong to [the layer and group model](/reference/layer-and-group-model/).
+9. An unknown tag fails silently: the element is simply not created, and the console shows `{{MARKUP}} INVALID OBJECT NAME`.

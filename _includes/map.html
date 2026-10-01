@@ -1,7 +1,11 @@
 {% if post == null %}
     {% assign post = page %}
 {% endif %}
-<div class="post-map">
+{% comment %}
+  include.lazy: the calculator is a whole application; on a tool page it is loaded only when
+  the reader asks for it (the button, or a map card below), not with the documentation.
+{% endcomment %}
+<div class="post-map{% if include.lazy %} post-map--lazy{% endif %}">
     <div class="post-map__header">
         <h2 id="mapTitle">{{post.title}}</h2>
         <div>
@@ -10,5 +14,12 @@
             <a id="openCalculatorMode" target="_blank" href="{{ site.maps.calculator }}{{ post.map-link }}">Open in larger window.</a>
         </div>
     </div>
-    <iframe id="mapViewer" src="{{ site.maps.calculator }}{{ post.map-link }}" width="100%" height="600"></iframe>
+    {% if include.lazy %}
+    <div class="post-map__frame">
+        <iframe id="mapViewer" data-src="{{ site.maps.calculator }}{{ post.map-link }}" width="100%" height="600" title="{{ post.title }}"></iframe>
+        <button type="button" class="post-map__load" onclick="var f=document.getElementById('mapViewer');f.src=f.getAttribute('data-src');this.parentNode.classList.add('is-loaded');">Load the live map</button>
+    </div>
+    {% else %}
+    <iframe id="mapViewer" src="{{ site.maps.calculator }}{{ post.map-link }}" width="100%" height="600" title="{{ post.title }}"></iframe>
+    {% endif %}
 </div>

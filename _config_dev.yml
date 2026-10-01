@@ -1,0 +1,7 @@
+# Local development only, layered over _config.yml:
+#   bundle exec jekyll serve --livereload --config _config.yml,_config_dev.yml
+# (what `npm start` and start.bat run). GitHub Pages never reads this file.
+
+# _pages as in _config.yml (a list here replaces that one), plus the DevTools workspace file
+# Chrome requests from localhost sites - see .well-known/appspecific/com.chrome.devtools.json.
+include: ['_pages', '.well-known']

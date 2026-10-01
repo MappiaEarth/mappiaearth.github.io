@@ -35,7 +35,7 @@
       {% assign info = category[1][0] %}
       {% assign name = info.name %}
       <div class="link-primary index-item" key="{{key}}" style="font-size: 18px; padding-top: 7px; padding-bottom: 7px; padding-left: 5px; border-left: rgba(39, 124, 234, 0.3) solid 1px;"
-      onclick="DocUtils.API.scrollToElement(this)">{{name}}</div>
+      onclick="DocUtils.API.scrollToElement(this)">{{ name | xml_escape }}</div>
       {% endunless %}
       {% endfor %}
     </div>
@@ -44,20 +44,24 @@
   <div style="flex: 0 0 auto; width: calc(100% - 300px); padding: 20px 0 0 20px;">
     <div id="empty-filter-results" class="hidden">No results found.</div>
     {% for groupID in api_groups %}
+      {% comment %}
+        One wrapper per section, opened and closed here whether the section has an intro or not
+        (it used to open only with the intro and close always, leaving a stray </div>).
+        Texts printed as HTML - the intros - come from api.json with any stray tag already
+        escaped (generate-docs.js, checked by publish-docs.js); everything else is escaped here.
+      {% endcomment %}
+      {% assign info = site.data.api[groupID]["_information"] %}
+      <div class="group-container" id="group_{{ groupID | replace: ' ', '_'  }}">
+        <h3>{{ groupID | xml_escape }}</h3>
+        {% if info %}
+          <pre class="group-description">{{ info.description }}</pre>
+          {% if info.example %}
+            {% highlight js %}{{ info.example }}{% endhighlight %}
+          {% endif %}
+        {% endif %}
       {% for category in site.data.api[groupID] %}
         {% assign category_name = category[0] %}
-        {% if category_name == "_information" %}
-        {% assign info = site.data.api[groupID]["_information"] %}
-        {% assign description = info.description %}
-        {% assign example = info.example %}
-        <div class="group-container" id="group_{{ groupID | replace: ' ', '_'  }}">
-        <h3>{{ groupID }}</h3>
-          <pre class="group-description">{{ description }}</pre>
-          {% if example %}
-            {% highlight js %}{{ example }}{% endhighlight %}
-          {% endif %}
-
-        {% else %}
+        {% unless category_name == "_information" %}
         {% assign key = category_name %}
         {% assign tags = site.data.api[groupID][category_name] %}
         {% assign informationData = site.data.api[groupID][category_name] | where: "key", "_information" | first %}
@@ -125,21 +129,19 @@
             </a>
             {% if informationTags contains "_name" %}
               <span class="property-category__metadata__name" onclick="DocUtils.API.toggleCategoryOpen(this)">{{
-                informationData.name }}</span>
+                informationData.name | xml_escape }}</span>
             {% endif %}
 
             {% if informationTags contains "_description" %}
-              <p class="property-category__metadata__description">{{ informationData.description | newline_to_br }}
-              </p>
+              <div class="property-category__metadata__description">{{ informationData.description | newline_to_br }}</div>
             {% endif %}
 
             {% if informationTags contains "_completeAPI" %}
-              <p class="property-category__metadata__completeAPI">{{ informationData.completeAPI | newline_to_br }}
-              </p>
+              <div class="property-category__metadata__completeAPI">{{ informationData.completeAPI | newline_to_br }}</div>
             {% endif %}
             
             {% if informationData.example %}
-              <pre class="property-category__metadata__example"><code>{{ informationData.example }}</code></pre>
+              <pre class="property-category__metadata__example"><code>{{ informationData.example | xml_escape }}</code></pre>
             {% endif %}
           </div>
           <div class="properties-container">
@@ -169,14 +171,14 @@
                   {% highlight js %}{{ example }}{% endhighlight %}
                 {% endfor %}
                 {% if tag.default %}
-                  <span>Defaults to <code>{{ tag.default }}</code></span>
+                  <span>Defaults to <code>{{ tag.default | xml_escape }}</code></span>
                 {% endif %}
               </div>
             </div>
             {% endfor %}
           </div>
         </div>
-        {% endif %}
+        {% endunless %}
       {% endfor %}
       </div>
     {% endfor %}

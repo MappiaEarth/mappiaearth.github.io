@@ -1,0 +1,139 @@
+---
+layout: compress
+---
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en-US" }}">
+
+  {% include head.html %}
+
+  {% comment %}
+    Kept in the layout instead of _sass: assets/css/main.css is a built artifact, so a
+    partial would need the asset pipeline to run before these pages look right.
+  {% endcomment %}
+  <style>
+    .reference__body { display: flex; align-items: flex-start; gap: 40px; }
+    .reference__index { flex: 0 0 260px; position: sticky; top: 12vh; max-height: 84vh; overflow-y: auto;
+      padding-right: 10px; font-size: 15px; }
+    .reference__home { display: inline-block; margin-bottom: 10px; font-weight: 600; }
+    .reference__section { margin: 18px 0 6px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: #6b7280; }
+    .reference__list { list-style: none; margin: 0; padding: 0; }
+    .reference__list li { padding: 3px 0 3px 10px; border-left: 1px solid rgba(39, 124, 234, .3); }
+    .reference__list li.is-current { border-left: 2px solid #277cea; }
+    .reference__list li.is-current > a { font-weight: 600; color: #277cea; }
+    .reference__content { flex: 1 1 auto; min-width: 0; }
+    .reference__content table { display: table; width: 100%; font-size: 15px; }
+    .reference__content td, .reference__content th { vertical-align: top; }
+    .reference__content pre { overflow-x: auto; }
+    .reference__keys .label { margin: 0 6px 6px 0; display: inline-block; }
+    .reference__pager { display: flex; justify-content: space-between; gap: 20px; margin-top: 48px;
+      padding-top: 16px; border-top: 1px solid #e5e7eb; }
+    .reference__pager .reference__next { margin-left: auto; text-align: right; }
+    @media (max-width: 900px) {
+      .reference__body { display: block; }
+      .reference__index { position: static; max-height: none; margin-bottom: 32px; }
+    }
+  </style>
+
+  <body class="site">
+
+    {% if site.google_tag_manager %}
+
+      <!-- Google Tag Manager (noscript) -->
+      <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ site.google_tag_manager }}"
+      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+      <!-- End Google Tag Manager (noscript) -->
+
+    {% endif %}
+
+    {% include header.html %}
+
+    <div class="hero--small dark-bg" style="margin-top: 0">
+      <div class="hero__wrap">
+        <p class="hero__meta">Reference &middot; {{ page.section }}</p>
+        <h1 class="hero__title">{{ page.title }}</h1>
+        {% if page.summary %}<p class="hero__meta">{{ page.summary }}</p>{% endif %}
+      </div>
+    </div>
+
+  {% include docs-nav.html %}
+    <main class="site__content">
+      <div class="container reference">
+        <div class="reference__body">
+
+          {% comment %} Chapter index, ordered as the reference is meant to be read. {% endcomment %}
+          <nav class="reference__index" aria-label="Reference contents">
+            <a class="reference__home" href="{{ '/reference/' | relative_url }}">All chapters</a>
+            {% assign sections = site.data.reference_sections %}
+            {% for section in sections %}
+              {% assign chapters = site.reference | where: "section", section | sort: "order" %}
+              {% if chapters.size > 0 %}
+                <h4 class="reference__section">{{ section }}</h4>
+                <ul class="reference__list">
+                  {% for chapter in chapters %}
+                    <li class="{% if chapter.url == page.url %}is-current{% endif %}">
+                      <a href="{{ chapter.url | relative_url }}">{{ chapter.title }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            {% endfor %}
+
+            <h4 class="reference__section">Machine readable</h4>
+            <ul class="reference__list">
+              <li><a href="{{ '/assets/reference/' | append: page.reference_id | append: '.md' | relative_url }}">This page as markdown</a></li>
+              <li><a href="{{ '/llms.txt' | relative_url }}">llms.txt</a></li>
+              <li><a href="{{ '/llms-full.txt' | relative_url }}">Whole reference (one file)</a></li>
+              <li><a href="{{ '/assets/api.json' | relative_url }}">api.json</a></li>
+            </ul>
+          </nav>
+
+          <article class="post-content reference__content" itemprop="articleBody">
+            {{ content }}
+
+            {% if page.api_keys and page.api_keys.size > 0 %}
+              <h2 id="generated-api-entries">Generated API entries for this chapter</h2>
+              <p>
+                Every property and function named here is listed, with its type, default and
+                example, in the generated <a href="{{ '/api/' | relative_url }}">API reference</a>:
+              </p>
+              <p class="reference__keys">
+                {% for key in page.api_keys %}
+                  {% assign group = key | split: "." | first %}
+                  <a class="label" href="{{ '/api/#category_' | append: group | relative_url }}"><code>{{ key }}</code></a>
+                {% endfor %}
+              </p>
+            {% endif %}
+
+            {% comment %} Previous / next inside the whole reading order. {% endcomment %}
+            {% assign ordered = "" | split: "" %}
+            {% for section in site.data.reference_sections %}
+              {% assign chapters = site.reference | where: "section", section | sort: "order" %}
+              {% assign ordered = ordered | concat: chapters %}
+            {% endfor %}
+            {% assign position = 0 %}
+            {% for chapter in ordered %}
+              {% if chapter.url == page.url %}{% assign position = forloop.index0 %}{% endif %}
+            {% endfor %}
+            <nav class="reference__pager">
+              {% if position > 0 %}
+                {% assign previousIndex = position | minus: 1 %}
+                {% assign previous = ordered[previousIndex] %}
+                <a class="reference__prev" href="{{ previous.url | relative_url }}">&larr; {{ previous.title }}</a>
+              {% endif %}
+              {% assign last = ordered.size | minus: 1 %}
+              {% if position < last %}
+                {% assign nextIndex = position | plus: 1 %}
+                {% assign next = ordered[nextIndex] %}
+                <a class="reference__next" href="{{ next.url | relative_url }}">{{ next.title }} &rarr;</a>
+              {% endif %}
+            </nav>
+          </article>
+        </div>
+      </div>
+    </main>
+
+    {% include footer.html %}
+
+  </body>
+
+</html>

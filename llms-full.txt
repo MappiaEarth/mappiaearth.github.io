@@ -1,0 +1,1891 @@
+# Mappia reference
+
+> The whole reference, concatenated. Individual pages: https://mappia.earth/llms.txt
+
+# Section: Writing a query
+
+## How a query is evaluated
+
+> A query is plain JavaScript - one expression whose value is the list of layers to show. This page is the contract around it: how the platform evaluates it, where state lives, and which parts of it run in a worker instead of on the page.
+
+A **query** is the text that defines one Mappia map: which layers it shows, how they are
+grouped, which widgets the user gets, and what arithmetic runs over the pixels. A query is
+stored on the server under a numeric id (`?queryid=417`) or handed to a page at runtime by
+its parent document.
+
+**There is no Mappia language.** A query is plain JavaScript, evaluated by the browser. What
+the platform adds is an **API**: the objects, the layer and group properties, the widgets and
+the callbacks that this reference declares — the layer and group properties in
+[the property catalogue](property-catalogue), the widgets in
+[the widget catalogue](widget-catalogue), and all of it, generated from the platform source,
+in the [API reference](/api/).
+
+What this page describes is the *contract* around that JavaScript: it is evaluated as a
+single expression, part of it runs in a worker rather than on the page, and state does not
+survive a re-apply. Almost every surprise a query author meets comes from one of those
+three facts.
+
+## 1. One expression, one value
+
+The platform does not run a query as a program. It evaluates it as a single expression,
+equivalent to:
+
+```javascript
+true && ( your query text )
+```
+
+and keeps **the value the expression produced**. That value must be an array of layer
+definitions. The smallest complete query is therefore one line:
+
+```javascript
+[{ name: "CSR:estados" }];
+```
+
+Two consequences follow, and they explain most "my query did nothing" reports:
+
+| If you write | What happens |
+|---|---|
+| A top-level statement (`var x = 1; [ … ]`) | A syntax error inside the expression. The map falls back to its default background and the array is never read. |
+| An expression whose value is not an array (a function declaration, an assignment, a `console.log`) | The query is discarded as "no layers", with the same visible result. |
+
+So state and setup cannot be introduced with statements. They are introduced with
+operators — which is what the next section is about.
+
+## 2. The `&&` chain: setup before the value
+
+Several platform calls exist to be used as the left-hand side of `&&`. Each performs a
+side effect and returns `true`, so the expression continues and still ends with the layer
+array:
+
+```javascript
+ExtjsUtils.CONFIGURATION.setOptions({ keepOnLeave: true }) && [
+  { name: "CSR:estados", visibility: true },
+];
+```
+
+| Call | Side effect | Use it when |
+|---|---|---|
+| `ExtjsUtils.CONFIGURATION.setOptions({…})` | Query-level behaviour: mouse-wheel policy when embedded, the default projection for vector data, the background picker | The map needs behaviour that is not a layer property |
+| `ExtjsUtils.QUERY.setQueryGlobalProperties({…})` | Copies each key onto `window` for the lifetime of this query | You need named functions or shared state (see §3) |
+| `ExtjsUtils.QUERY.setMappiaIoCallback(fn)` | Registers the handler for messages sent by the parent document | The map is embedded and the parent talks to it |
+| `ExtjsUtils.QUERY.decorate({…})` | Page chrome: `header`, `footer`, `run`; any other key is installed as a CSS rule | Branded or stripped-down pages |
+| `ExtjsUtils.QUERY.addRemoteWMSServer({…})` | Registers extra WMS endpoints before the layers that use them are read | Layers come from a server outside the default catalogue |
+| `ExtjsUtils.PROJECTION.setProjectionOptions({…})` | Adds coordinate systems to the upload dialog | Users upload data in an unusual CRS |
+
+Chain only what the map needs. A query that opens with five setup calls it does not use is
+harder to read and no more capable than `[{ name: "…" }]`.
+
+Two details worth knowing:
+
+- **Order matters where data depends on it.** `addRemoteWMSServer` must come before the
+  array that references its layers, otherwise those layers are skipped with a
+  "source not found by name" message in the console.
+- **Setup calls do not run during a syntax check.** When the editor only parses a query to
+  validate it, side-effect calls are suppressed; only the layer array is produced. Code
+  that must run exactly once after setup belongs in `runNow` (§3), not in a bare call.
+
+## 3. Where state lives
+
+A query is re-evaluated whenever it is applied again — by the editor, by the parent
+document, by a user pressing *Apply*. Anything held in a top-level variable is lost, and
+top-level variables are not even syntactically available (§1). All shared state goes
+through one call:
+
+```javascript
+ExtjsUtils.QUERY.setQueryGlobalProperties({
+  PALETTE: ["#ffffcc", "#c2e699", "#78c679", "#238443"],
+  toTitle: function (name) { return name.replace(/_/g, " "); },
+  handleParentMessage: function (msg) { /* … */ },
+}) && [ /* layers */ ];
+```
+
+- Each key becomes a property of `window` until the next query replaces it.
+- A name that already exists on `window` and was not created by a query is **refused**,
+  with "Global variable can't be redefined" in the console. Choose names that cannot
+  collide with the platform's own globals.
+- Exactly one name has a meaning to the platform: **`runNow`**. If the query defines it,
+  the platform calls it once, after the globals are registered. Everything else is a
+  private name that only your own query code reads.
+- A `global: { … }` object on a group or on a layer is an equivalent, narrower way to
+  declare globals while that node is being interpreted.
+
+## 4. Names, and where a layer comes from
+
+A layer definition identifies its data by `name`:
+
+```javascript
+[{ name: "CSR:estados", visibility: true }]
+```
+
+That name is looked up in the catalogue the platform already knows (its WMS
+capabilities). A name that is not in the catalogue produces no layer — and this is the
+single most common reason a query that "worked last year" shows an empty map: the published
+layer was renamed or withdrawn. Layers from elsewhere need their server registered first
+(`addRemoteWMSServer`), and layers that are not WMS at all (a GeoJSON file, an XYZ tile
+service, an uploaded CSV) declare a `source` or a `type` instead. The layer and group
+vocabulary is a chapter of its own: [the layer and group model](/reference/layer-and-group-model/).
+
+## 5. Functions inside a query
+
+Layer definitions hold functions: what to do before a calculation, what to draw for a
+legend, what a button does. Three rules cover all of them.
+
+**5.1 `this` is the layer, so use a regular function.** The platform calls these callbacks
+with `this` bound to the layer (or, for tree callbacks, to the node). An arrow function
+keeps the `this` of the surrounding scope, where none of the layer's methods exist:
+
+```javascript
+// correct
+beforeCalc: function (inputs) { this.changeLayers([{ index: 0, name: inputs.id["pick"] }]); }
+
+// broken: this.changeLayers is undefined
+beforeCalc: (inputs) => { this.changeLayers(/* … */); }
+```
+
+This applies to `beforeCalc`, `afterCalc`, `onVisibilityChange`, `onInputsReady`, the
+entries of a layer's `functions` map, widget `handler` / `toggleHandler`, vector callbacks
+such as `onClick` / `onHover` / `loadData`, and the group callbacks.
+
+**5.2 A handler named by a string is resolved in a fixed order.** Widgets take their
+callbacks as text (`{{button|handler=applyFilter}}`). The platform resolves that name:
+
+1. the layer's own `functions` map — `functions: { applyFilter: function () { … } }`;
+2. a global of that name (typically one declared with `setQueryGlobalProperties`);
+3. failing both, the string itself is evaluated: a string starting with `function` becomes
+   that function, and any other text is treated as the *body* of a function.
+
+Prefer (1). It keeps the callback next to the layer it belongs to, and it cannot collide
+with anything else on the page.
+
+**5.3 `expression` is not evaluated on the page.** A calculated layer's `expression` is
+serialized with `toString()` and rebuilt inside a WebWorker, where the page does not
+exist: no closures over your variables, no `window`, no DOM, no platform objects.
+
+```javascript
+// broken: `factor` and `document` do not exist in the worker
+expression: function (layersVals) { return layersVals[0] * factor; }
+
+// broken: inputs.id is undefined in the worker
+expression: function (layersVals, inputs) { return layersVals[0] * inputs.id["factor"]; }
+
+// correct: the widget values arrive as a plain array, in the order the widgets appear
+expression: function (layersVals, inputs) { return layersVals[0] * inputs[0]; }
+```
+
+Inside `expression` you have: `layersVals` (the pixel values of the layers, in order),
+`inputs`, and `this`, which is the calculation object — so `this.isNumeric(v)`,
+`this.getValueFromLegend(...)` and `this.nullValue` are available.
+
+**`inputs` is a plain array inside `expression`.** On the page, `inputs` also carries a map by
+widget id — `inputs.id["factor"]` — but the inputs reach the worker as JSON, and JSON keeps only
+an array's elements, so that map is gone there. Read values by **position**: `inputs[0]` is the
+first input widget in `descriptionHtml`, `inputs[1]` the second, and so on (labels, buttons and
+checkboxes are not inputs and take no position). Name-based access, `inputs.id[ID]`, works in
+`beforeCalc`, `onInputsReady`, `afterCalc` and the `functions` map, which all run on the page.
+
+Anything else must be computed in `beforeCalc` and passed in. How that works, and when each
+callback runs, is the next chapter: [the execution model](/reference/execution-model/).
+
+## 6. Widgets are text, not JavaScript
+
+Interface elements are written as markup inside a layer's `descriptionHtml`, in double
+braces, parameters separated by pipes:
+
+```javascript
+descriptionHtml: "Year {{slider|id=year|minValue=2000|maxValue=2024|value=2020}}"
+```
+
+This is a second, smaller language with its own escaping and parameter conventions, and it
+has its own chapter: [the widget markup language](/reference/markup-widgets/).
+
+## 7. Which JavaScript is available
+
+A query is evaluated by the browser's own `eval`, so the language available is whatever the
+visitor's browser supports — `let`, template literals, arrow functions (outside the
+`this`-bound callbacks of §5.1), destructuring. There is no transpilation step and no
+"write ES5" rule. The real constraints are the three above: one expression (§1), no page
+context inside `expression` (§5.3), and regular functions where `this` matters (§5.1).
+
+## 8. A complete query, annotated
+
+```javascript
+ExtjsUtils.QUERY.setQueryGlobalProperties({
+  // Shared helper, reachable from every callback below.
+  labelFor: function (value) { return value + " m"; },
+}) &&
+  ExtjsUtils.CONFIGURATION.setOptions({ backgroundSelector: true }) && [
+    // A background layer: same array, marked by its group.
+    { name: "mapnik", source: "osm", group: "background", visibility: true },
+
+    // A named group with one calculated layer inside it.
+    {
+      viewTitle: "Elevation",
+      color: "#8b0000",
+      elements: [
+        {
+          title: "Terrain above the threshold",
+          name: "CSR:altimetria",
+          source: "calculate",
+          visibility: true,
+          descriptionHtml:
+            "Minimum {{slider|id=threshold|minValue=0|maxValue=2000|value=800}}",
+          // Runs on the page: may read the map, the DOM, other layers.
+          beforeCalc: function (inputs) {
+            this.setCalculateLegend([
+              { color: [139, 0, 0], value: 1, title: window.labelFor(inputs.id["threshold"]) },
+            ]);
+          },
+          // Runs in a worker: only layersVals, inputs and this.
+          expression: function (layersVals, inputs) {
+            return layersVals[0] >= inputs[0] ? 1 : this.nullValue; // inputs[0]: the slider
+          },
+        },
+      ],
+    },
+  ];
+```
+
+## 9. When a query does not work
+
+| Symptom | Almost always |
+|---|---|
+| Only the default background appears | The expression threw, or its value was not an array (§1) |
+| A layer silently missing | Its `name` is not in the catalogue, or its server was registered after the array (§4) |
+| `this.something is not a function` | An arrow function where the platform binds `this` (§5.1) |
+| A value is `undefined` only inside `expression` | It came from a closure, the DOM or a global; pass it through `inputs` (§5.3) |
+| Works once, breaks when re-applied | State kept outside `setQueryGlobalProperties` (§3) |
+| "Global variable can't be redefined" | A global name collides with an existing page global (§3) |
+
+The console is the primary instrument: the platform logs the reason it skipped a layer or
+refused a global. A longer list, including properties that look meaningful but are ignored,
+is in [pitfalls and properties that do nothing](/reference/pitfalls/).
+
+## Execution model
+
+> What the platform does between reading a query and painting a tile — when each callback runs, what waits for what, and which code crosses into the calculation worker.
+
+A query is read once; the map it describes then keeps working for as long as the page is
+open. Knowing the order of what happens — and, above all, which code runs on the page and
+which runs in a worker — is what makes the difference between a query that behaves and one
+that intermittently shows nothing.
+
+## 1. From text to layers
+
+```
+query text
+   │  evaluated as one expression, value = array of definitions
+   ▼
+interpretation ── groups flattened into an ordered list of layers
+   │              group defaults applied, group path remembered per layer
+   ▼
+one layer object per definition, by kind:
+   ├─ catalogue map (WMS tiles, drawn as they arrive)
+   ├─ calculated map (several maps + your expression, see §2)
+   ├─ vector/file layer (GeoJSON, CSV, uploaded file)
+   └─ tile service (XYZ / OSM basemap)
+   │
+   ▼
+layer panel, map, widgets declared in descriptionHtml
+```
+
+Interpretation is where a nested query becomes flat: a group (`viewTitle` with `elements`)
+contributes its own properties to each layer inside it and records the path that the layer
+panel shows. Within a group, entries keep the order you wrote them in, unless a
+`priority` reorders them (higher first).
+
+Nothing has been drawn yet at this point, and no calculation has run.
+
+## 2. The cycle of a calculated map
+
+A calculated layer (`source: "calculate"`) names several maps at once and produces a new
+map from their pixels. Its cycle is the part of the platform most queries interact with:
+
+```
+        widgets in descriptionHtml are created
+                      │
+                      ▼
+        every input has a value ──────────► onInputsReady(inputs)
+                      │
+                      ▼
+               beforeCalc(inputs)            ← on the page: map, DOM, other layers
+                      │
+                      ▼
+      tiles of each named map are fetched and decoded
+                      │
+                      ▼
+   for every pixel:  expression(layersVals, inputs)   ← in a worker
+                      │
+                      ▼
+      legend: legendColor(value) per distinct value,
+              or the entries you set with setCalculateLegend
+                      │
+                      ▼
+                afterCalc(...)               ← on the page again
+                      │
+                      ▼
+                   painted
+```
+
+| Callback | Runs | Receives | Typical use |
+|---|---|---|---|
+| `onInputsReady` | Once every input of the layer has a value — including for layers that are not visible | `inputs` | Kick off work that needs the widgets, e.g. a first `generateNewLegend()` |
+| `beforeCalc` | Before each calculation round | `inputs` | Read widgets, swap the maps being read (`changeLayers`), set the legend, cancel the round |
+| `expression` | Once per pixel, in the worker | `layersVals`, `inputs`, `this` = the calculation object | The arithmetic itself |
+| `legendColor` | Once per distinct value produced | the value | Colour scale |
+| `afterCalc` | When the round finished - only for a layer with an `expression`: without one nothing is computed and `afterCalc` never runs | the results | Totals, notifying the parent page, enabling UI |
+
+`inputs` is the collected value of every widget declared in that layer's
+`descriptionHtml`, in declaration order, and can also be read on demand with
+`getInputs()`.
+
+## 3. What crosses into the worker
+
+`expression` is the only part of a query that does not run on the page. It is turned into
+text with `toString()` and rebuilt inside a WebWorker, together with the pixel values and
+the plain widget values.
+
+| Crosses into the worker | Stays on the page |
+|---|---|
+| The source text of `expression` | Any variable it closed over — it becomes `undefined` |
+| `layersVals`: one value per named map, in `name` order | `window`, the DOM, the map, the platform objects |
+| `inputs`: the widget values as a **plain array**, in markup order | The name map `inputs.id` (JSON keeps only an array's elements), and widget values that are not plain data (a function, a table object, a manager's methods) |
+| `this`: the calculation object (`isNumeric`, `getValueFromLegend`, `nullValue`) | Your own helpers and globals |
+
+The practical rule: anything an expression needs that is not a pixel value must be computed
+in `beforeCalc` and handed over as an input — and read by position, `inputs[0]`, `inputs[1]`,
+never as `inputs.id[ID]`, which only exists on the page. A widget whose value is an object (a
+loaded CSV table, a picked point) is readable in `beforeCalc`, not inside `expression`; an
+`{{inputmanager}}` arrives as its plain `global` values (`inputs[0].global.key`).
+
+## 4. What triggers a new round
+
+A calculated layer recalculates when:
+
+- a widget that is registered as an input reports its change event — a slider moved, a text
+  field was typed in, a CSV finished downloading, a timeline stepped;
+- code calls `forceRecalc()` on an input manager, or `generateNewLegend()` on the layer;
+- the maps being read change (`changeLayers`, `setLayerOperation`,
+  `setInsideLayerVisibility`);
+- the layer becomes visible again, or the map moves to tiles that have not been computed.
+
+Rounds are cancellable: `pauseAndStopCalculations()` stops the current one and suppresses
+new ones until `resumeCalculations()` is called once per pause. Queries that load an
+external resource before they can compute use this pair, so the user does not see a legend
+computed from half the data.
+
+## 5. Waiting, and why a query must not assume
+
+Several things load independently: the layer catalogue, each layer's own resources, the
+widgets' files (a CSV, a JSON), the legend of a stored map. The platform keeps count of
+what is outstanding and holds the calculation until the count reaches zero, which is why
+`onInputsReady` exists and why `beforeCalc` may legitimately run later than you expect.
+
+Two consequences for a query author:
+
+- **Do not read another layer's data during interpretation.** At that moment the other
+  layer may not exist yet. Read it in `onInputsReady`, in `beforeCalc`, or in a callback.
+- **A resource your own code fetches must be announced**, otherwise the platform may
+  calculate without it. Widgets that download something (`{{loadcsv}}`, `{{loadjson}}`) do
+  this for you; a hand-written `fetch` in a callback does not.
+
+## 6. Tiles, zoom and decoded values
+
+Catalogue and calculated maps are tiled. Two behaviours surprise query authors:
+
+- **Beyond a layer's maximum zoom**, the platform keeps requesting the deepest tile it has
+  and stretches it, instead of requesting a zoom the server does not publish.
+- **The values a calculated layer reads are decoded**, and how they are decoded is chosen
+  per map with `operation`: the original cell value of the most central cell, the packed
+  colour, an area-weighted sum or average, a maximum, a summed-area integral. The tokens
+  are listed with the layer vocabulary in
+  [the layer and group model](/reference/layer-and-group-model/); the decoding requires the map to
+  be published with that operation available.
+
+When the same map appears more than once in `name` with different operations, each
+position in `layersVals` corresponds to one entry of the `name` list — the list is the
+contract between the query and the expression.
+
+## 7. Re-applying a query
+
+Applying a query again — from the editor, or from a parent document — re-evaluates the text
+from scratch: globals are re-registered, layers are rebuilt, widgets are recreated. It does
+not preserve anything the previous evaluation left in a page variable. This is the reason
+shared state belongs in the query's globals, described in
+[the query language](/reference/query-language/).
+
+## 8. Reading the console
+
+The platform narrates this pipeline. The messages worth recognising:
+
+| Message | Means |
+|---|---|
+| A layer is skipped with "source not found by name" | The layer's server was not registered before the array |
+| "Operation X is not defined for layer Y" | The map is not published with the decoding the query asked for |
+| "Global variable can't be redefined" | A query global collides with a page global |
+| A calculation that never finishes | Something is still counted as loading — usually a resource fetched without announcing it (§5) |
+
+# Section: Model
+
+## The layer and group model
+
+> The vocabulary a query is written in — the kinds of layer, how groups nest them, how a calculated layer reads several maps at once, and where the full property list lives.
+
+Everything a query says is said about a **layer definition**: a plain object. Groups nest
+those objects and pass properties down to them. This page is the vocabulary: the kinds of
+layer that exist, what distinguishes them, and which property list applies to each. The
+exhaustive, generated list of properties lives in the
+[API reference](/api/) — this page is the map of it.
+
+## 1. A layer definition
+
+```javascript
+{
+  name: "CSR:estados",      // which map(s) — the only property with no default
+  title: "States",          // what the layer panel shows
+  visibility: true,         // starts visible
+  opacity: 0.8,
+  group: "background",      // optional: a reserved slot, see §4
+}
+```
+
+Two properties decide how everything else is read:
+
+| Property | Decides |
+|---|---|
+| `source` | Where the pixels come from: the catalogue, a calculation, a file, a tile service |
+| `name` | Which map, or — for a calculated layer — which maps, comma-separated, in order |
+
+## 2. The kinds of layer
+
+| `source` | What it is | The properties that matter | Property group in the API reference |
+|---|---|---|---|
+| *(absent)* or `"local"` | One published map, drawn as WMS tiles | `styles`, `extents`, `minscale` / `maxscale`, `maxZoom` | `LayersProperties`, `ConfigLayer` |
+| `"calculate"` | Several maps read together; your `expression` produces a new map from their pixels | `name` (list), `operation`, `expression`, `beforeCalc`, `legendColor`, `insideOpacity`, `categorical` | `LayersProperties`, `LayersFunctions`, `LayerInternal` |
+| `"file"` | Vector features from a file, an inline object or your own loader — with `type` choosing which | `type`, `url`, `json`, `loadData`, `styleMap`, `onClick`, `onHover`, `cluster` | `FileLayer`, `VectorLayer` |
+| `"xyz"` | A tile service addressed by z/x/y | `url`, `name` | `XYZLayer` |
+| `"osm"`, `"google"`, `"arcgisrest"` | A ready-made basemap | `name` selects the variant (for example `mapnik`, `SATELLITE`) | `LayersProperties` |
+
+A layer registered through `addRemoteWMSServer` behaves as a catalogue layer; the
+registration says where its server is and whether it needs a proxy.
+
+### 2.1 `type`, for file layers
+
+`type` chooses how a `source: "file"` layer obtains its features (case-insensitive):
+
+| `type` | Source of the features |
+|---|---|
+| `load` | Your `loadData(inputs, config)` callback loads them; it must announce the load with the layer's `startLoadingLayer` / `endLoadingLayer` events |
+| `csv` | The CSV at `url`, one feature per line |
+| `json` | The inline `json` property: GeoJSON, or an array of plain objects |
+| `jsonurl` | JSON fetched from `url` (also the fallback for an unrecognised `type`) |
+| `geojsonurl` | GeoJSON fetched from `url` |
+| `empty` | No features; the query adds them later |
+
+Vector data without a declared CRS is assumed to be in the platform's default projection.
+Declare `crs` in the GeoJSON, or `fromProj` on the layer, whenever the data is in anything
+else — a silent misalignment is the usual symptom.
+
+### 2.2 `operation`, for calculated layers
+
+A calculated layer's `name` lists several maps; `operation` is a comma-separated list with
+**one token per map, in the same order**, saying how each map's pixels are turned into the
+numbers `expression` receives. An empty token leaves that map on the default.
+
+```javascript
+{
+  source: "calculate",
+  name: "CSR:pop_density_estimate_2015,CSR:estados,CSR:pop_density_estimate_2015",
+  operation: "average,,area",   // map 1 averaged, map 2 default, map 3 as area
+}
+```
+
+| Token | The value `expression` receives |
+|---|---|
+| *(empty)* | The regular WMS image: the pixel's legend colour/category |
+| `raw` | The value of the most central original cell under the pixel |
+| `rgba` | The pixel's RGBA bytes packed into one integer |
+| `sum` / `average` | Area-weighted sum / mean of the cells under the pixel |
+| `max` / `min` | Largest / smallest cell at least partly under the pixel |
+| `integral` | Summed-area table: the sum over a rectangle from its four corners |
+| `areaintegral` | Summed-area table of the covered areas |
+| `area` | Original map area inside the pixel |
+| `cells` | Weighted count of original cells inside the pixel |
+
+Tokens are case- and whitespace-insensitive. Every token except the default and `rgba`
+requires the map to be **published with that operation available**; if it is not, the
+console reports `Operation X is not defined for layer Y` and the layer produces nothing.
+
+## 3. Groups
+
+A group is a definition with `viewTitle` and `elements`:
+
+```javascript
+[
+  {
+    viewTitle: "Boundaries",
+    color: "#8b0000",
+    openGroup: true,
+    defaultProperties: { visibility: false, source: "local" },
+    elements: [
+      { title: "States", name: "CSR:estados", visibility: true },
+      { title: "Municipalities", name: "CSR:municipios" },
+    ],
+  },
+]
+```
+
+| Property | Effect |
+|---|---|
+| `viewTitle` | The group's row in the layer panel; groups may nest by nesting `elements` |
+| `elements` | The layers, or further groups, inside it |
+| `defaultProperties` | Applied to every descendant that does not set the property itself |
+| `openGroup` | The group starts expanded (also available per layer, where it expands the layer's ancestors) |
+| `color`, `viewColor` | The colour of the group row and of its layers' rows |
+| `onClickViewGroup`, `onToggleViewGroup` | Called when the group row is clicked or toggled, with `this` = the node. These need a real group: attached to a layer that is not inside a `viewTitle`, they never fire |
+| `global` | Declares query globals while this group is interpreted |
+
+Interpretation flattens all of this into an ordered list of layers, each remembering its
+group path. Order inside a group is declaration order unless `priority` reorders it
+(higher first).
+
+## 4. Reserved and special slots
+
+| Slot | Meaning |
+|---|---|
+| `group: "background"` | The layer is a basemap: it goes under everything and joins the background picker instead of the layer list |
+| `group: "<name>"` | A flat grouping label for layers that do not use `viewTitle` |
+| `paramsButtonConfig` | Extra buttons on the layer's row — query, download, tooltip and toggle buttons; a bare object is treated as one entry of type `query` |
+| `descriptionHtml` | The layer's panel content: free HTML plus the widget markup of [the widget markup language](/reference/markup-widgets/) |
+
+## 5. Presentation properties, in one place
+
+These do not change what the layer computes, only how it appears. All are documented
+individually in the [API reference](/api/) under `LayersProperties` and `ConfigLayer`:
+
+- **In the panel**: `title`, `description`, `thumbUrl`, `legendTitle`, `startLegendOpen`,
+  `startListed`, `hideListing`, `hideMetadata`, `hideLegendButton`, `hideStyleChooser`,
+  `showRemoveBtn`, `useLayerTooltip`, `customLayerClass`, `verticalMenu`.
+- **On the map**: `visibility`, `opacity`, `insideOpacity`, `maxExtent`, `minscale`,
+  `maxscale`, `maxZoom`, `attribution`, `hideTilePlaceholder`.
+- **In the legend of a calculated layer**: `categorical`, `categoricalPalette`,
+  `maxQntEntries`, `showLoadingModal`.
+
+## 6. How to find a property
+
+1. The [API reference](/api/) is generated from the platform source: it is the list that
+   cannot be out of date. Filter by name; the group tells you which kind of layer it
+   applies to.
+2. This page tells you which group to look in.
+3. If a property appears in an old query and does nothing, check
+   [pitfalls and properties that do nothing](/reference/pitfalls/) before trusting it — a handful of
+   keys have been copied between queries for years without ever being read.
+
+## Layer and group property catalogue
+
+> Every property a layer, a group or a layer-row button accepts, generated from the platform source: the declared API of a query's layer definitions.
+
+The complete property list of a layer definition, as the platform declares it. Which properties apply to which kind of layer is explained in the previous chapter; this is the exhaustive list, generated from the source.
+
+## Layers
+
+### LayersProperties — Layers Properties
+
+You can define the following properties for a Layer:
+
+| Name | Type | Description |
+|---|---|---|
+| `categorical` | `Boolean` | Switches the generated legend of a `source: 'calculate'` layer to categorical mode. When `true`, every distinct value returned by `expression()` becomes its own legend entry (values are grouped by value, never into ranges) and the colours come from… |
+| `categoricalPalette` | `Array.<Array.<Number>>` | Colours of the legend entries of a categorical `source: 'calculate'` layer (see `categorical`), as an array of `[R, G, B]` triplets (0 to 255). The entries are assigned, in the sorted order of the values returned by `expression()`, spreading evenly over the… |
+| `description` | `String` | Define the text that will be displayed when the mouse hover the Legend Window Title. This description applies when the 'source' of the map is 'xyz' or the Layer is a 'vector'. |
+| `descriptionHtml` | `String` | Define the content that will be displayed at the Query section ("Exibir Consulta" button). This property accepts any string in HTML format. Besides that, you can also use predefined tools. |
+| `disabledAttributes` | `String` | Define which styles will be hidden in the Style Chooser Combobox from Layers that has the 'source' property as 'local'. You need to pass the name of a style as in the GetCapabilities() xml. They follow the pattern of the map name, underline (_) and then the… |
+| `exclusiveGroupDetails` | `String` | Define a name for a Layer Details. Between all Layers with the same ‘exclusiveGroupDetails’ name, only one Layer can have its Legend open each time. |
+| `extents` | `Array.<Numeric>` | Define which tiles will be used to render the map. All the tiles that are within the 'extents' coordinates will be used to render the map. The extents must be in EPSG:4326 (coordinates in lat,long). Also, the array values need to be in the order: [minX, minY,… |
+| `global` | `Object` | A second way to declare query globals from a layer: an object whose properties become temporary globals, passed to `ExtjsUtils.QUERY.setQueryGlobalProperties` while the layer is interpreted. The usual form is the… |
+| `hideLegendButton` | `Boolean` | Hides the legend of the layer in its Legend Window. Set it to 'true' to hide it, 'false' to display it. It applies to every layer source: on a `local` layer it hides the "show legend" toggle button of the row; on a `calculate`, `file` or `xyz` layer it hides… |
+| `hideListing` | `Boolean` | Define if should hide a Layer in the list that appears when the mouse hover the Group Title at the top of the screen. Set it to 'true' to hide that Layer in the list. Otherwise, set it to 'false' to show it. |
+| `hideMetadata` | `Boolean` | If true, hides the metadata button in the Legend Window for this layer. When omitted, falls back to the plugin hideMetadata option (URL options=hidemetadata). |
+| `hideStyleChooser` | `Boolean` | Define if should hide the Combobox with the map possible styles that can be applied to a map in a Layer that has the 'source' 'local'. |
+| `hideTilePlaceholder` | `Boolean` | Removes the stretched placeholder tile that is shown while the real tiles load (the OpenLayers `resize` transition). Set it to `true` for layers whose content changes between loads, such as timeline or calculated maps, to avoid the previous image being… |
+| `insideOpacity` | `Array.<Numeric>` | Defines the opacity for the maps defined in the 'name' property. This property is an array of values which are the opacity that will be applied in the same order that the map was defined in the 'name' property. For example, the first value in the… |
+| `legendTitle` | `String` | Defines the text that will be displayed at the top of the 'legendhtml tool' declared at the 'descriptionHtml' property |
+| `maxQntEntries` | `Number` | Maximum number of legend entries generated from the values returned by `expression()` on a non-categorical `source: 'calculate'` layer; when there are more distinct values than this they are grouped into value ranges. The value is clamped to the length of the… |
+| `name` | `String` | Defines the maps that will be a part of the Layer. Every map defined in here will be shown when the Layer is active. Besides that, all of their information can be used to calculate a new map combining their data. In this website you will find some of the maps… |
+| `opacity` | `Numeric` | Define the opacity of the Layer. The opacity is a value between 0 and 1 that is a scale for its transparency. 0 is completely transparent. 1 is completely visible. |
+| `priority` | `Number` | Defines the order of which map will be rendered on top of the others. Layers with higher 'priority' will always be rendered on top of the layers with lower 'priority'. |
+| `showLoadingModal` | `Boolean` | Shows the "generating legend" loading mask visibly over the page while the layer is paused (calculating or loading a resource). By default the mask is an invisible overlay that only changes the cursor to "wait"; set it to `true` to make it visible. Only shown… |
+| `showRemoveBtn` | `Boolean` | Defines it the remove button at the top right of the Layer Legend Window show be displayed. Set it to 'true' to show it. Set it to 'false' to hide it. |
+| `source` | `String` | Defines the source from where the maps declared at the name will be loaded from. The Source can be one of the following: - 'local': The maps in the name will be loaded from the CSR servers - 'calculate': The maps in the name gonna be used to calculate a new… |
+| `startLegendOpen` | `Boolean` | Defines if the Legend Window should start or not. Set it to 'true' to make it start open. Set it to 'false' for it to start closed. |
+| `startListed` | `Boolean` | Define if the Layer should start with its Legend Window visible or not. This does not make the Layer visible on the map by itself. For that, you need to set the 'visibility' property to 'true'. 'startListed' just displays the Legend Window associated with the… |
+| `styles` | `String` | Defines which styles will be applied over the maps defined at the 'name' property. The styles are applied in the same order as the maps are declared in name. For example, if there are 3 maps in the 'name' property and 3 styles. The first style will be applied… |
+| `thumbUrl` | `String` | Define the thumbnail image that is displayed when the mouse hovers the Legend Window title. You can define any image you would like to display as the map thumbnail. You just need to pass its URL. |
+| `title` | `String` | Defines the Title that will be displayed at the Legend Window in the top left corner of the screen and inside the Group List at the top center of the screen. |
+| `updateAutomatically` | `Boolean` | Define if a Layer with the 'source' value as 'calculate' should be updated automatically after any user interactions, like changing an input value. If you’re creating a Layer with the 'source: calculate' you need to set this property to 'true' for it to… |
+| `viewColor` | `String` | HTML color to use on the group. |
+| `visibility` | `Boolean` | Define if the Layer should start visible or not. Set it to 'true' for the Layer start visible. Otherwise, set it to 'false' and the Layer will start hidden. |
+
+Full descriptions, defaults and examples: [LayersProperties in the API reference](/api/#category_LayersProperties).
+
+### LayersFunctions — Layers Functions
+
+You can use the following functions for a Layer:
+
+| Name | Type | Description |
+|---|---|---|
+| `afterCalc` | `function` | This function is executed right after the 'expression()' calculations. This function is only available for a Layer with a 'source' of type 'calculate' and that has defined the 'expression()' function. @param inputs {Array} The value of each input defined in… |
+| `beforeCalc` | `function` | This function is executed before any calculation is made in the 'expression()' function. This function is only available for a Layer with a 'source' of type 'calculate'. Also, it’s called even if there is no definition for the 'expression()' function. @param… |
+| `expression` | `function` | This function is executed for every pixel in the map. It can be used to process the information of all maps in the Layer to create a new one. This function is called regularly to update the map. @param layerVals {Array.&lt;LayerValues&gt;} Is an array that has the… |
+| `functions` | `Object` | Associate custom functions to handle events on layer callbacks such as button callbacks or any layer callbacks. These functions are scoped to the Layer and can be referenced by name on layer widget callbacks. Functions can also be accessed using… |
+| `legendColor` | `function` | This function generates the color of each value/category of the calculated map generated by the 'expression()' function. The return value is the legend color that will be applied to the category. PS: This function callback is called in layer context. @param… |
+| `onInputsReady` | `function` | This function is called when all inputs have been loaded and are ready. Even from Layers that aren’t visible. @param inputs {Array} The value of each input defined in the descriptionHtml. The order of the values is the same as the inputs (i.e. the first input… |
+| `onVisibilityChange` | `function` | This function is called whenever a Layer changes its visibility. Like, when the user toggle the value in the visibility button at the top right in the Legend Window. @param visibility {Boolean} It’s true if the Layer is visible or false otherwise. @param… |
+
+Full descriptions, defaults and examples: [LayersFunctions in the API reference](/api/#category_LayersFunctions).
+
+## Groups
+
+### GroupProperties — Groups Properties
+
+Inside the brackets of a Group you can define their properties, which are the following:
+
+| Name | Type | Description |
+|---|---|---|
+| `color` | `String` | Defines the Color of the group. This is the Color of the Title and some elements inside the sub menu on the top of the screen. |
+| `customLayerClass` | `String` | Extra CSS class added to the node of a `viewTitle` group in the Legend Window, so the group title and its rows can be styled with `ExtjsUtils.CSS.defineClass` or a stylesheet. Only groups with a `viewTitle` create a node; on a layer the same key styles the… |
+| `defaultProperties` | `Object` | Specifies properties that apply universally to all layers within a group, including nested subgroups and their respective layers. Priority is determined by specificity: a property defined at the layer level takes precedence, followed by properties defined in… |
+| `elements` | `Array.<Layers>` | Defines the Layers that will be part of the Group. Each Layer can have multiple maps inside it. All maps inside a Layer will be shown together when that Layer is enabled. Besides that, all information about those maps can be used to calculate a new one using… |
+| `global` | `Object` | A second way to declare query globals: an object whose properties become temporary globals, passed to `ExtjsUtils.QUERY.setQueryGlobalProperties` while the group is interpreted (before its layers). The usual form is the… |
+| `openGroup` | `Boolean` | Defines if the 'viewTitle' should start opening or collapse. Set it to 'true' for the 'viewTitle' start open or 'false' for it to start closed. This property only applies to a group that has the 'viewTitle' property defined. If the Group View has any visible… |
+| `title` | `String` | Defines the Title of the group. The Title is shown at the sub menu on the top of the screen. |
+| `viewTitle` | `String` | Define the Title of the View that will gather together the elements inside it (Groups or other Views). If an external View has in its elements another definition of a 'viewTitle', subviews will be created, like in the second example. |
+
+Full descriptions, defaults and examples: [GroupProperties in the API reference](/api/#category_GroupProperties).
+
+### GroupFunctions — Groups Functions
+
+You can also define the following functions for a Group:
+
+| Name | Type | Description |
+|---|---|---|
+| `onClickViewGroup` | `function` | Called whenever the user clicks the title of a `viewTitle` group in the Legend Window. It belongs on a group that has `viewTitle`: the handler is bound to that group's tree node, so `this` is the node and `view.expanded` tells whether the group is open after… |
+| `onToggleViewGroup` | `function` | Called whenever a `viewTitle` group of the Legend Window is expanded or collapsed (by the user or by code). It belongs on a group that has `viewTitle`: the handler is bound to that group's tree node, so `this` is the node and `view.expanded` is `true` after… |
+
+Full descriptions, defaults and examples: [GroupFunctions in the API reference](/api/#category_GroupFunctions).
+
+## Configuring Layers
+
+### ConfigLayer — Layer properties configuration
+
+Configurable exhibition of each map, defining interactions, possible internal maps and applied calculations among them.
+
+| Name | Type | Description |
+|---|---|---|
+| `attribution` | `String` | Recognizes someone as the platform author, showing in the "Powered by: {insert name}". |
+| `callFunction` | `function(name, anyArguments) : *` | Calls one of the layer's own `functions` by name with the layer as `this`. Extra arguments are passed through to the function. @param name {String} Key of the layer's `functions` object. @param anyArguments {*} Arguments forwarded to the function. |
+| `customLayerClass` | `String` | Extra CSS class added to the row of the layer in the Legend Window and to its vertical options menu (see `verticalMenu`), so the layer can be styled with `ExtjsUtils.CSS.defineClass` or a stylesheet. The same key on a `viewTitle` group is added to the group… |
+| `enableToggle` | `Boolean` | Defines the associated button as a regular button or toggle. PS: When its true the callback function name is 'toggle', otherwise the callback is 'handler'. |
+| `getLayerLegend` | `function(composedLayer, index) : Array` | Gets the associated layer legend content by its index. PS: The legend format is the same as expected by the composedLayer.setCalculateLegend function. Usage:this.setCalculateLegend(ExtjsUtils.Layer.getLayerLegend(composedLayer, 0)); @param composedLayer… |
+| `group` | `String` | Defines which group the layer is associated with. Layers from the same group can't be active simultaneously. Reserved value: "background" has special meaning, will make the layer act as background basemap. |
+| `isCalculationPaused` | `function() : Boolean` | Returns calculation status. True if calculations are paused, false otherwise. |
+| `maxExtent` | `OpenLayers.Bounds` | Defines a geographical limit for a map rendering. |
+| `maxZoom` | `Numeric` | Defines the limit of the real max zoom of a given layer. When map zoom exceed this, the image is reused and stretched. |
+| `maxscale` | `Numeric` | Defines the limit of the real max scale of a given layer. When the map scale value exceeds the defined one, the image is reused and stretched. |
+| `metadataUrl` | `string\|null` | Defines the url to show custom layers metadata information. If empty, the default value is obtained from layer metadata from the WMS definition. PS: The linked domain must have CORS headers enabled. |
+| `minscale` | `Numeric` | Defines the limit of the real min scale of a given layer. When the map scale reaches a value lower than the defined one, the image is reused and compressed. |
+| `openGroup` | `Boolean` | Defines if the group starts opened, even without any visible layers. Set it true to start open, false otherwise. PS: If one layer is visible, the group will start open. It works at both levels: on a `viewTitle` group it makes that group start expanded; on a… |
+| `operation` | `String` | Defines how the pixels of each map of a `source: 'calculate'` layer are decoded into the values that `expression()` receives in `layersVals`. It is a comma-separated list with one token per map in `name`, in the same order; an empty token keeps that map on… |
+| `shouldKeepRecord` | `Boolean` | Defines what the 'X' (remove) button of the Legend Window does (see `showRemoveBtn`). When `true` the layer record is kept: the layer is only hidden and removed from the listing, so it can be listed again from the group menu at the top. When `false` the layer… |
+| `toggleGroup` | `String` | Places a layer in a group of layers with mutually exclusive visibility. At most one layer of the same group will be visible, when one is shown, the others will be hidden. |
+| `type` | `String` | Defines how a `source: 'file'` layer gets its features (case insensitive). One of: 'load': you load the data yourself in the `loadData` callback (`function(inputs, config)`, called with the layer as `this`). The callback must trigger… |
+| `useLayerTooltip` | `Boolean\|Number` | If false, the layer tooltip is not shown. If a number, the layer tooltip is shown for the specified layer. (Only supported for layers with `source: "calculate"`) Otherwise follow tooltip default behavior that varies from map source |
+| `verticalMenu` | `Boolean` | Uses the compact layout for the Legend Window of the layer: the secondary buttons (remove, metadata, download, zoom to extents) and a vertical opacity slider move into a small options menu opened by a gear button, instead of being drawn in the row with the… |
+
+Full descriptions, defaults and examples: [ConfigLayer in the API reference](/api/#category_ConfigLayer).
+
+### VectorLayer — VectorLayer configuration
+
+Vector Layer configuration.
+
+| Name | Type | Description |
+|---|---|---|
+| `activateDrawMode` | `function(mode) : Boolean` | Select polygon/line tool and enter edit mode when needed (split-button menu). @param mode {String} 'polygon' or 'line' — must be one of the layer's configured `drawModes`. |
+| `applyFeatureChanges` | `function() : Boolean` | Finish sketch or deselect feature (triggers featureEditEnd when applicable). |
+| `applyGeomOp` | `function(sourceGeoms, options) : Object` | Replace geometries on this **drawable VectorLayer** with id/attribute control via one options object. Only available on vector layers from ``VectorFileSource`` (e.g. ``drawable: true``). Implementation helpers live in {@link DrawableSplit.applyGeomOp}. @param… |
+| `callFunction` | `function(name, anyArguments) : *` | Calls one of the layer's own `functions` by name with the layer as `this`; falls back to a method of the layer with that name. Extra arguments are passed through to the function. @param name {String} Key of the `functions` object (or a layer method name).… |
+| `cancelDrawing` | `function() : Boolean` | Cancel the in-progress sketch/edit without committing changes. |
+| `cluster` | `Object` | AnimatedCluster options. Truthy object enables clustering even when `clusterDistance` is omitted. Zoom / map state is **not** passed into callbacks — read it yourself via `this.layer.map` (call scope is the strategy) or `ExtjsUtils.JS.getMap()`. |
+| `clusterDistance` | `Numeric` | Defines the minimum relative distance (in pixels) to clusterize points. Set 0 to never clusterize, or a value greater than 0 to set the minimum distance. For a membership key or dynamic distance, use {@link VectorLayer.cluster} instead (or together —… |
+| `convertJsonEntryToFeature` | `function(curObj, optionalGetLonLat) :…` | Converts a JsonObject into a Layer Feature (that can be added to layer). @param curObj {JsonObject} Object with properties. @param optionalGetLonLat {function} Optional function to get position coordinates from JSON. P.S.: Optional function to get X,Y values… |
+| `coordinates` | `Object` | Redefines the coordinate property names to {x, y}. PS: Used only if the 'VectorLayer.getVector' is not defined. |
+| `defaultStyle` | `Object` | Defines the default style that will be applied to the geometry. PS: Accepts 'context' and 'rules'. Property 'context': allows definition of functions. Property 'rules': allows definition of filters (only the geometries that fit into this rule will be… |
+| `deselectFeature` | `function() : Boolean` | Deselect the currently selected/edited feature without discarding it. |
+| `drawable` | `Boolean\|Object` | Makes a vector layer editable: users can sketch, edit and delete polygon (optionally polygon+line) features, with configurable overlap resolution. Set to `true` for defaults, or an object to configure: - `maxGeomCount` {Number} — maximum number of features… |
+| `fillGeometryLayer` | `function(config)` | Loads (or reloads) the layer's features from a data-loading config, following its `type` strategy: `load` calls `config.loadData`, `csv`/`jsonurl`/ `geojsonurl` fetch `config.url`, `json` uses the inline `config.json`, `empty` adds nothing. Unknown types fall… |
+| `findFeatureById` | `function(featureId) : OpenLayers.Feature.Vector\|null` | Find a feature by the id returned from ``getFeatureId`` (fid, id, or index). Prefer this over OpenLayers ``getFeatureById`` when callers use getFeatureId ids. @param featureId {String\|Number} Id as returned by `getFeatureId`. |
+| `finishDrawing` | `function() : Boolean` | Commit in-progress polygon sketch (same as double-click). |
+| `fromProj` | `String` | Defines the projection of the JSON (accepts only EPSG:4326 and EPSG:900913). |
+| `generateNewLegend` | `function()` | Runs the layer's `beforeCalc(inputs)` again with the current input values. It is the supported way to force a vector layer to refresh whatever `beforeCalc` builds (styles, filters, charts) from outside a normal cycle, for example from `onVisibilityChange`;… |
+| `getEditingFeatureId` | `function() : String\|Number\|null` | Feature id currently selected for vertex edit (drawable modify control), if any. |
+| `getFeatureId` | `function(feature) : String\|Number\|null` | Stable-enough id for a feature on this layer: ``fid``, then OpenLayers ``id``, otherwise the feature's index in ``layer.features`` (no synthetic attributes). @param feature {OpenLayers.Feature.Vector} Feature of this layer. |
+| `getInputs` | `function() : Array` | Returns the current value of every input tool declared in `descriptionHtml`, in declaration order (the same array the layer callbacks receive as `inputs`). Use it from callbacks that do not receive `inputs`, such as a `{{button}}` handler or… |
+| `getLayerDefinedFunctionsByName` | `function(name) : function\|Undefined` | Gets the layer inner function. Define the layer inner function at VectorLayer. Ex: { name: 'CSR:map_name', function: { nameFunctionExample: function(){alert('a');} } } @param name {String} Function name |
+| `getVector` | `function` | Defines the callback function to parse the layer data and get the geometry. Callback Function getVector function(attribute, config) @param attribute {Object} Object with attributes. @param config {Object} Layer config. |
+| `hoverSelectedStyle` | `Object` | Defines the style that will be applied to the geometry when the mouse hovers over a selected feature. Default hover selected style is the selected style PS: Accepts 'context' and 'rules'. Property 'context': allows definition of functions. Property 'rules':… |
+| `hoverStyle` | `Object` | Defines the style that will be applied to the geometry when mouse is hovering. PS: Accepts 'context' and 'rules'. Property 'context': allows definition of functions. Property 'rules': allows definition of filters (only the geometries that fit into this rule… |
+| `llbbox` | `OpenLayers.Bounds` | Bounds of the features currently on the layer, recomputed automatically after features are added or removed (and extended while drawing). Despite the name it is expressed in the map projection, not in lon/lat, so it can be passed straight to… |
+| `loadGeojson` | `function()` | Function to load geojson and draw on the layer. |
+| `onAdded` | `function()` | Defines the callback function that is called when the layer is added to the map, with its features already loaded: when the layer joins the map while its data is still being fetched (`jsonurl`, `geojsonurl`, `csv`, a `load` that fetches), the call waits for… |
+| `onBeforeFeatureChangeCallback` | `function` | Defines the callback function that is called before a layer feature is added, removed or edited. PS: If it returns false, the change operation is canceled. @param operationType {String} Receive the operation type: 'add' or 'remove' when adding or removing… |
+| `onClick` | `function` | Defines the callback function to the click event on Layer. @param event {Object} The click event Object. @param source {VectorFileSource} Auxiliary functions to deal with Vector Layer. @param inputs {Array.&lt;Object&gt;} Array with all layer input values. |
+| `onClickCfg` | `function` | Defines the callback function to the Click Select controller. The additional parameters are listed in http://dev.openlayers.org/docs/files/OpenLayers/Control/SelectFeature-js.html. |
+| `onFeatureChangeCallback` | `function` | Defines a function that is called after a layer feature is added, removed or edited. @param operationType {String} One of: ``'add'`` (features added in bulk, e.g. after loading data), ``'add1'`` (a single feature added interactively), ``'remove'`` (features… |
+| `onHover` | `function` | Defines the callback function on 'Vector Layer' hover. @param evt {Object} Features. @param state {Boolean} True when hover starts, false when it ends. @param controller {Object} The controller itself. @param inputs {Object} Layer widget values. |
+| `onInputsReady` | `function` | Called when all inputs are ready on layer. |
+| `onLoad` | `function` | Defines the callback function to be called after the layer is loaded or added to a map. PS: You can use 'this' to access layer properties. @param widgetValues {Array} inputs for onLoad callback |
+| `onSelectionToggle` | `function` | Defines the callback function to the unselect feature. @param event {Object} The click event Object. @param source {VectorFileSource} Auxiliary functions to deal with Vector Layer. @param inputs {Array.&lt;Object&gt;} Array with all layer input values. |
+| `popupCallback` | `function` | Not implemented for file layers: accepted but never called (see `popupTemplate`). Use `onClick`, which receives the clicked feature. @param attributes {Array} attributes for popupCallback @param inputs {Array} inputs for popupCallback |
+| `popupTemplate` | `String` | Not implemented for file layers: the value is accepted and kept on the layer, but nothing reads it, so no popup ever opens (the template belongs to the gxp feed sources this layer does not extend). Show a feature's attributes from `onClick` instead - for… |
+| `resolveOverlap` | `function(editedGeoms, intersectingGeoms, options)` | Resolve overlaps between edited and existing polygons on this drawable VectorLayer. Uses ``drawable.onOverlap``: a single key applies immediately; an array prompts via ``ALERTIFY.confirmChoice`` (``merge`` / ``cut`` / ``keep``). @param editedGeoms… |
+| `selectController` | `OpenLayers.Control.CustomSelectFeature` | The selection control created for the layer when `onClick`, `onSelectionToggle` or `onHover` is defined (undefined otherwise). It is the `OpenLayers.Control.CustomSelectFeature` instance, so you can call its `select(feature)`, `unselect(feature)`,… |
+| `selectStyle` | `Object` | Defines the default style that will be applied to the selected geometry. PS: Accepts 'context' and 'rules'. Property 'context': allows definition of functions. Property 'rules': allows definition of filters (only the geometries that fit into this rule will be… |
+| `setDrawing` | `function(enabled, callbackOnAdd)` | Defines drawing features on layers. PS: Function is available to the VectorLayer. @param enabled {Boolean} True to enable drawing, False otherwise. @param callbackOnAdd {function} Callback when a new feature is drew. P.S.: You can use 'this' to access layer… |
+| `showLoadingModal` | `Boolean` | Shows the "generating legend" loading mask visibly over the page while the layer is paused (loading its data or another resource). By default the mask is an invisible overlay that only changes the cursor to "wait"; set it to `true` in the layer definition to… |
+| `styleMap` | `Object\|OpenLayers.StyleMap` | Customizes the layer visualization. PS: It is an advanced parameter, so it might be easier to use selectedStyle, defaultStyle and hoverStyle. PS2: The 'hover' style is applied on hover event. |
+| `waitingRenderAndLoadAssync` | `Number` | Number of asynchronous resources of the layer still loading (its own data for `csv`, `json`, `jsonurl`, `geojsonurl` and `load` types, plus `{{loadcsv}}`/`{{loadjson}}` inputs and any `startLoadingLayer` you trigger yourself). It is increased on… |
+
+Full descriptions, defaults and examples: [VectorLayer in the API reference](/api/#category_VectorLayer).
+
+### XYZLayer — XYZ configuration
+
+XYZ Layer configuration.
+
+| Name | Type | Description |
+|---|---|---|
+| `name` | `String` | Defines a map identifier. This name should be unique. |
+| `source` | `Object` | Adds a layer to store the source. @param layerCfg {LayerConfig} Layer XYZ configuration. LayerConfig { url: url, name: name, isBaseLayer: isBaseLayer, sphericalMercator: sphericalMercator } |
+| `url` | `String` | Defines the url where the map can be fetched from. Use the ${x} ${y} ${z} as placeholder for x, y and z coordinates. |
+
+Full descriptions, defaults and examples: [XYZLayer in the API reference](/api/#category_XYZLayer).
+
+### SourceConfig — Source
+
+Layers sources configuration.
+
+| Name | Type | Description |
+|---|---|---|
+| `onError` | `function` | Defines callback function to be called when the store failes to be loaded. |
+| `onLoad` | `function` | Defines callback function to be called when the store is successfully loaded. |
+| `ptype` | `String` | The source plugin type of a layer source: the `ptype` key of a source definition given to `ExtjsUtils.QUERY.addRemoteWMSServer`, or of a `sources` entry of a saved map. It defaults to `"gxp_customwmscsource"` (the platform's tiled WMS source, used whenever… |
+
+Full descriptions, defaults and examples: [SourceConfig in the API reference](/api/#category_SourceConfig).
+
+### FileLayer — File layer configuration
+
+Additional configuration specific to layers loaded from local/inline data (source: 'file').
+
+| Name | Type | Description |
+|---|---|---|
+| `json` | `Array.<Object>\|Object` | Inline data of a `source: 'file'` layer with `type: 'json'`. Either a GeoJSON object (FeatureCollection, Feature or a geometry; its projection is taken from `fromProj`, its `crs` or guessed from the coordinates) or an array of plain objects, each converted to… |
+| `loadData` | `function` | Custom loader of a `source: 'file'` layer with `type: 'load'`: `function(inputs, config)` called with the layer as `this`, receiving the current input values and the layer definition. Add the features yourself (`this.addFeatures`, `this.loadGeojson`, ...) and… |
+| `onVisibilityChange` | `function` | Callback when layer visibility is changed. PS: Is not called for the initial visibility of the layer. |
+| `url` | `String` | URL of the data of a `source: 'file'` layer, used by the types `csv` (a CSV file), `jsonurl` (a JSON array of plain objects) and `geojsonurl` (a GeoJSON file). Relative URLs are resolved against the Mappia page. Also available inside `loadData` as… |
+
+Full descriptions, defaults and examples: [FileLayer in the API reference](/api/#category_FileLayer).
+
+## paramsButtonConfig
+
+### paramsButtonConfigProperties — paramsButtonConfig Properties
+
+You can define the following properties for a button:
+
+| Name | Type | Description |
+|---|---|---|
+| `hideBottomButton` | `Boolean` | Hides the text buttons at the bottom of the query and legend sections of the Legend Window ("Show query"/"Hide query" and "Show legend"/"Hide legend"). Set it to 'true' to hide them or 'false' to display them. It only works inside a `paramsButtonConfig` entry… |
+| `hideButton` | `Boolean` | Define if the associated button should be hidden. Set it to 'true' to hide the button or 'false' to show it. This property only applies to the type: 'query' |
+| `iconCls` | `String` | Define a class that will be added to the html in the associated button. This class can be one that has a image on it like: - 'gxp-icon-togglevisibility' is the icon of the Show/Hide Map Button (The first icon on the Legend Window, from left to right) -… |
+| `pressed` | `Boolean` | Defines if the button should start pressed or not. Set it to 'true' for it to start pressed or 'false' for start unpressed. For example, the 'query' button type set as pressed will display the Query region (where  the descriptionHtml content is) by default… |
+| `toggleGroup` | `String` | Defines a group for all the buttons that has the same toggleGroup name. From all the buttons on the same group, only one can be active at each time. Whenever another one is activated the previous one collapses. |
+| `tooltip` | `String` | Defines the help tooltip text that is displayed when the mouse hover the associated button. |
+| `type` | `String` | Define which button will be affected by the configurations. The type can be one of the following: - 'query': The query button shows or hides the Query panel (where the descriptionHtml is drawn). - 'download': The download button is the one with a downward… |
+
+Full descriptions, defaults and examples: [paramsButtonConfigProperties in the API reference](/api/#category_paramsButtonConfigProperties).
+
+### paramsButtonConfigFunctions — paramsButtonConfig Functions
+
+You can use the following functions for a button:
+
+| Name | Type | Description |
+|---|---|---|
+| `handler` | `function` | Defines a function that will be called when the associated button is clicked. @param button {Object} is the button that was clicked by the mouse. @param clickEvent {MouseEvent} is the object that carries more information about the click event. |
+| `toggleHandler` | `function` | This function is called whenever the associated button change its toggle state. PS: Using custom function, ignore the associatedButtonID "It doesnt have to even exists". @param button {Ext.Button} The button element that was clicked @param state {Boolean} The… |
+
+Full descriptions, defaults and examples: [paramsButtonConfigFunctions in the API reference](/api/#category_paramsButtonConfigFunctions).
+
+## General Information
+
+### RawMaps — Web Raw Maps
+
+The Raw Maps are some maps that are sent with each pixel value and not a RGBA color. All the manipulations are at most with integer or float precision so the colors must be applied on the client, after some calculation to, on the client, create each cell color value.
+
+| Name | Type | Description |
+|---|---|---|
+| `operations` | `Object` | Enumeration of the operations a map of a `source: 'calculate'` layer can be decoded with. This is what the `operation` layer key selects, one token per map in `name`; the tokens are the lower-case names below, matched case and whitespace insensitive. The… |
+
+Full descriptions, defaults and examples: [RawMaps in the API reference](/api/#category_RawMaps).
+
+### QGIS — QGIS stylization
+
+The style can be defined in QGIS and the automatic publication process will create the same looking style from the style file.
+
+| Name | Type | Description |
+|---|---|---|
+| `styles` | `String` | Where a map's styles come from: they are not written in the query. A map is published with one or more styles, and when it is published from QGIS the layer's QGIS style is converted at publication time, so the classes, colours and legend labels the map shows… |
+
+Full descriptions, defaults and examples: [QGIS in the API reference](/api/#category_QGIS).
+
+# Section: Tools
+
+## The widget markup language
+
+> The double-brace markup that puts sliders, buttons, pickers and loaders inside a layer's panel - every tag, the parameter grammar, how callbacks are resolved and what each widget's value holds.
+
+A layer's `descriptionHtml` is free HTML with one addition: text in double braces becomes
+an interface element. This is the language of that markup - a small one, with its own
+parameter grammar, its own escaping and its own rules for finding the function a widget
+should call.
+
+Widgets that collect a value also feed the layer's calculation, which is what makes a
+Mappia map interactive: a slider moved by the user re-runs the arithmetic over the pixels.
+The full parameter list of every widget is in the [API reference](/api/) under **Tools**;
+this page is the language and the behaviour around it.
+
+Use these tools inside a layer’s `descriptionHtml`. Parameters are pipe-separated:
+
+```text
+{{toolName|param=value|other=value}}
+```
+
+HTML and multiple tools can be concatenated:
+
+```javascript
+descriptionHtml:
+  '<p>Intro</p>' +
+  '{{label|text=Year:}}' +
+  '{{slider|id=year|minValue=2000|maxValue=2020|value=2010}}' +
+  '{{button|id=run|text=Run|handler=onRun}}'
+```
+
+Open the query panel with `paramsButtonConfig: [{ type: 'query', pressed: true }]` when the user must see the tools.
+
+**Input order:** tools that act as inputs (slider, textfield, combobox, timeline, zoomlevel, pickpoint, hoverpixel, summedarea, areaintegral, loadcsv, loadjson, filefield, inputmanager, window) feed `expression` / `beforeCalc` / `afterCalc` as `inputs[0]`, `inputs[1]`, … in **markup order**. When they have an `id` they are also `inputs.id[ID]` — **on the page only** (`beforeCalc`, `onInputsReady`, `afterCalc`, `functions`): inside `expression` the inputs arrive as a JSON copy of the array, which drops the `id` map, so `expression` must use positions. `button`, `checkbox`, `label`, `legendhtml`, `opacityslider`, `livecomposedsplit` are **not** inputs.
+
+**Callback names** (`handler=`, `toggleHandler=`, `runOnClick=`, `runOnHover=`, `onMark=`, `onPlayToggle=`, `_onChange=`, …) resolve in this order: **(1)** `layer.functions[name]` → **(2)** a global `window[name]` (from `setQueryGlobalProperties`) → **(3)** the text itself evaluated as a function (a full `function(){…}` or a bare statement body). `this` inside is the layer (exceptions per widget below). `{{combobox|onSelect=}}` skips step 2. Prefer `functions: { onRun: function() { … } }` on the layer.
+
+---
+
+## Catalog (all `Mark.create` tags)
+
+| Tag | Purpose | Key params (see `api.json` → Tools → group for the full list) |
+|-----|---------|-------------------------------------------|
+| `label` | Static text / HTML | `text`, `html` (verbatim up to next `\|`), `cls`, `style`, `forId` |
+| `button` | Click / toggle action | `id`, `text`, `handler` / `toggleHandler`, `enableToggle`, `pressed`, `hidden`. `toggle=` is an alias moved to `toggleHandler`; with `enableToggle=true` and no `toggleHandler`, `handler` becomes the toggle handler |
+| `checkbox` | Boolean switch — **not an input**: `handler(checkbox, checked)` runs on every toggle (also once with `false` when the layer is removed) | `id`, `text`, `checked`, `handler`, `labelBefore`, `iconCls`; runtime `Ext.getCmp(id).toggle(state?)`, `setBoxLabel(txt)` |
+| `textfield` | Single-line text / number input | `id`, `value`, `fieldLabel`, `isnumeric` (validator only — value stays a string), `hideLabel`, `afteredit` |
+| `combobox` | Select from list | `id`, `data` (`[["value"], …]` - one value per entry, shown as is), `fieldLabel`, `editable`, `hideLabel`, `onSelect(combo, record, index)` |
+| `slider` | Numeric range input | `id`, `minValue`, `maxValue`, `value` / `values` (range), `increment`, `plugins=tip={0}%`, `gradient`, `backgroundColors` |
+| `opacityslider` | Layer opacity | `value` (only when the layer has no `opacity`), `inverse`, `complementaryLayer`, `changeVisibility` |
+| `legendhtml` | Inline map legend | `reverseLegend`, `filterLayers`, `legendId`, `preventClick`, `useScaleParameter`, `autoWidth` |
+| `timeline` | Play through style / scenario steps | `id`, `steps`, `nextStepInterval`, `preloadTiles`, `onPlayToggle` (**must return truthy** — a falsy return vetoes the play/stop), `fieldLabel`; many runtime methods (`setSteps`, `getValue`, `startAnimationStep`, …) |
+| `livecomposedsplit` | Split-screen compare of two composed styles | `displayNames`, `layerNames`, `baseName`, `leftDefault`, `rightDefault`, `id`, `layout` (`compact`\|`inline`) |
+| `window` | Floating Ext window | `id`, `title`, `text`/`html`, `startVisible`, `width`, `height`, `x`, `y`, `items`, `onBeforeHide`, `ignoreVisibility` |
+| `filefield` | Local file picker | `id`, `fieldLabel`, `ignoreUpdate`, `_on<event>=` for any Ext field event in `eventNames` (`_onChange=onSelectFile`, case-insensitive) |
+| `loadcsv` | Load remote CSV → `CsvTable` | `id`, `url`, `cors`, `removeEmptyLines`; `trim` is accepted but **ignored by the parser** (trim cells yourself) |
+| `loadjson` | Load remote JSON | `id`, `url`, `cors` |
+| `pickpoint` | Click map → feature attributes per layer | `id`, `checked`, `onefeature`, `geometryColor`, `onMark` (≡ `runOnClick`; `onMark` wins), `runOnHover`, `lat`/`lon`, `markLayerInd`, `notify`, `unselect` |
+| `hoverpixel` | Pixel value under cursor / on click | `id`, `text`, `runOnHover`, `runOnClick`, `runOnHoverOutside`, `runOnClickOutside`, `checked`, `notify` — moving/clicking does **not** recalculate the layer |
+| `summedarea` | Draw polygon → sum raster values | `id`, `text`, `runOnClick(layersValues, inputs, feature)`, `notify`, `unselect`. Its `inputs.id[ID]` value is **never filled** — use the callback |
+| `areaintegral` | Two clicks → rectangle sum via summed-area (`integral`) maps | `id`, `text`, `runOnClick(layersValues, inputs, boundingBox, pixel, lastInfo)`, `notify`, `unselect`, `iconCls`, `labelBefore`. Was broken for a long time - it registered its input under a name that did not exist and never set `lastInfo` - and now works |
+| `inputmanager` | Named bag of values for callbacks | `id`; runtime `getValue`, `setValues(obj, cancelUpdate, local)`, `setDefaultValues(obj, local)`, `forceRecalc()` |
+| `zoomlevel` | Hidden input = current map zoom | `id` (required; renders nothing) |
+
+Also allowed in `descriptionHtml`: raw **HTML** (not a `{{…}}` tag).
+
+---
+
+## Markup syntax (all tools) — `api.json` → Tools → `MarkupSyntax`
+
+| Rule | Effect |
+|------|--------|
+| `param=value` | Numbers become JS numbers; `param=` (empty) is `""`; anything else stays a string (`true` is the string `"true"`, truthy). Arrays/objects (`data`, `steps`, `values`, `filterLayers`) are parsed by the tool as JSON |
+| `param=false` | Rewritten to `param=` (falsy) — the only way to switch off a default-true flag (`unselect=false`, `notify=false`) |
+| `\|isnumeric\|` | Bare key = `""`, except the special keys (`isnumeric`) |
+| `a=b=c` | Nested object `{a: {b: c}}` — `plugins=tip={0}%` (slider tip), `scope=getid=ID` |
+| `\=` | Literal `=` inside a value (URLs with query strings); double the backslash inside a JS string. `html=` is exempt (verbatim) |
+| `cls=` | Repeating `cls` **concatenates** (no separator); other repeated keys keep the last value |
+| `getid=ID` | Reference an element created **earlier** in the same description; `getid=ID\|getid=on_<event>=<code>` attaches an Ext listener to it (`this` = that element; evaluated directly, no `functions`/globals lookup) |
+| `function=<body>` | A function from raw text (`param=function=<body>` to assign it); rarely needed — callback params already accept names or inline text |
+
+## Input values — what `inputs.id[ID]` holds and what triggers a recalculation
+
+From the `<Widget>.value` entries in `api.json` (read the entry for details):
+
+| Widget | `inputs.id[ID]` holds | Layer recalculates on |
+|---|---|---|
+| `slider` | number, or `[lower, upper]` with `values` | slider `change` (thumb released / set from code) |
+| `textfield` | the raw text (**string**, even with `isnumeric` — `parseFloat` it) | every `keyup` |
+| `combobox` | selected `data` value as a string (first entry initially) | `select` |
+| `timeline` | key of the current step (first element of the `steps` entry, string) | `change` (thumb moved, animation) — after the step style is applied |
+| `zoomlevel` | current zoom (number) | map `moveend`, only when the zoom changed |
+| `loadcsv` | `ExtjsUtils.CSV.CsvTable` (header = row 0); `undefined` until loaded | resource `waitend` — the layer waits, so `beforeCalc` can rely on it |
+| `loadjson` | parsed JSON (object/array; `[]` on empty body) | resource `waitend` |
+| `pickpoint` | the `PointAttributeManager` (`getAttributes(mapIndex)`, `searchAttribute`, `getPointPos`, `getLastEvent`, `removeAll`, …) — holds map features: extract plain values in `beforeCalc`, never send to `expression` | `onmark` (after every click, once all layers' feature info arrived) |
+| `hoverpixel` | `lastInfo` `{click: {lon, lat}, hover: {lon, lat}}` (EPSG:4326, `null` before first event; updated in place, so always current when read) | **nothing** — registered on `forceupdatelayer`, which nothing fires; react in `runOnClick`/`runOnHover` |
+| `summedarea` | an array meant for the last sums — **stays empty** (never filled); use `runOnClick` | `forceupdatelayer` of the switch (`Ext.getCmp(id).items.get(0).forceUpdateLayer()`) |
+| `areaintegral` | `layersValues` of the last rectangle (one sum per inner layer; updated in place) | `forceupdatelayer` — not fired by the tool; call `forceUpdateLayer()` inside `runOnClick` |
+| `inputmanager` | the manager (`getValue`, `setValues`, `setDefaultValues`, `forceRecalc`, `.global` bucket). Only `global` reaches `expression`; `local=true` values may hold DOM/Ext objects | its `change` — fired by `setValues` (unless `cancelUpdate`) and `forceRecalc` |
+| `filefield` | a **getter function**: `inputs.id[ID]()` → the `File` or `undefined` | input `change` (new file) unless `ignoreUpdate=true` |
+| `window` | handle `{getIds, getWindow, getButton, getContainer}` (components — not for `expression`), stored under the **button's id**: `inputs.id[btnID]`, not the markup `id` (set `btnID` to know it) | once, on window `afterrender` |
+| `opacityslider` | not an input (`value` = initial opacity %) | — |
+
+Caveats worth repeating: `LoadCsv.trim` is a no-op; `SummedArea.value` is never filled; `Hoverpixel` never recalculates by itself (`lastInfo` is still always current); `Timeline.onPlayToggle` must return truthy (a bare statement body returns `true`).
+
+---
+
+## How to choose a tool
+
+| Need | Prefer |
+|------|--------|
+| Show text / HTML | `label` or raw HTML |
+| User runs a named function | `button` (+ `functions`) |
+| Numeric parameter for `expression` | `slider` or `textfield\|isnumeric=true` |
+| Discrete choice | `combobox\|data=…` |
+| Boolean switch that runs code | `checkbox` (+ `handler`; store the state with an `inputmanager` if `expression` needs it) |
+| Opacity control | `opacityslider` |
+| Show legend in panel | `legendhtml` |
+| Animate styles over time | `timeline` |
+| Compare two composed styles live | `livecomposedsplit` |
+| Click map for value / geometry | `pickpoint` |
+| Continuous pixel read | `hoverpixel` |
+| Area sum / integral | `summedarea` / `areaintegral` |
+| Upload local file | `filefield` |
+| Fetch remote CSV/JSON | `loadcsv` / `loadjson` |
+| Extra floating UI | `window` |
+
+---
+
+## Minimal patterns (copy / adapt)
+
+### Button + handler
+
+```javascript
+{
+  title: 'Demo',
+  name: 'CSR:estados',
+  source: 'calculate',
+  visibility: true,
+  paramsButtonConfig: [{ type: 'query', pressed: true }],
+  descriptionHtml: '{{button|id=say_hi|text=Say hi|handler=onHi}}',
+  functions: {
+    onHi: function() {
+      ExtjsUtils.ALERTIFY.log('hi');
+    }
+  }
+}
+```
+
+### Slider as `expression` input
+
+```javascript
+{
+  title: 'Threshold',
+  name: 'CSR:altimetria',
+  source: 'calculate',
+  visibility: true,
+  paramsButtonConfig: [{ type: 'query', pressed: true }],
+  descriptionHtml: '{{slider|id=thr|minValue=0|maxValue=100|value=50}}',
+  expression: function(layerVals, inputs) {
+    var thr = inputs[0];
+    return layerVals[0] > thr ? 1 : undefined;
+  }
+}
+```
+
+### Combobox
+
+```text
+{{combobox|id=month|fieldLabel=Month|data=[["Jan"],["Feb"]]|editable=false}}
+```
+
+`data` is a list of one-element arrays: each value is both what the list shows and what the input holds. A second element (`["01", "Jan"]`) is ignored - the store has a single `value` field.
+
+### Timeline
+
+```text
+{{timeline|id=lu_tl|nextStepInterval=1000|steps=[["01","January"],["02","February"]]}}
+```
+
+Pairs with composed / calculate layers that change styles per step. See `api.json` → Timeline (`onPlayToggle`, `preloadTiles`, …).
+
+### Pickpoint / hoverpixel
+
+```text
+{{pickpoint|id=pick|fieldLabel=Pick|checked=false|onefeature=true|onMark=onPicked}}
+{{hoverpixel|id=hp|text=Value|runOnHover=onHoverValue|runOnClick=onClickValue}}
+```
+
+```javascript
+functions: {
+  onPicked: function (evt) { /* evt.type 'add'|'remove', evt.features[layerIdx][i].data; this = the pickpoint checkbox, this.value = PointAttributeManager */ },
+  onHoverValue: function (layerVals, inputs, coordinates, mouseEvt, lastCoordinates) { /* this = layer */ },
+  onClickValue: function (layerVals, inputs, coordinates, clickEvt, lastCoordinates) { /* this = layer */ }
+}
+```
+
+`pickpoint` recalculates the layer after every click (`onmark`); `hoverpixel` never does — use the callbacks (they receive the map values) or force a recalculation.
+
+### Checkbox (handler, not an input)
+
+```text
+{{checkbox|id=show_details|text=Show details|checked=true|handler=onToggleDetails}}{{inputmanager|id=state}}
+```
+
+```javascript
+functions: {
+  onToggleDetails: function (checkbox, checked) {
+    this.getInputs().id["state"].setValues({ details: checked }); // recalculates the layer
+  }
+}
+```
+
+### Area integral (two-click rectangle; needs maps published with the `integral` operation)
+
+```text
+{{areaintegral|id=integral_tool|text=Sum a rectangle|runOnClick=onAreaSummed}}
+```
+
+```javascript
+functions: {
+  onAreaSummed: function (layersValues, inputs, boundingBox, pixel, lastInfo) {
+    // boundingBox = [minLon, minLat, maxLon, maxLat] (EPSG:4326); lastInfo = {first:{lon,lat}, second:{lon,lat}}
+    ExtjsUtils.ALERTIFY.log("Sum: " + layersValues[0]);
+    Ext.getCmp("integral_tool").items.get(0).forceUpdateLayer(); // only if beforeCalc must see inputs.id["integral_tool"]
+  }
+}
+```
+
+`summedarea` is the free-polygon sibling: `runOnClick(layersValues, inputs, feature)`; its `inputs` value is never filled.
+
+### Opacity + legend
+
+```text
+{{opacityslider}}{{legendhtml|reverseLegend=false}}
+```
+
+### Live composed split
+
+Requires a calculated layer built from two styles of the same map (often the same name twice with two `styles` entries). The parameters are listed in the [API reference](/api/) under **Tools -> LiveComposedSplit**.
+
+```text
+{{livecomposedsplit|id=split1|displayNames=A,B|layerNames=style_a,style_b|baseName=CSR:estados|leftDefault=A|rightDefault=B}}
+```
+
+### Window
+
+```text
+{{window|id=help_win|title=Help|text=Read me|startVisible=false|width=320|height=200}}
+```
+
+### File / CSV / JSON
+
+```text
+{{filefield|fieldLabel=Load SHP|id=loadshp|_onChange=onSelectFile}}
+{{loadcsv|id=tbl|url=https://example.com/data.csv?v\=2|removeEmptyLines=true|cors=true}}
+{{loadjson|id=cfg|url=https://example.com/config.json}}
+```
+
+With stable `id`s, the layer's callbacks read **`inputs.id["tbl"]`** (a CSV table object), **`inputs.id["cfg"]`** (parsed JSON) and **`inputs.id["loadshp"]()`** (the selected file). When each of these becomes available, and why a layer waits for them, is described in [the execution model](/reference/execution-model/).
+
+### Zoom level (hidden input)
+
+```text
+{{zoomlevel|id=z}}
+```
+
+`inputs.id["z"]` = current zoom (number); refreshed when the map stops moving, and it recalculates the layer only when the zoom actually changed.
+
+### Timeline with a play veto
+
+```text
+{{timeline|id=tl|steps=[["1990","1990"],["2000","2000"]]|onPlayToggle=onPlay}}
+```
+
+```javascript
+functions: {
+  onPlay: function (pressed, layer, timeline, playBtn) { return !window.stillLoading; } // falsy = veto
+}
+```
+
+---
+
+## Authoring checklist
+
+1. Put tools only in `descriptionHtml` (not as top-level QUERY keys).
+2. Use the exact tag from the catalog (`livecomposedsplit`, not `LiveComposedSplit`).
+3. Give interactive tools stable `id`s when other code or inputs must find them.
+4. Wire `handler` / `toggleHandler` / `runOnClick` names to `functions: { … }` on the same layer (regular `function`, not arrows — `this` is the layer).
+5. Remember **input order** for `expression(layerVals, inputs)`, and that only plain data reaches `expression`.
+6. For a side-by-side comparison use `livecomposedsplit`; there is no second split API.
+7. Prefer `api.json` → Tools → `<Name>` when a parameter’s type/default is unclear; `<Name>.value` says what the input holds.
+8. Panels with several widgets, the layer-row buttons (`paramsButtonConfig`) and page chrome belong to [the layer and group model](/reference/layer-and-group-model/).
+9. An unknown tag fails silently: the element is simply not created, and the console shows `{{MARKUP}} INVALID OBJECT NAME`.
+
+## Widget catalogue
+
+> Every widget the markup accepts, with its parameters, its runtime methods and the shape of the value it contributes to a calculation - generated from the platform source.
+
+Every tag the widget markup accepts, as the platform declares it. A widget's parameters are written inside its braces (`{{slider|id=year|minValue=2000}}`); the entries below are that parameter list, plus the methods and the input value each widget exposes to a layer's callbacks. How the markup itself is parsed - escaping, nested keys, handler resolution - is in the previous chapter.
+
+## Button — Button tool
+
+Create a simple button to user interact with the map.
+
+| Name | Type | Description |
+|---|---|---|
+| `enableToggle` | `Boolean` | Defines the button type as toggle. Set true to use as toggle, false otherwise. PS: When its true the callback is 'toggleHandler', otherwise the callback is 'handler'. |
+| `fieldLabel` | `String` | Defines the button label. |
+| `handler` | `function` | Defines the callback function on button click event. This should be used when the enableToggle property is false. `this` inside the callback is the layer. The value is resolved in this order: (1) a key of the layer `functions` object with that name; (2) a… |
+| `hidden` | `Boolean` | Set true to create the button hidden (Ext `hidden` config); show it later with `Ext.getCmp(id).show()`. This is one example of the pass-through: every other `Ext.Button` config (`iconCls`, `tooltip`, `cls`, `width`, `disabled`, `scale`...) written in the… |
+| `id` | `String` | Defines the id to identify the object. |
+| `pressed` | `Boolean` | Defines the button initial state. Set it true to start pressed (only if enableToggle = true), false otherwise. |
+| `text` | `String` | Defines the button text. |
+| `toggle` | `function` | Alias of `toggleHandler`: a function given as `toggle=` is moved to `toggleHandler` (unless one is already defined), so the Ext `toggle()` method of the button is never overwritten. Prefer `toggleHandler`. |
+| `toggleHandler` | `function` | Defines the callback function on button toggle event. This should be used when the enableToggle property is true. `this` inside the callback is the layer. The value is resolved in this order: (1) a key of the layer `functions` object with that name; (2) a… |
+
+Full descriptions, defaults and examples: [Button in the API reference](/api/#category_Button).
+
+## Combobox — Combobox tool
+
+It creates an input of ComboBox tool where the value is selectable from a list. Usage: '{{combobox}}' or <a href='/elements/combobox-widget/'>examples</a>.
+
+| Name | Type | Description |
+|---|---|---|
+| `data` | `Array.<Array.<String>>` | Defines the data that will be displayed in the Combobox. |
+| `editable` | `Boolean` | Determines if the Combobox is editable. That is, if it allows the user to type inside the input field. Set it true to allow it, false otherwise. |
+| `fieldLabel` | `String` | Defines a label for the Combobox. It will be shown at the left of the Combobox, by default. |
+| `getValue` | `function() : String` | Returns the currently selected value (the text of the chosen `data` entry). Call it on the component (`Ext.getCmp(id)` or a `getid=` reference); `inputs.id[ID]` already holds the same value. |
+| `hideLabel` | `Boolean` | Defines if the label of the Combobox should be displayed. Set true to hide the label, false to show it. |
+| `id` | `String` | Defines the id to identify the object. |
+| `labelStyle` | `String` | Defines the style of the label. You can use CSS to style the label element. |
+| `onSelect` | `function` | Defines a callback run when the user picks an entry. It receives the Ext `select` event arguments `(combo, record, index)` — read the chosen text with `record.get('value')` — and `this` is the layer. The value is resolved as a key of the layer `functions`… |
+| `setValue` | `function(value)` | Selects an entry from code. Pass one of the `data` values; it does not fire `select`, so call `forceRecalc()` on an InputManager (or fire the event) when the layer must be recalculated. @param value {String} One of the values listed in `data`. |
+| `value` | `String` | Value stored in `inputs.id[ID]` (and `inputs[i]`): the selected entry of `data` as a string (the first entry is selected initially). The layer recalculates on the combobox `select` event (user choice). |
+| `width` | `Number` | Defines the width of the combobox in pixels. |
+
+Full descriptions, defaults and examples: [Combobox in the API reference](/api/#category_Combobox).
+
+## Hoverpixel — HoverPixel tool
+
+Create a tool to instantly inspect pixel under mouse. The value of the map can also be used as input for another functions. Usage: {{hoverpixel}}
+
+| Name | Type | Description |
+|---|---|---|
+| `checked` | `Boolean` | Defines if the hoverPixel should start enabled. Set true to start enabled, false otherwise. |
+| `fieldLabel` | `String` | Define the text that will be displayed at the left of the toggler |
+| `getLayerValues` | `function(evt, layer) : Array.<Number>\|null` | Reads the values of the composed map under a mouse event: one value per inner layer (from the legend colours of the rendered tiles) plus one extra entry with the result of the layer `expression` for those values. This is the `layerVals` argument of… |
+| `hideLabel` | `Boolean` | Defines if the label of the HoverPixel should be displayed. Set true to hide the label, false to show it. |
+| `iconCls` | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. |
+| `id` | `String` | Defines the id to identify the object. |
+| `labelBefore` | `Boolean` | Set true to render the `text` label before (left of) the toggle switch instead of after it. |
+| `labelStyle` | `String` | Defines the style of the label at the HoverPixel toggler. You can use CSS to style the label element. |
+| `notify` | `Boolean` | Set false to suppress the notification shown when the tool is activated ("click on the map..."). |
+| `runOnClick` | `function` | Defines a callback when the user clicks on the map. It passes the following parameters for the callback function: handleOnClick(layerVals, inputs, coordinates, clickEvent, lastCoordinates) @param layerVals {Array} Array with the values of the maps at the… |
+| `runOnClickOutside` | `function` | True to run the callback function even when clicking outside of the layer, False to disable. (Default False) |
+| `runOnHover` | `function` | Defines a callback when the user hovers the map. It passes the following parameters for the callback function: handleOnClick(layerVals, inputs, coordinates, clickEvent, lastCoordinates) @param layerVals {Array} Array with the values of the maps at the pixel… |
+| `runOnHoverOutside` | `function` | True to run the callback function even when hovering outside of the layer, False to disable. (Default False) |
+| `text` | `String` | Define the text that will be displayed at the right of the toggler |
+| `unselect` | `Boolean` | Only changes the activation message: with the default `true` it says a single point is expected, with `false` several. The hoverpixel is never deactivated automatically after a click. |
+| `value` | `Object` | Value stored in `inputs.id[ID]`: the `lastInfo` object `{click, hover}` with the coordinates (`{lon, lat}` in EPSG:4326, or `null` before the first event) of the last click and of the last mouse move while the tool is active. The object is updated in place,… |
+
+Full descriptions, defaults and examples: [Hoverpixel in the API reference](/api/#category_Hoverpixel).
+
+## LegendHtml — Legend
+
+Create a tool with the map legends at any place of the query description. Usage: '{{legendhtml}}'
+
+| Name | Type | Description |
+|---|---|---|
+| `autoWidth` | `Boolean` | Set true (default) to let the legend panel take the width of its container; set false to give it a fixed `width`. |
+| `filterLayers` | `Array.<Number>` | Defines an array of indexes of layers to be included in map legend (from 0 to quantity of layers). If not defined, all layer legends are shown by default. Otherwise, only the listed indexes are included. Ex: A composed layer with three maps: name:… |
+| `id` | `String` | Defines the id of the legend panel component (`Ext.getCmp(id)`), e.g. to `show()`/`hide()` it or to find the legend entries inside it. Generated when omitted. Other `GeoExt.WMSLegend`/`Ext.Panel` configs (`cls`, `style`, `hidden`, `useScaleParameter`,… |
+| `legendId` | `String` | Defines the legend container id. You can use this id to toggle each legend filter individually. |
+| `preventClick` | `Boolean` | Defines if the user can filter the maps categories by clicking on the legend. Set it true to ignore the legend click, false otherwise. |
+| `reverseLegend` | `Boolean` | Defines if it should sort the legend on the decreasing order. Set it true to use the decreasing order, false otherwise. |
+| `useScaleParameter` | `Boolean` | Set true to request a new legend image from the server whenever the map scale changes (GeoServer `SCALE` parameter), for styles that depend on the scale. Off by default: the legend is generated once and reused, which is faster and keeps the click-to-filter… |
+
+Full descriptions, defaults and examples: [LegendHtml in the API reference](/api/#category_LegendHtml).
+
+## OpacitySlider — Opacity slider tool
+
+Create a slider to change the map opacity. Usage: '{{opacityslider}}'
+
+| Name | Type | Description |
+|---|---|---|
+| `aggressive` | `Boolean` | Set true to apply the opacity while the thumb is being dragged instead of only when it is released. |
+| `changeVisibility` | `Boolean` | Set true to let the slider also control the layer visibility: the layer is hidden when the slider reaches `minValue` and shown again when it leaves it. The layer must be visible when the slider is created. |
+| `complementaryLayer` | `OpenLayers.Layer` | A second layer that is hidden when the slider reaches `maxValue` (GeoExt option to fade between two layers). GeoExt expects a layer object here, which the markup cannot express (a string is not resolved to a layer), so this option is only usable from code;… |
+| `id` | `String` | Defines the id of the slider component (`Ext.getCmp(id)`), e.g. to read `getValue()` or to `hide()` it. Generated when omitted. Every parameter of the tool is passed to `GeoExt.LayerOpacitySlider` / `Ext.slider.SingleSlider` unchanged (`width`, `cls`,… |
+| `inverse` | `Boolean` | Set true to make the slider work with transparency instead of opacity (100 = fully transparent). |
+| `maxValue` | `Number` | Defines the maximum value of the slider (opacity percent at the right end). |
+| `minValue` | `Number` | Defines the minimum value of the slider (opacity percent at the left end). |
+| `value` | `Number` | Defines the initial slider value (opacity in percent). It is only used when the layer has no opacity yet (`opacity` not set on the layer): otherwise the slider starts at the layer's current opacity. |
+
+Full descriptions, defaults and examples: [OpacitySlider in the API reference](/api/#category_OpacitySlider).
+
+## LoadCsv — Csv manager tool
+
+Describes the API to read and manipulate ExtjsUtils.CSV.CsvTable files from URL.
+
+| Name | Type | Description |
+|---|---|---|
+| `columnNameToInd` | `function(columnName) : Number` | Get the index of a column with the 'columnName' name. @param columnName {String} Column name to search for. |
+| `columnNamesToIndexes` | `function(columnNames) : Array.<Number>` | Resolves column names to column indexes: every string entry is looked up in the header (`-1` when absent) and every numeric entry is kept as it is. A single value is accepted in place of the array. This is what `getLines`/`createIndexes` do with their… |
+| `cors` | `Boolean` | Downloads the CSV through the Mappia CORS proxy; use it for servers that do not send CORS headers. |
+| `createIndexes` | `function(columns)` | Create indexes for faster search. PS: Indexes are used to faster results on "getLines" calls, apply only when all [columns] are indexes. @param columns {Array} (Optional) Array of indexes/names of the filtered columns. |
+| `getColunsInd` | `function() : Array.<String>` | Returns a copy of the header row — the column names, in order — so query code can discover columns instead of hard-coding indexes. The name is a historical typo of `getColumnsInd`, kept for compatibility (the platform and many queries call it by this… |
+| `getLineCount` | `function() : Number` | Number of data lines in the table (the header line is not counted). |
+| `getLines` | `function(columns, values, includeHeader) :…` | Returns the lines (arrays of cell strings) whose cells in `columns` equal the corresponding entries of `values`. Columns may be given by index or by header name; to filter on several columns give one value per column, e.g. `getLines([1, "Year"], ["Park A",… |
+| `getValue` | `function(column, line, includeHeader) : String` | Get a value by the matrix index and column. @param column {Number} Column index (First index is 0). @param line {Number} Line index (First index is 0). @param includeHeader {boolean} True to include the header line in the matrix index, False to ignore. |
+| `id` | `String` | Defines the id of the input; it is the key used to read the table in `inputs.id[ID]` (required, the tool renders nothing visible). |
+| `removeEmptyLines` | `boolean` | Ignore the empty lines, removing them from the parsed CSV. True to remove the empty lines from the CSV. |
+| `setValue` | `function(column, line, value)` | Change a cell value by its cell index. @param column {Numeric} Column index. @param line {Numeric} Line index to change (ignore the header information when it exists). @param value {*} New value to replace the older value. |
+| `trim` | `Boolean` | Requests that cell values be trimmed of surrounding whitespace. The flag is accepted and forwarded to the CSV parser, but the current parser ignores it (cells are stored as written, quotes removed), so trim values yourself when needed. Kept for compatibility… |
+| `url` | `String` | Defines the URL of the CSV file to download (required). Relative URLs are resolved against the Mappia host, so backend endpoints such as `/wmtp/calc/...` work; escape `=` inside query strings as `\=`. The layer waits for the download before calculating. |
+| `value` | `ExtjsUtils.CSV.CsvTable` | Value stored in `inputs.id[ID]`: an `ExtjsUtils.CSV.CsvTable` wrapping the parsed file (first row = header). Read it with the CsvTable methods listed in this group (`getLines`, `getValue`, `columnNameToInd`, `createIndexes`, `getLineCount`...). It is… |
+
+Full descriptions, defaults and examples: [LoadCsv in the API reference](/api/#category_LoadCsv).
+
+## Slider — Slider tool
+
+Tool that allows users to create a slider that the user can drag and change its value as map input.
+
+| Name | Type | Description |
+|---|---|---|
+| `backgroundColors` | `Array.<String>` | Array of colors of background slider values, to define background slider color based in slider value. The values are defined from most to minimum with two properties each: - color: {String} CSS color definition for the current interval. i.e.… |
+| `cls` | `String` | Extra CSS class(es) added to the slider element (appended to the default `clickable`). |
+| `disabled` | `Boolean` | Set true to render the slider disabled (Ext `disabled`); enable it later with `Ext.getCmp(id).enable()`. |
+| `fieldLabel` | `String` | Defines the label shown at the left of the slider (Ext `fieldLabel`). |
+| `getValue` | `function() : Number` | Returns the current value of a single-thumb slider. Call it on the component (`Ext.getCmp(id)` or a `getid=` reference), not on `inputs.id[ID]`, which already holds the plain value. |
+| `getValues` | `function() : Array.<Number>` | Returns the value of every thumb; use it for range sliders created with `values=[lo, hi]`. |
+| `gradient` | `Boolean` | Set true to blend the `backgroundColors` into a continuous gradient along the filled part of the slider (each colour fading into the next from its `startValue`). With the default `false` each interval is a solid colour, with a short blend only around the… |
+| `hideLabel` | `Boolean` | Set true to hide the label and the space reserved for it (Ext `hideLabel`). |
+| `id` | `String` | Defines the id to identify the object. |
+| `increment` | `Number` | Defines the step of each increment or decrement in the actual value of the slider when being dragged. |
+| `maxValue` | `Number` | Defines the maximum value of the slider. |
+| `minValue` | `Number` | Defines the minimum value of the slider. |
+| `setValue` | `function(value, animate)` | Sets the slider value from code. Firing the `change` event (the default) also updates `inputs.id[ID]` and recalculates the layer. For a range slider pass the thumb index first: `setValue(index, value)`. @param value {Number} New value (clamped to… |
+| `thumbStyle` | `String` | Defines extra CSS class(es) added to the slider thumb (the draggable handle), to restyle it. |
+| `value` | `Number` | Defines the initial value of the slider (default 100). At runtime the same value is what `inputs.id[ID]` (and `inputs[i]`) holds in `beforeCalc`/`expression`: a number, or an array `[lower, upper]` when the `values` range form is used. The layer recalculates… |
+| `values` | `Array.<Number>` | Defines the slider interval limits. If defined, the slider will be displayed as a range slider. It's return at the 'inputs' parameter will be a array of two values. |
+| `width` | `Number` | Defines the slider width in pixels. Any other `Ext.slider.SingleSlider` config (`cls`, `fieldLabel`, `hideLabel`, `disabled`, `style`, `keyIncrement`...) is also passed through unchanged. |
+
+Full descriptions, defaults and examples: [Slider in the API reference](/api/#category_Slider).
+
+## Textfield — Textfield tool
+
+Tool that allows the user to input a single line of text. Usage: '{{textfield}}'
+
+| Name | Type | Description |
+|---|---|---|
+| `afteredit` | `Event` | Event fired once the field loses focus (blur) and its text differs from the value it had when editing started; the listener receives the TextField. Unlike `keyup` it fires a single time per edit, so use it for expensive reactions. Attach it with… |
+| `fieldLabel` | `String` | Defines the TextField label. |
+| `getRawValue` | `function() : String` | Returns the text currently in the field, unprocessed (this is what `inputs.id[ID]` holds). Call it on the component (`Ext.getCmp(id)`). |
+| `hideLabel` | `Boolean` | Defines if it should completely hide the label element (label and separator) of the TextField. That is, if this property is set to true, the label will be hidden. Otherwise, the label will be shown by default. PS: Since the label will be shown by default,… |
+| `id` | `String` | Defines the id to identify the object. |
+| `isnumeric` | `boolean` | Defines the TextField content as numeric only. |
+| `setRawValue` | `function(value)` | Replaces the text of the field from code. It does not fire `keyup`, so call `forceRecalc()` on an InputManager (or fire the event) when the layer must be recalculated with the new text. @param value {String} New text for the field. |
+| `style` | `String` | Defines the TextField style properties. You can use CSS style rules to customize it. |
+| `value` | `String` | Defines the initial value to the TextField content. At runtime `inputs.id[ID]` (and `inputs[i]`) holds the current text exactly as typed (`getRawValue()`, always a string — convert it with `parseFloat` when `isnumeric` is used). The layer recalculates on… |
+
+Full descriptions, defaults and examples: [Textfield in the API reference](/api/#category_Textfield).
+
+## Label
+
+Create a simple label element to display some text. Usage: {{label\|}}
+
+| Name | Type | Description |
+|---|---|---|
+| `cls` | `String` | Extra CSS class(es) added to the `<label>` element. |
+| `forId` | `String` | Defines the id of the form field the label is for (rendered as the `for` attribute of the `<label>`), so clicking the label focuses that field. |
+| `html` | `String` | Defines the content of the label as raw HTML (not escaped). Everything after `html=` up to the next `\|` is the value, so it may contain `=` characters. `text` wins when both are given. |
+| `id` | `String` | Defines the id of the label component (`Ext.getCmp(id)`), needed to change its text from code or to reference it with `getid=` in another tag. Generated when omitted. |
+| `style` | `String` | Inline CSS applied to the `<label>` element. Any other `Ext.form.Label`/`Ext.Component` config (`hidden`, `width`...) is passed through unchanged. |
+| `text` | `String` | Defines the text of the label. It is HTML-escaped, so use `html` when markup is needed. Update it later with `Ext.getCmp(id).setText(text)` (typically from an `on_change=` listener of a slider or textfield through `getid=`). |
+
+Full descriptions, defaults and examples: [Label in the API reference](/api/#category_Label).
+
+## HTML — HTML contents
+
+Any HTML is possible to be added to the layer description.
+
+| Name | Type | Description |
+|---|---|---|
+| `content` | `String` | Free HTML inside a layer's `descriptionHtml`: everything that is not a `{{tag}}` is passed through to the panel untouched, so a description can carry headings, images, links, tables and the container elements a chart or a custom control needs. Widgets and… |
+
+Full descriptions, defaults and examples: [HTML in the API reference](/api/#category_HTML).
+
+## LoadJson — LoadJson tool
+
+Tool to load a remote JSON and use it with map, this object can store string, values and functions. Usage: {{loadjson}}
+
+| Name | Type | Description |
+|---|---|---|
+| `cors` | `Boolean` | Loads the JSON through the Mappia CORS proxy (for servers without CORS headers). |
+| `id` | `String` | Defines an id for the stored info on layerInputs. |
+| `url` | `String` | Defines the url to load the json from. |
+| `value` | `Object\|Array` | Value stored in `inputs.id[ID]`: the parsed JSON (`JSON.parse` of the response body — an object or an array; an empty response gives `[]`). It is `undefined` until the download finishes: the layer waits for the resource and recalculates on its `waitend`… |
+
+Full descriptions, defaults and examples: [LoadJson in the API reference](/api/#category_LoadJson).
+
+## PickPoint — PickPoint tool
+
+Creates an input that allows users to interact with the real cell or feature value at any position. The returned values are from the original mal to the selected point, in case of RASTER is returned a cell value, in case of shapefile the geometry is returned too. Usage: {{pickpoint}}
+
+| Name | Type | Description |
+|---|---|---|
+| `checked` | `Boolean` | Defines if Pickpoint should start selected. Set it true to start it enabled, false otherwise. |
+| `fieldLabel` | `String` | Sets the label for the 'pickpoint' button widget. |
+| `geometryColor` | `String` | If defined sets a color to use when drawing a geometry by this tool. Otherwise a random color will be used at each interaction. |
+| `getAttributes` | `function(mapIndex) : Array.<Object>` | Returns the attributes of every selected point for one of the layers of the composed map: one object per selection (in click order) holding the feature `data` of that layer, or `{}` when the click hit nothing on it (e.g. a raster). This is the usual way to… |
+| `getLastEvent` | `function() : OpenLayers.Event\|null` | Returns the map click event handled by the last selection (its `type` is set to `add` or `remove`), or `null` before the first click. Use `evt.xy` for the pixel and `ExtjsUtils.COORDINATE.getLatLong(evt)` for the coordinate. |
+| `getPointPos` | `function() : Array.<Number>` | Returns the geographic position of the last clicked point (the marker), in the map's desired projection (normally EPSG:4326 — longitude, latitude). |
+| `iconCls` | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. `labelBefore=true` places the text before the switch, and `inputValue` sets the DOM `value` of the checkbox input (both passed through to the checkbox). |
+| `id` | `String` | Defines the id of the tool (required). It is the key used in `inputs.id[ID]` and the id of the checkbox component (`Ext.getCmp(id)`), so it must be unique in the page. |
+| `inputValue` | `String` | Defines the DOM `value` attribute of the underlying checkbox input (useful when the tool is inside an HTML form). It does not affect what `inputs.id[ID]` holds. |
+| `label` | `String` | Defines a text template drawn on the map next to each selected feature. `${attr}` placeholders are replaced by the attribute values of the clicked feature (vector layers only; a raster cell has no attributes). Without it no label is drawn. |
+| `labelBefore` | `Boolean` | Set true to render the `text` label before (left of) the toggle switch instead of after it. |
+| `lat` | `Number` | Defines the initial latitude (EPSG:4326, decimal degrees) of the marker shown when the tool is activated, before any click. Use it with `lon`; default 0. |
+| `lon` | `Number` | Defines the initial longitude (EPSG:4326, decimal degrees) of the marker shown when the tool is activated, before any click. Use it with `lat` to start on a point of interest; default 0. |
+| `markLayerInd` | `Number` | Defines by layer index which one to draw its geometry when a click event happens. (0-indexed) |
+| `movePoint` | `function(evt)` | Moves the marker of the last click to the position of a map mouse event. The tool calls it on every click; call it yourself only to relocate the marker from a synthetic event. @param evt {OpenLayers.Event} Map mouse event carrying the pixel position in… |
+| `notify` | `Boolean` | Set false to prevent the notify messages from appear (the "click on the map..." notification shown when the tool is activated). |
+| `onMark` | `function` | Callback function called after clicking on a feature with this 'pickpoint' widget, once the feature info of every layer of the composed map has been received. `this` is the pickpoint checkbox (or `scope`), so `this.value` is the PointAttributeManager. The… |
+| `onefeature` | `boolean` | Defines if PickPoint should keep only the last feature selected. Set it true to keep only the last one, false otherwise. |
+| `pointVisibility` | `Boolean` | Defines if Pickpoint should show where the last click was. Set it true to show, false otherwise. |
+| `removeAll` | `function()` | Clears the whole selection: every selected feature is removed from the map and from the list returned by `getAttributes`. Typical use: a "Clear" button handler, followed by a recalculation. |
+| `removeAttribute` | `function(index)` | Removes one selection (by its position in the `getAttributes` list) from the map and from the selection list. An invalid index changes nothing. @param index {Number} 0-based index of the selection to remove (same order as `getAttributes`). |
+| `runOnClick` | `function` | Alias of `onMark`, kept so the pickpoint accepts the same callback name as the other map tools (hoverpixel, summedarea, areaintegral). When both are written, `onMark` wins. See {@link PickPoint.onMark} for the callback signature. |
+| `runOnHover` | `function` | Defines a callback function to run when clicking at the map. Defines a callBack with following parameters function(mouseEvt, coordinates) --mouseEvt: {MouseEvent} Mouse hover event. --coordinates: {Openlayers.LatLon} Coordinate of the cursor over the map. PS:… |
+| `runOnHoverOutside` | `function` | True to run the callback function even when hovering outside of the layer, False to disable. (Default False) |
+| `scope` | `Object` | Defines the object used as `this` inside the `onMark`/`runOnClick` callback. By default it is the pickpoint checkbox component (so `this.value` is the PointAttributeManager). From the markup it can only reference an element created earlier in the same… |
+| `searchAttribute` | `function(mapIndex, propName, value) : Object\|null` | Finds, among the selected features of one layer, the first whose attribute `propName` equals `value` and returns its attributes. Useful to check whether a given feature is already selected. @param mapIndex {Number} 0-based index of the layer inside the… |
+| `setFeatureVisibility` | `function(state, feature)` | Adds a feature to, or removes it from, the auxiliary vector layer where the tool draws its selections. Lets a callback draw extra geometries (an `OpenLayers.Feature.Vector`) with the selection, or hide one of the selected features without forgetting it.… |
+| `setPointVisibility` | `function(state)` | Shows or hides the marker drawn at the last clicked position (the same marker controlled by the `pointVisibility` parameter). @param state {Boolean} `true` to show the marker, `false` to hide it. |
+| `text` | `String` | Defines the text shown next to the toggle. When omitted the label shows the coordinate of the last click, `(lat, lon)`, and is updated at every click. |
+| `toggle` | `function(forceState)` | Activates or deactivates the pick mode from code (same as clicking the switch): the map cursor, the click listeners and the marker follow the new state. Call it on the checkbox component (`Ext.getCmp(id)`). Without an argument the state is inverted. @param… |
+| `togglePoint` | `function(pointFeatures, evt) : Object` | Adds a set of features (one array per layer of the composed map, as returned by GetFeatureInfo) to the selection, or removes it when the same features were already selected. With `onefeature=true` the previous selection is cleared first. The tool calls it… |
+| `unselect` | `Boolean` | Defines if Pickpoint will be automatically disabled after each click. Set it true to automatically disable, false otherwise (write `unselect=` or `unselect=false` to keep the tool active for several clicks). |
+| `value` | `Object` | Value stored in `inputs.id[ID]`: the PointAttributeManager of the tool, the object that keeps the selected features. Read it with `getAttributes(mapIndex)`, `searchAttribute(...)`, `getPointPos()`, `getLastEvent()`, and change it with `removeAll()`,… |
+
+Full descriptions, defaults and examples: [PickPoint in the API reference](/api/#category_PickPoint).
+
+## Timeline — Timeline tool
+
+Display a spatial scenarios changes in a timeline.
+
+| Name | Type | Description |
+|---|---|---|
+| `fieldLabel` | `String` | Defines a label for the Timeline. It will be shown at the left of the button to hide the tiemline, by default. |
+| `getCurrentLayerStyle` | `function() : String` | Returns the WMS style currently applied to the layer (`layer.params.STYLES`), or an empty string for the default style. |
+| `getDesiredVisibility` | `function() : Boolean` | Returns the visibility the timeline has, or will have when its layer becomes visible: `true` may be returned while the panel is actually hidden because the layer is hidden. |
+| `getMainThumb` | `function() : Ext.slider.Thumb` | Returns the main (middle) thumb of the slider — the one that selects the current step; its `value` is the 0-based step index. The outer thumbs (`thumbs[0]`, `thumbs[2]`) bound the animation range. |
+| `getMaxThumbValue` | `function() : Number` | Returns the position of the right (max) thumb: the last step index the animation reaches. |
+| `getMinThumbValue` | `function() : Number` | Returns the position of the left (min) thumb: the step index the animation restarts from. |
+| `getStyleFromValue` | `function(value) : String\|Object\|undefined` | Returns the style of a step key or, when the key has no style of its own, the style of the nearest previous key (numeric keys are compared as numbers, text keys by position in `steps`). @param value {String\|Number} A step key. |
+| `getTimeline` | `function() : GeoExt.TimelinePanel` | Returns the timeline panel driven by this button. The markup `id` identifies the button, so this is the way to reach the panel methods (`getValue`, `updateMainThumbValue`, `startAnimationStep`, `setSteps`...). |
+| `getValue` | `function() : String` | Returns the key of the step currently selected by the main thumb (the same value the layer receives in `inputs.id[ID]`). |
+| `getValueFromStyle` | `function(style) : Number` | Returns the step key whose style is the given one (the last match when several steps share a style), or the first step key when the style is empty or unknown. The key is returned through `parseInt`, so it is meaningful for numeric keys only (text keys give… |
+| `hidden` | `Boolean` | Set true to hide the "Show/Hide timeline" button rendered in the layer description (the standard Ext `hidden` config, so `Ext.getCmp(id).show()` reveals it). The timeline panel itself is still created and its initial visibility follows `renderHidden`; use it… |
+| `hideLabel` | `Boolean` | Defines if the label of the timeline should be displayed. Set true to hide the label, false to show it. |
+| `id` | `String` | Defines the id to identify the object. It is the key used in `inputs.id[ID]` and the id of the show/hide button component: `Ext.getCmp(id)` returns the button and `Ext.getCmp(id).getTimeline()` the timeline panel (see the methods listed in this group). |
+| `nextAnimationStep` | `function()` | Advances the timeline one step (main thumb + 1), applying the style of the new step to the layer and firing `change`; does nothing when the main thumb is already at the max thumb. Useful for a custom "next" button. |
+| `nextStepInterval` | `Number` | Defines the duration of the interval between steps of the timeline in milliseconds. |
+| `onPlayToggle` | `function` | Defines the callback function called when the play/stop button is toggled, BEFORE the animation starts or stops. It must return a truthy value: returning `false`/nothing cancels the start/stop (use it as a veto, e.g. while data is loading). `pressed` is true… |
+| `playing` | `Boolean` | `true` while the animation is running (between play and stop/end). Read it on the panel (`Ext.getCmp(id).getTimeline().playing`) to know whether to call `startAnimationStep()` or `stopAnimation()`. |
+| `preloadTiles` | `Boolean` | Defines if the timeline should preload the tiles of the next steps to get smoother transitions. Set it true to preload, false otherwise. |
+| `renderHidden` | `Boolean` | Defines the timeline initial visibility. Set it true to start with the timeline hidden, false otherwise. |
+| `setCurrentLayerStyle` | `function(style)` | Applies a style to the layer the way a step does: a style name, or a `{style, name}` object that also switches the WMS layer name (the object form of a `steps` entry). For a composed layer the first inner layer is updated and the legend is rebuilt. The slider… |
+| `setDesiredVisibility` | `function(visible) : GeoExt.TimelinePanel` | Shows or hides the timeline panel while keeping it consistent with the layer: when the layer is hidden the panel stays hidden and the requested state is remembered, to be applied as soon as the layer becomes visible. Prefer it over `show()`/`hide()`; the… |
+| `setMaxThumbValue` | `function(value)` | Moves the right (max) thumb, limiting the animation to the steps up to that index (no animation, no `change` event). @param value {Number} 0-based step index for the max thumb. |
+| `setMinThumbValue` | `function(value)` | Moves the left (min) thumb, making the animation start from that step index (no animation, no `change` event). @param value {Number} 0-based step index for the min thumb. |
+| `setSteps` | `function(steps)` | Replaces the steps of the timeline and redraws it (labels, slider range and current step). Unlike the markup `steps` parameter this takes the already-built object: keys are the step labels, values the style name or a `{style, name}` object. Use it to change… |
+| `startAnimationStep` | `function()` | Starts (or resumes) the animation from the current step: each step is shown for `nextStepInterval` milliseconds after the layer finished loading it, up to the max thumb, where the animation stops by itself. When the main thumb is already at the max thumb it… |
+| `steps` | `Array.<Array.<(String\|Object)>>` | Defines the timeline change steps. |
+| `stopAnimation` | `function()` | Stops the running animation (cancels the pending step timer, releases the play button and hides the slider tip). The current step is kept. Safe to call when nothing is playing. |
+| `toggleTimelineVisibility` | `function(forceState)` | Shows or hides the timeline panel from code — what clicking the button does. Without an argument the current (desired) visibility is inverted. The panel only appears while the layer is visible; the requested state is remembered otherwise (see… |
+| `updateLayer` | `function(value)` | Applies to the layer the style of a step key, without moving the slider. When the key has no step of its own the style of the nearest previous numeric key is used (steps `{2010: "s1", 2015: "s2"}` and value 2014 keep/apply "s1"); nothing happens when that… |
+| `updateMainThumbValue` | `function(value)` | Moves the main thumb to a step index (0-based position in `steps`), applying that step's style to the layer and firing `change` — the programmatic way to select a step. Without an argument it re-syncs the thumb with the layer's current style using… |
+| `value` | `String` | Value stored in `inputs.id[ID]` (and `inputs[i]`): the key of the current step — the first element of the selected `steps` entry (e.g. `"1990"` or `"January"`), as a string. It changes whenever the main thumb moves (drag, click or animation) and the layer… |
+
+Full descriptions, defaults and examples: [Timeline in the API reference](/api/#category_Timeline).
+
+## LiveComposedSplit — Live composed split tool
+
+Compare two styles of a Composed layer with a live split-screen slider on the map. The layer must be a Composed layer (typically the same WMS layer twice in `name` with two `styles`). Put the tool in `descriptionHtml`, open the query panel, choose left/right styles, then press Compare to show a draggable vertical divider. Required parameters: displayNames, layerNames (same order and length).…
+
+| Name | Type | Description |
+|---|---|---|
+| `applySelectedStyles` | `function()` | Pushes the two selected styles to the composed layer (`changeLayers` with the left style on child 0 and the right style on child 1) and makes both children visible. Called when Compare is pressed; after calling it yourself use `refreshActiveSplit()` so the… |
+| `baseName` | `String` | WMS layer name used with each style (e.g. CSR:precip_monthly_average). Defaults to layer.params.LAYERS when omitted. |
+| `cls` | `String` | Extra CSS class for the Compare toggle button (replaces the default `clickable`; the class `live-composed-split-compare` is always added). |
+| `composedLayerName` | `String` | Name of the Composed layer to split. If omitted, the first OpenLayers.Layer.Composed on the map is used. |
+| `destroySplitControl` | `function()` | Removes the split divider control from the map for good (it is recreated on the next Compare press). The panel calls it when its layer is removed; call it to force a clean state. It does not restore the single-style view — press the Compare button off… |
+| `displayNames` | `String` | Comma-separated labels shown in the left/right combo boxes (required). |
+| `id` | `String` | Id of the Compare button (wrapper id is id + "_container"). |
+| `isComparisonActive` | `function() : Boolean` | Tells whether the split comparison is currently shown on the map (Compare pressed and the divider active). Get the panel with `Ext.getCmp(id + '_container')`, where `id` is the markup id. |
+| `layerNames` | `String` | Comma-separated WMS style names aligned with displayNames (required). When Compare is pressed, the composed layer switches to the selected pair. |
+| `layout` | `String` | Presentation inside the layer query panel. compact (default): stacked fields that fit the ~300px layer card. inline: horizontal row (legacy Left / Right / Compare on one line). |
+| `leftDefault` | `String` | Initial left combo value; must be one of displayNames. |
+| `refreshActiveSplit` | `function()` | Re-applies the selected styles and re-clips the split after the composed layer's children were replaced (e.g. by your own `changeLayers` call), keeping the divider position. Does nothing while the comparison is not active. |
+| `rightDefault` | `String` | Initial right combo value; must be one of displayNames (and different from left). |
+| `setComparisonEditingEnabled` | `function(enabled)` | Enables or disables the right-side combo and the swap button. The panel calls it itself (only the left combo is editable while idle; both unlock when comparing); call it to lock the choice while data loads. @param enabled {Boolean} `true` to allow changing… |
+| `swapSides` | `function()` | Exchanges the left and right styles (combos and map) and re-clips the split, keeping the divider where it is. Does nothing while the comparison is not active — what the swap button does. |
+| `text` | `String` | Label on the Compare toggle button (before the split is active). |
+
+Full descriptions, defaults and examples: [LiveComposedSplit in the API reference](/api/#category_LiveComposedSplit).
+
+## InputManager — InputManager tool
+
+Tool to store local variables to be used in others functions callbacks. PS: DOM elements cannot be used in 'expression' context, because them cannot be sent to WebWorkers (javascript language limitation). Usage: '{{inputmanager}}'
+
+| Name | Type | Description |
+|---|---|---|
+| `forceRecalc` | `function()` | Force a legend map recalculation. |
+| `getValue` | `function(key) : *` | Get the stored value by his property name, if it does not exists returns null. @param key {String} Stored property name. |
+| `id` | `String` | Defines the id of the input; it is the key used to reach the manager in `inputs.id[ID]` (required, the tool renders nothing visible). |
+| `setDefaultValues` | `function(obj, local)` | Set default values to the stored elements, these values are used before any other value is defined and never update or replace another stored values. PS: Auxiliary function to make easy wrinting the script (typically called in `onInputsReady` or at the start… |
+| `setValues` | `function(obj, cancelUpdate, local)` | Stores object properties for later usage. PS: If has name property collision the older is replaced. PS: Values go to one of two buckets of the manager: `global` (the default — serialized and sent to `expression`, so it must hold plain JSON-compatible data) or… |
+| `value` | `Object` | Value stored in `inputs.id[ID]`: the manager object itself, with `getValue(key)`, `setValues(obj, cancelUpdate, local)`, `setDefaultValues(obj, local)` and `forceRecalc()` (listed in this group) and the `global` bucket where the stored properties live… |
+
+Full descriptions, defaults and examples: [InputManager in the API reference](/api/#category_InputManager).
+
+## FileField — FileField tool
+
+Tool that allows handle and local files. PS: This object cannot be sent to 'expression'. Usage: {{filefield\|fieldLabel=loadshp\|id=loadshp\|_onChange=function(){alert('changed')}}}
+
+| Name | Type | Description |
+|---|---|---|
+| `eventNames` | `Array.<string>` | Defines the list of events by name. Use this property to define callback functions to any of the following events. |
+| `fieldLabel` | `String` | Defines the label shown at the left of the file input (Ext `fieldLabel`). `hideLabel=true` removes the label and its reserved space; other `Ext.form.Field` configs are passed through unchanged. |
+| `hideLabel` | `Boolean` | Set true to hide the label element and the space reserved for it. |
+| `id` | `String` | Defines the id of the input; it is the key used in `inputs.id[ID]` and the id of the Ext field (`Ext.getCmp(id)`), so it must be unique in the page. |
+| `ignoreUpdate` | `Boolean` | Defines if it should ignore the widget change event. If it's false, it dispatches the update event at every file selection. |
+| `inputType` | `String` | The HTML input type. It is always forced to `file` by the tool, so a value written in the markup is ignored (documented only to explain why it cannot be changed). |
+| `value` | `function` | Value stored in `inputs.id[ID]`: not the file itself but a getter function. Call it — `inputs.id[ID]()` — to obtain the selected `File` (the first entry of the DOM `files` list) or `undefined` when nothing is selected. It is a function so the value can never… |
+
+Full descriptions, defaults and examples: [FileField in the API reference](/api/#category_FileField).
+
+## SummedArea — Summed Area tool
+
+Create an input of summation in any arbitrary area. CallBack parameters (context {OpenLayers.Layer}, layersValues {Array[Number]}, inputs {[Object]}, feature {Geometry}) runOnClick {Function}  Callback called exactly after sum the map region., PS: 'layersValues' return the sum of each internal layer and an adittional value which is the sum of all pixels of resulting layer.
+
+| Name | Type | Description |
+|---|---|---|
+| `description` | `function(name, config, layer, parameters) : Ext.Container` | Creates an input of summatory in any arbitrary area. CallBack parameters (context {OpenLayers.Layer}, layersValues {Array[Number]}, inputs {[Object]}, feature {Geometry}) runOnClick {Function} Callback called exactly after sum the map region., PS:… |
+| `getSummedLayerValues` | `function(layer, feature) : Array` | Sums, for each inner layer of the composed map, the values of the rendered cells that fall inside a polygon (values decoded from the tile colours through the layer legend, null cells skipped). This is what `runOnClick` receives as `layersValues`; call it from… |
+| `iconCls` | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. |
+| `id` | `String` | Defines the id of the tool: the key used in `inputs.id[ID]` and the id of the container component (`Ext.getCmp(id)`; the switch itself is `Ext.getCmp(id).items.get(0)`). Generated when omitted. |
+| `labelBefore` | `Boolean` | Set true to render the `text` label before (left of) the toggle switch instead of after it. |
+| `notify` | `Boolean` | Set false to suppress the notification shown when the tool is activated. |
+| `runOnClick` | `function` | Defines the callback run when the user finishes drawing the polygon (double-click closes it), with the values already summed. Called as `runOnClick(layersValues, inputs, feature)` with `this` = the layer: `layersValues` is the array described in… |
+| `text` | `String` | Defines the text shown next to the toggle switch. |
+| `unselect` | `Boolean` | Only changes the activation message (`true`: one selection expected, `false`: several); the tool always deactivates itself after a polygon is summed. |
+| `value` | `Array.<Number>` | Value stored in `inputs.id[ID]`: an array meant to hold the last `layersValues` (one sum per inner layer, see `getSummedLayerValues`). In the current implementation the tool does not copy the sums into it after drawing — it stays empty — so read the results… |
+
+Full descriptions, defaults and examples: [SummedArea in the API reference](/api/#category_SummedArea).
+
+## Window — Floating Window tool
+
+Tool that allows to show contents in an interactive floating window. It can only be shown when the layer is visible.
+
+| Name | Type | Description |
+|---|---|---|
+| `btnID` | `String` | Defines the id of the button that controls the window visibility. |
+| `getButton` | `function() : Ext.Button` | Returns the show/hide toggle `Ext.Button` (id `btnID`), e.g. to `toggle(true)`, `setText()` or `hide()` it. |
+| `getContainer` | `function() : Ext.Container` | Returns the content container (`Ext.Container`, id `id`) inside the window. Use `update(html)` to replace its HTML, or `add()`/`doLayout()` to place Ext components in it. |
+| `getIds` | `function() : Array.<String>` | Returns the ids of the three components created by the tool, in the order `[windowID, id (content div), btnID]`. |
+| `getWindow` | `function() : Ext.Window` | Returns the floating `Ext.Window` (use it for `show()`, `hide()`, `setTitle()`, `setSize()`, `setPosition()`...). Prefer `getButton().toggle()` to change visibility so the button stays in sync. |
+| `height` | `number` | Defines the floating window initial height. |
+| `html` | `String` | Defines the initial HTML content of the window's container div. Because the parser treats everything after `html=` as the value, the content may contain `=` characters; it cannot contain `\|` or `}}`. For content built at runtime, write into the container… |
+| `id` | `String` | Defines an id for the div contained in the floating window (where the content can be drawn). |
+| `ignoreVisibility` | `Boolean` | Defines if the window should ignore the layer visibility state. By default, the window visibility state is the same as the layer's. Set true to ignore the layer visibility state, false otherwise. PS: The 'ignoreVisibility' is not compatible with the… |
+| `items` | `Array` | Not supported: the tool always creates its own single content container (the div identified by `id`), so any `items` written in the markup are discarded. Put content in with `html=`, or render into the container from code (`Ext.getCmp(id)` /… |
+| `onBeforeHide` | `function` | Defines a callback function to be called before hiding the floating window. @param layer {Object} Scope of the layer @param data {Array} [window, button, windowConfig] window: Window object; button: Button created; windowConfig: Window object configuration |
+| `resize` | `function` | Defines the callback function to be called when the floating window is resized. |
+| `startVisible` | `Boolean` | Defines if the window should start visible or not. Set true if it should, false otherwise. |
+| `text` | `string` | Defines the window button text. |
+| `title` | `String` | Defines the floating window's title. |
+| `toggle` | `function(pressed)` | Shows or hides the floating window from code by pressing/releasing its toggle button — the same as the user clicking it, so `onBeforeHide` still runs. Call it on the button: `inputs.id[ID].getButton().toggle(state)` or `Ext.getCmp(btnID).toggle(state)`.… |
+| `underButtons` | `Boolean` | Defines where the floating window will be positioned in relation to the buttons panel. Set true to position the window under the right buttons panel, false otherwise. |
+| `value` | `Object` | Value stored in `inputs.id[btnID]` - under the show/hide button's id, not the markup `id`, so set `btnID` to read it (without one the key is an automatic id): a small handle object with the methods `getIds()`, `getWindow()`, `getButton()` and `getContainer()`… |
+| `width` | `number` | Defines the floating window initial width. |
+| `windowID` | `String` | Defines the window id. |
+| `x` | `Number` | Defines the initial absolute X position of the window, in pixels from the left edge of the page. A negative value counts from the right edge instead: the window's right side is placed at `viewportWidth + x` (e.g. `x=-10` leaves a 10px margin on the right).… |
+| `y` | `Number` | Defines the initial absolute Y position of the window, in pixels from the top of the page. A negative value counts from the bottom edge instead: the window's bottom side is placed at `viewportHeight + y` (e.g. `y=-20` leaves a 20px margin at the bottom). PS:… |
+
+Full descriptions, defaults and examples: [Window in the API reference](/api/#category_Window).
+
+## Checkbox — Checkbox tool
+
+A checkbox that calls a function of the layer when toggled. It is not registered as an input: read its state inside the handler. Usage: {{checkbox\|text=Show details\|handler=onToggleDetails}}
+
+| Name | Type | Description |
+|---|---|---|
+| `checked` | `Boolean` | Set true to start checked. `handler` is not run for the initial state. |
+| `fieldLabel` | `String` | Defines a label at the left of the whole field (Ext `fieldLabel`), in addition to the `text` shown next to the switch. `hideLabel=true` removes it and its reserved space. |
+| `forceUpdateLayer` | `function()` | Fires the `forceupdatelayer` event of the widget. For the map-interaction tools registered as inputs (summedarea, areaintegral) this is the event the layer listens to, so calling it marks the input as changed and recalculates the layer with the values… |
+| `handler` | `function` | Defines the callback run whenever the checkbox is checked or unchecked (by the user or by `toggle()`). Called as `handler(checkbox, checked)` with `this` = the layer. The value is resolved in this order: a key of the layer `functions` object, then a global… |
+| `iconCls` | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. |
+| `id` | `String` | Defines the id of the checkbox component (`Ext.getCmp(id)`), e.g. to call `toggle()` or `setBoxLabel()` from a button. Generated when omitted. |
+| `inputValue` | `String` | Defines the DOM `value` attribute of the underlying `<input type="checkbox">` (useful inside an HTML form). |
+| `labelBefore` | `Boolean` | Set true to render the `text` before (left of) the toggle switch instead of after it. |
+| `notify` | `Boolean` | Accepted for parity with the map-picking switches (pickpoint, hoverpixel...), where it controls the activation notification. A plain checkbox shows no notification, so the value has no effect here. |
+| `setBoxLabel` | `function(boxLabel)` | Changes the text shown next to the checkbox (the markup `text` parameter) after it was rendered. Available on every checkbox-style tool (checkbox, pickpoint, hoverpixel, summedarea, areaintegral); get the component with `Ext.getCmp(id)`. @param boxLabel… |
+| `text` | `String` | Defines the text shown next to the toggle switch (the checkbox `boxLabel`). |
+| `toggle` | `function(forceState)` | Checks or unchecks the checkbox from code, running its `handler` as if the user had clicked it. Without an argument the current state is inverted. Get the component with `Ext.getCmp(id)`. @param forceState {Boolean} `true` to check, `false` to uncheck; omit… |
+| `unselect` | `Boolean` | Accepted for parity with the map-picking switches, where it selects the activation message. A plain checkbox never unchecks itself, so the value has no effect here. |
+
+Full descriptions, defaults and examples: [Checkbox in the API reference](/api/#category_Checkbox).
+
+## ZoomLevel — Zoom level input
+
+A hidden input whose value is the current map zoom level; the layer recalculates whenever the zoom changes. Usage: {{zoomlevel\|id=zoom}} then inputs.id['zoom'] in beforeCalc/expression
+
+| Name | Type | Description |
+|---|---|---|
+| `id` | `String` | Defines the id of the input; it is the key used to read the zoom level in `inputs.id[ID]` (required, the tool renders nothing visible). |
+| `value` | `Number` | Value stored in `inputs.id[ID]` (and `inputs[i]`) for `beforeCalc`/`expression`: the current map zoom level as a number. It is refreshed on the map `moveend` event and only triggers a recalculation when the zoom actually changed (panning is ignored). |
+
+Full descriptions, defaults and examples: [ZoomLevel in the API reference](/api/#category_ZoomLevel).
+
+## AreaIntegral — Area integral tool
+
+Two clicks on the map define a rectangle; the tool sums the map values inside it using summed-area (integral) maps, so it only works with maps published with the 'integral' operation. Callback parameters (layersValues {Array[Number]}, inputs {Array}, boundingBox {Array[Number]} in EPSG:4326, pixel {x,y}, lastInfo {first, second}) Usage: {{areaintegral\|runOnClick=onAreaSummed}}
+
+| Name | Type | Description |
+|---|---|---|
+| `getLayerValues` | `function(mousePoint, layer) : Array.<Number>\|null` | Reads the composed map at one screen position: one value per inner layer (decoded from the tile colours through the legend, null cells read as 0) plus one extra entry with the layer `expression` result for those values. The tool samples the four corners of… |
+| `iconCls` | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. |
+| `id` | `String` | Defines the id of the tool: the key used in `inputs.id[ID]` and the id of the container component (`Ext.getCmp(id)`; the switch itself is `Ext.getCmp(id).items.get(0)`). Generated when omitted. |
+| `labelBefore` | `Boolean` | Set true to render the `text` label before (left of) the toggle switch instead of after it. |
+| `notify` | `Boolean` | Set false to suppress the notification shown when the tool is activated. |
+| `runOnClick` | `function` | Defines the callback run after the second click closes the rectangle, with the sums computed. Called as `runOnClick(layersValues, inputs, boundingBox, pixel, lastInfo)` with `this` = the layer: `layersValues` has one summed value per inner layer (see… |
+| `text` | `String` | Defines the text shown next to the toggle switch. |
+| `unselect` | `Boolean` | Only changes the activation message (`true`: one selection expected, `false`: several); the tool always deactivates itself after the second click. |
+| `value` | `Array.<Number>` | Value stored in `inputs.id[ID]`: the `layersValues` array of the tool — one summed value per inner layer of the composed map for the last rectangle (empty before the first one). The array is updated in place after the second click, so… |
+
+Full descriptions, defaults and examples: [AreaIntegral in the API reference](/api/#category_AreaIntegral).
+
+## MarkupSyntax — Markup syntax (all tools)
+
+Rules shared by every tool written inside descriptionHtml as {{tool\|param=value\|param2=value2}}: how parameters are parsed, the values they accept and the special parameters (getid, function, on_&lt;event&gt;, isnumeric, cls, key=false, nested a=b=c, escaped \= ) available to all tools. Function-valued parameters (handler, runOnClick, runOnHover, onSelect, ...) are resolved in this order: a key…
+
+| Name | Type | Description |
+|---|---|---|
+| `cls` | `String` | `cls=<class>` adds CSS classes to the created element. Unlike other keys, repeating it concatenates the values (with no separator — start the second one with a space, or list all classes in a single `cls`). |
+| `defaultParsing` | `String\|Number` | How a plain `param=value` is converted before reaching the tool: a value that looks like a number (`10`, `-4.5`, `1e3`) becomes a JavaScript number, an empty value (`param=`) becomes the empty string (falsy), and anything else stays a string — tools that need… |
+| `escapedEquals` | `String` | Write `\=` to put a literal `=` inside a value; a bare `=` would start a nested key (see `nestedKeys`). Needed above all in URLs with query strings. Inside a JavaScript string remember to double the backslash (`'\\='`). The value of `html=` is exempt:… |
+| `falseValue` | `Boolean` | `param=false` is rewritten to `param=` (an empty, falsy value) before parsing, because the literal text `"false"` would otherwise be a truthy string. Use it to switch off a boolean parameter whose default is true (`unselect=false`, `notify=false`,… |
+| `function` | `function` | `function=<body>` stores a function whose body is the given text (`function () { <body> }`), evaluated with no `try/catch` and no lookup in the layer `functions`. Use the nested form `param=function=<body>` to assign it to a parameter (a top-level `function=`… |
+| `getid` | `Object` | `getid=ID` gives access to an element created EARLIER in the same description (by any tag with that `id`). At the top level (`\|getid=slider1\|`) the element is stored in the tool config under `getid`; the common use is to attach a listener to it with… |
+| `html` | `String` | `html=` is the one key whose value is taken verbatim up to the next `\|`: `=` characters inside it are kept and no nesting happens. Used by `label` and `window`. |
+| `isnumeric` | `Boolean` | `\|isnumeric\|` (or `isnumeric=true`) installs a validator that only accepts numeric text — the field is marked invalid with the localized "must be a number" message otherwise. Meant for `textfield`. Note that the input value is still delivered as a string;… |
+| `nestedKeys` | `Object` | `a=b=c` creates a nested object: the tool receives `{a: {b: c}}`. The innermost `key=value` is parsed with the same rules as a top-level one, so the special keys work at any depth — `plugins=tip=...` builds a slider tip plugin, `scope=getid=ID` assigns an… |
+| `on_event` | `function` | `on_<event>=<code>` adds a listener for an Ext event (`change`, `select`, `afteredit`, `toggle`...) on an element referenced with `getid` — the form is `getid=ID\|getid=on_<event>=<code>`; it cannot be used on the tag's own element. `<code>` is either a full… |
+| `tip` | `Object` | `tip=<format>` builds an `Ext.slider.Tip` whose text is `String.format(format, thumbValue, value of thumb 0, value of thumb 1...)`, so `{0}` is the dragged thumb value. It must be assigned to a slider's `plugins` with the nested form `plugins=tip=<format>`; a… |
+
+Full descriptions, defaults and examples: [MarkupSyntax in the API reference](/api/#category_MarkupSyntax).
+
+# Section: Integration
+
+## Embedding a map and talking to it
+
+> How a page embeds a Mappia map in an iframe with mappia_io.js, applies a query into it at runtime, and exchanges messages with the query running inside — the envelope, the handshake, the queueing and the failure modes.
+
+A Mappia map can be a page of its own, or a component inside somebody else's
+application — an Angular dashboard, a plain HTML site, a CMS page. Embedded, it is an
+`<iframe>`, and the host talks to the map by exchanging messages with it through the small
+library the platform serves for that purpose, **`mappia_io.js`**.
+
+Two halves have to agree: the **parent page**, which creates the connection and sends
+messages, and the **query** inside the iframe, which receives them and answers. This page
+describes both, and the contract between them. Worked examples - applying queries, both
+message directions, request and answer - and a live playground are on the
+[MappiaIO tool page](/elements/mappia-io/).
+
+## 1. The two routes
+
+| URL | What it is |
+|---|---|
+| `{origin}/calculator/?queryid=<id>` | The end-user view: the map, its layers and its widgets |
+| `{origin}/editor/?queryid=<id>` | The same query in the developer view, with the query text and the editor tools |
+
+Both accept the same URL parameters (`queryid`, `options`, `extent`, `lang`, `visiblelayers`,
+…), documented in the [API reference](/api/) under **Sharing Maps**. The two pages do **not**
+share live state: applying a query in the editor does not change an open calculator page.
+
+## 2. Connecting from the parent page
+
+```html
+<iframe id="mappia" src="https://maps.csr.ufmg.br/calculator/?queryid=417&options=scale"></iframe>
+<script src="https://maps.csr.ufmg.br/mappia_io.js"></script>
+<script>
+  var mappia = MappiaIO("mappia", true);
+</script>
+```
+
+`MappiaIO(target, keepAfterReady)`:
+
+| Argument | Meaning |
+|---|---|
+| `target` | The iframe's `id`, the iframe element itself, or the window object returned by `window.open` — the map can equally well live in a separate window |
+| `keepAfterReady` | `true` keeps listening after the initial handshake. For an embed that keeps talking to the map, pass `true`; `false` is for a one-shot message |
+
+The returned object is the connection. Its methods, all chainable:
+
+| Method | What it does |
+|---|---|
+| `send(message[, forceSend])` | Sends a message to the query. Until the iframe reports ready, messages are **queued**, not dropped — `forceSend` skips the queue and is rarely needed |
+| `applyQuery(text)` | Applies query text into the running iframe, replacing what it shows |
+| `applyQueryFromUrl(url)` | Fetches the text and applies it (subject to the usual cross-origin rules) |
+| `addOnMessageCallback(fn)` | Registers a handler for messages coming **from** the query |
+| `addReadyCallback(fn)` | Runs `fn` when the iframe is ready (immediately, if it already is) |
+| `isDomLoaded()` / `isDomAttached()` | The state of the connection |
+| `remove()` | Stops listening — call it when the component holding the iframe is destroyed |
+| `addOnRemoveCallback(fn)` | Notified when the connection is removed |
+
+> **`noopener` and `noreferrer` break the connection.** They sever the window reference the
+> messages travel on. Do not put them on the iframe, and do not pass them to `window.open`
+> for a map window.
+
+## 3. Loading a query into the frame
+
+Two independent mechanisms, which can be combined:
+
+| Mechanism | How | When to use it |
+|---|---|---|
+| Saved query | `?queryid=<number>` in the iframe URL | The query lives on the Mappia server |
+| Runtime query | `mappia.applyQuery(text)` from the parent | The query text belongs to the host: generated per user, per selection, kept in the host's own repository |
+
+A common shape is both: the iframe opens a saved query so something is on screen at once,
+and the parent then applies a more specific query.
+
+## 4. The message envelope
+
+Every message is one JSON object. Only `operation` is structural; what it means is for the
+parent and the query to agree on.
+
+```javascript
+{
+  operation: "show_property",     // required: your own name for the action
+  message: { id: 4711 },          // your payload
+  type: "geojson",                // optional, your own
+  overwrite: { title: "Farm 4711", visibility: true },  // optional layer overrides
+  layerDefinitionsMode: false     // optional
+}
+```
+
+The platform does not define an action vocabulary: `show_property`, `clear_selection`,
+`export_png` are names **you** invent and implement in the query. The only reserved names
+are the handshake ones in §6, all prefixed `mappia__`.
+
+## 5. The query side
+
+Inside the iframe, the query registers a handler and answers with `postMessage`:
+
+```javascript
+ExtjsUtils.QUERY.setQueryGlobalProperties({
+  handleParentMessage: function (msg) {
+    if (msg.operation === "show_property") {
+      ExtjsUtils.QUERY.addLayer({
+        name: "CSR:municipios",
+        title: (msg.overwrite && msg.overwrite.title) || "Municipalities",
+        visibility: true,
+      });
+      // answer the parent
+      ExtjsUtils.QUERY.postMessage({ operation: "property_shown", message: msg.message });
+    }
+  },
+}) &&
+  ExtjsUtils.QUERY.setMappiaIoCallback(window.handleParentMessage) && [
+    { name: "CSR:estados", visibility: true },
+  ];
+```
+
+- `ExtjsUtils.QUERY.setMappiaIoCallback(fn)` registers the handler. (`setMessageCallback` is
+  an older alias of the same function.)
+- `ExtjsUtils.QUERY.postMessage(obj)` sends to the parent — to the containing page when
+  embedded, to the opener when the map is a separate window. Objects are serialized for you.
+- The parent receives it in every handler registered with `addOnMessageCallback`.
+
+Because the handler is a function the query needs by name, it belongs in the query's globals
+rather than in a top-level variable — see [the query language](/reference/query-language/) §3.
+
+## 6. The handshake, and why nothing is lost
+
+The two sides synchronise themselves before application messages flow. These `operation`
+values are the platform's own; **never send them from application code**:
+
+`mappia__checkDOM`, `mappia__confirmDOM`, `mappia__checkQueryListening`,
+`mappia__confirmQueryListening`, `mappia__applyQuery`, `mappia__queryApplied`.
+
+What the two sides guarantee:
+
+- **Parent side**: `send` before the iframe reports ready is queued and flushed on ready.
+- **Query side**: a message that arrives while a query is being applied is queued and handed
+  to the handler once the load finishes.
+
+So `applyQuery(...)` immediately followed by `send(...)` is safe: the message is delivered
+after the new query is in place, not against the old one. Neither side silently drops
+messages — they delay them.
+
+Two of those platform messages also reach the parent's `addOnMessageCallback` handlers, as
+plain strings: `mappia__queryApplied` after every `applyQuery` — the way to know the new
+query is in place — and `mappia__confirmQueryListening` whenever a query registers its
+callback. Handlers should skip strings starting with `mappia__` they do not use. The waiting mechanism is the same one described in
+[the execution model](/reference/execution-model/) §5.
+
+## 7. A complete parent-side integration
+
+```javascript
+var mappia = MappiaIO("mappia", true);
+
+// Receive first, so nothing sent below can outrun the handler.
+mappia.addOnMessageCallback(function (msg) {
+  if (msg.operation === "property_shown") {
+    document.getElementById("status").textContent = "Showing " + msg.message.id;
+  }
+});
+
+mappia.addReadyCallback(function () {
+  fetch("/queries/properties.js")
+    .then(function (response) { return response.text(); })
+    .then(function (queryText) {
+      mappia.applyQuery(queryText);
+      mappia.send({ operation: "show_property", message: { id: 4711 } });
+    });
+});
+
+// When the component is destroyed
+// mappia.remove();
+```
+
+Worth wrapping `send` in one small module per integration, with a function per operation
+name, so the host's UI code never repeats a raw string and the contract is written down in
+one place.
+
+## 8. Failure modes
+
+| Symptom | Cause |
+|---|---|
+| Nothing arrives, in either direction | `noopener` / `noreferrer` on the iframe or the opened window (§2) |
+| Messages arrive before the query is ready, and are ignored | The query registered no handler — `setMappiaIoCallback` is what makes it listen (§5) |
+| The map answers the first message and then goes quiet | The connection was created with `keepAfterReady = false` |
+| Re-used iframe never answers again | The connection was removed and the iframe was not loaded afresh; create the connection again after a real load |
+| A handler runs with the previous query's layers | The message was sent without waiting; the handshake covers `applyQuery`, but a message sent during a user-triggered reload of the whole frame is a different race — wait for ready (§2) |
+| A query that registers no callback still answers like the previous one | The callback set by `setMappiaIoCallback` is kept when another query is applied, until a query registers its own. A handler should check that what it works on still exists |
+| The parent receives raw events it cannot read | Messages travel wrapped; read them through the callback rather than listening on `window` yourself |
+
+Operation names seen in an existing integration are that integration's choices, not platform
+API. When in doubt, the reserved prefix is `mappia__`, and everything else is yours.
+
+# Section: Practical guidance
+
+## Pitfalls, and properties that do nothing
+
+> The mistakes that make a query fail silently, the keys that have been copied between queries for years without ever being read, and the handful of parameters the platform accepts but does not honour.
+
+A query almost never fails loudly. It shows a map with one layer missing, or a panel with no
+widget, or a legend that never appears — and the cause is usually one of the items below.
+The list is short because it is the result of reading the whole body of queries running in
+production: these are the things that actually go wrong.
+
+## 1. The query produced nothing
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| Only the default background is shown | The query text is not a single expression (a top-level `var`, a statement, a stray semicolon), so it threw before producing a value | See [the query language](/reference/query-language/) §1 |
+| Same, with no error in the console | The expression evaluated, but its value was not an array of layer definitions | End the expression with the array |
+| One layer missing, others fine | Its `name` is not in the catalogue, or its server was registered after the array that uses it | Check the name; put `addRemoteWMSServer` before the array |
+| A calculated layer stays empty | A map in `name` is not published with the `operation` the query asks for; the console says `Operation X is not defined for layer Y` | Use a decoding the map offers |
+| `this.something is not a function` | An arrow function where the platform binds `this` to the layer | Regular `function` for `beforeCalc`, `handler`, `functions.*`, the vector callbacks |
+| A value is `undefined` only inside `expression` | It came from a closure, a global or the DOM, none of which exist in the calculation worker | Compute it in `beforeCalc`, pass it as an input |
+| `Cannot read properties of undefined (reading '<id>')` from `expression` | `inputs.id[ID]` used inside `expression`: the inputs reach the worker as JSON, which keeps only the array's elements, so the `id` map is gone | Read by position: `inputs[0]` is the first input widget in `descriptionHtml`. `inputs.id[ID]` works only on the page (`beforeCalc`, `functions`, ...) |
+| `filterLegends[...].color.join is not a function` | `setCalculateLegend` given a CSS colour (`"#c0392b"`): the legend entries take `[R, G, B]` | `{ color: [192, 57, 43], value: 1, title: "Above 800 m" }`. Layer and group `color` properties do take CSS colours |
+| Works once, then breaks on re-apply | State kept outside the query's globals | `setQueryGlobalProperties` |
+| "Global variable can't be redefined" | A global name collides with one the page already had | Rename it |
+| A widget's tag renders as nothing | Unknown tag name; the console shows `{{MARKUP}} INVALID OBJECT NAME` | Use the exact tag from [the widget markup language](/reference/markup-widgets/) |
+
+## 2. Keys that are silently ignored
+
+These appear in real queries — some in dozens of them — and have no reader in the platform.
+Nothing warns about them, which is exactly why they spread by copy-paste. Remove them; they
+document an intent the map never had.
+
+| Key | Where it is written | What people expect | What happens |
+|---|---|---|---|
+| `closedGroup` | On a group | Start the group collapsed | Nothing. Groups start collapsed by default; use `openGroup: true` to start one expanded |
+| `disableDownload` | On a layer | Hide that layer's download button | Nothing. It only exists as a page option (`options=disabledownload` in the URL), which applies to the whole page |
+| `hideBottomButton` | On a layer | Hide the query button under the layer row | Nothing at layer level. It works only inside a `paramsButtonConfig` entry of type `query` |
+| `legendId` | On a layer | Point the layer at a legend | Nothing. It is a parameter of the `legendhtml` widget |
+| `maxZoomReal` | On a layer | A second maximum zoom | Nothing. `maxZoom` is the one that is read |
+| `showTimelineButton`, `timelineConfig` | On a layer | Configure a timeline | Nothing. The timeline is the `{{timeline}}` widget, configured by its own parameters |
+| `priority`, `visible`, `layerGroup`, `startOpen`, `startOpened` | On a **group** | Ordering and initial state | Nothing at group level. `priority` and `visibility` are layer properties; `openGroup` is the group one |
+| `popupTemplate`, `popupCallback` | On a file (vector) layer | A popup with the clicked feature's attributes | Nothing. They are accepted and never read - no popup opens. Show the attributes from `onClick`, e.g. with `ExtjsUtils.ALERTIFY.log` |
+| `selectSource` | Anywhere | Choose a source per layer name | Nothing. No part of the platform reads it |
+
+## 3. Accepted, but not honoured
+
+Different case: the platform takes the value, and then does not do what the name promises.
+
+| Parameter | Reality |
+|---|---|
+| `{{loadcsv\|trim=true}}` | The flag is passed to the CSV parser, which never reads it. Trim the cells yourself when you use them |
+| `maxQntEntries` on a calculated layer | Stored, and clamped to the palette size, but the legend grouping uses its own default instead. To control the entries exactly, build the legend yourself with `setCalculateLegend` |
+| `{{summedarea}}` input value | Never filled. The sums reach `runOnClick`, not `inputs.id[ID]` |
+| `{{hoverpixel}}` | Moving or clicking never recalculates the layer. Its `lastInfo` value is always current, so read it in a callback — or force a recalculation yourself |
+| `onClickViewGroup` / `onToggleViewGroup` on a layer | They only fire for a real group row (a `viewTitle` node). On a layer that is not inside a group, they bind to the invisible root and never run |
+
+## 4. Embedding
+
+| Mistake | Effect |
+|---|---|
+| `noopener` or `noreferrer` on the iframe or the opened window | Messages between the parent and the map stop working |
+| Re-using an iframe after tearing the connection down, without setting `src` again | The parent-side helper is gone; the map never answers |
+| Treating one integration's operation names as platform API | Operation names are a contract between one parent page and one query, not a platform feature |
+
+## 5. Data
+
+| Mistake | Effect |
+|---|---|
+| GeoJSON without a `crs` (and no `fromProj` on the layer) | The data is assumed to be in the platform's default projection, and silently lands in the wrong place |
+| Coordinates in latitude/longitude order where the format wants longitude/latitude | Features appear mirrored around the diagonal, or off the map |
+| A CSV whose numeric column arrives as text | Comparisons in `expression` behave like string comparisons; convert before comparing |
+
+## 6. Style
+
+Two habits worth dropping:
+
+- **A full setup chain on every query.** `[{ name: "…" }]` is a complete query. Add
+  `setOptions`, `decorate`, `setQueryGlobalProperties` only where the map needs them.
+- **Code hidden in a made-up `decorate` key.** Any key that `decorate` does not know is
+  installed as a CSS rule, so writing `noTop: (function () { … })()` "works" — the function
+  runs while the object is being built, and its return value becomes a stylesheet entry.
+  Use `run` for code and keep `decorate` for chrome.
+
+## 7. Layers age
+
+The most frequent cause of an old query breaking is not the query: a published map was
+renamed or withdrawn, and the layer that referenced it now resolves to nothing. When
+reviving an old map, check its layer names against the current catalogue before looking for
+anything else.

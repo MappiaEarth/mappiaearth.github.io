@@ -1,0 +1,9 @@
+---
+# Chrome DevTools asks every localhost site for this file ("Automatic Workspace Folders"): it maps
+# the served site to its source folder, so edits made in DevTools are saved to disk. Served only
+# by `npm start` / start.bat (_config_dev.yml includes .well-known); GitHub Pages builds with
+# _config.yml alone, which leaves dot-folders out, so it is never published.
+layout: null
+permalink: /.well-known/appspecific/com.chrome.devtools.json
+---
+{"workspace":{"root":{{ site.source | jsonify }},"uuid":"b6ec09c9-0975-46fe-a546-80056ac05a5d"}}

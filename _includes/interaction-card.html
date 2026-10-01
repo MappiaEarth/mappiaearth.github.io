@@ -4,7 +4,7 @@
   {% endif %}
     <figure class="post-card__thumb">
       <img
-              src="{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_placehold.{{intro.featured-img[1]}}",
+              src="{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_placehold.{{intro.featured-img[1]}}"
               data-srcset="{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb.{{intro.featured-img[1]}}, {{ site.url }}{{ site.baseurl }}/assets/img/{{intro.featured-img[0]}}_thumb@2x.{{intro.featured-img[1]}} 2x"
               class="lazyload blur hoverswap" hoversrc="{{ site.baseurl }}/assets/img/{{intro.hover-img[0]}}_placehold.{{intro.hover-img[1]}}" hoversrcset="{{ site.url }}{{ site.baseurl }}/assets/img/{{intro.hover-img[0]}}_thumb.{{intro.hover-img[1]}}, {{ site.url }}{{ site.baseurl }}/assets/img/{{intro.hover-img[0]}}_thumb@2x.{{intro.hover-img[1]}} 2x"
               alt="{{intro.title}}"

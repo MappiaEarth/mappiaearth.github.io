@@ -68,3 +68,31 @@ node_modules
 _algolia_api_key
 start.bat
 install.bat
+
+# Generated or temporary files that must never be committed #
+############################################################
+# npm output accidentally written to a file (in cmd, `npm i pkg@>5.4.0` creates "5.4.0")
+5.4.0
+# Chrome's crash-reporter log, written by headless Chrome (critical CSS, screenshots)
+debug.log
+*.log
+# Local trash folder holding an old copy of node_modules ("lixo" = trash)
+lixo/
+# Temporary builds: `npm run sw` builds the site into .tmp/ and removes it afterwards;
+# extra local builds go to _site-<name>/ so they never mix with the served _site/
+.tmp/
+_site-*/
+# Raw widget screenshots (MappiaExplorer `npm run docs:screenshots`); only their encoded
+# copies in assets/img/examples/ are published (`npm run images:examples`)
+_img/examples/
+# Jekyll 4 cache, should the site be upgraded
+.jekyll-cache/
+
+# Generated, but committed on purpose #
+#######################################
+# GitHub Pages builds the site from this repository, so the files MappiaExplorer's
+# `npm run docs:publish` writes here must be committed - do NOT ignore them:
+#   _reference/, assets/reference/, assets/api.json, _data/api.json,
+#   _data/api_groups.json, _data/reference_sections.json, llms.txt, llms-full.txt
+# The same holds for sw.js (refresh it with `npm run sw` before committing).
+debug.log

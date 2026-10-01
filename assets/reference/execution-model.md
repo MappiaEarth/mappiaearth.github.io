@@ -1,0 +1,166 @@
+# Execution model
+
+> What the platform does between reading a query and painting a tile — when each callback runs, what waits for what, and which code crosses into the calculation worker.
+
+Mappia reference, section "Writing a query". Page: https://mappia.earth/reference/execution-model/
+Generated API entries: LayersFunctions.beforeCalc, LayersFunctions.expression, LayersFunctions.afterCalc, LayersFunctions.onInputsReady, LayersFunctions.legendColor, LayerInternal.getInputs, LayerInternal.setCalculateLegend, LayerInternal.generateNewLegend, LayerInternal.pauseAndStopCalculations, LayersProperties.priority, RawMaps.operations, QueryState (https://mappia.earth/assets/api.json)
+
+A query is read once; the map it describes then keeps working for as long as the page is
+open. Knowing the order of what happens — and, above all, which code runs on the page and
+which runs in a worker — is what makes the difference between a query that behaves and one
+that intermittently shows nothing.
+
+## 1. From text to layers
+
+```
+query text
+   │  evaluated as one expression, value = array of definitions
+   ▼
+interpretation ── groups flattened into an ordered list of layers
+   │              group defaults applied, group path remembered per layer
+   ▼
+one layer object per definition, by kind:
+   ├─ catalogue map (WMS tiles, drawn as they arrive)
+   ├─ calculated map (several maps + your expression, see §2)
+   ├─ vector/file layer (GeoJSON, CSV, uploaded file)
+   └─ tile service (XYZ / OSM basemap)
+   │
+   ▼
+layer panel, map, widgets declared in descriptionHtml
+```
+
+Interpretation is where a nested query becomes flat: a group (`viewTitle` with `elements`)
+contributes its own properties to each layer inside it and records the path that the layer
+panel shows. Within a group, entries keep the order you wrote them in, unless a
+`priority` reorders them (higher first).
+
+Nothing has been drawn yet at this point, and no calculation has run.
+
+## 2. The cycle of a calculated map
+
+A calculated layer (`source: "calculate"`) names several maps at once and produces a new
+map from their pixels. Its cycle is the part of the platform most queries interact with:
+
+```
+        widgets in descriptionHtml are created
+                      │
+                      ▼
+        every input has a value ──────────► onInputsReady(inputs)
+                      │
+                      ▼
+               beforeCalc(inputs)            ← on the page: map, DOM, other layers
+                      │
+                      ▼
+      tiles of each named map are fetched and decoded
+                      │
+                      ▼
+   for every pixel:  expression(layersVals, inputs)   ← in a worker
+                      │
+                      ▼
+      legend: legendColor(value) per distinct value,
+              or the entries you set with setCalculateLegend
+                      │
+                      ▼
+                afterCalc(...)               ← on the page again
+                      │
+                      ▼
+                   painted
+```
+
+| Callback | Runs | Receives | Typical use |
+|---|---|---|---|
+| `onInputsReady` | Once every input of the layer has a value — including for layers that are not visible | `inputs` | Kick off work that needs the widgets, e.g. a first `generateNewLegend()` |
+| `beforeCalc` | Before each calculation round | `inputs` | Read widgets, swap the maps being read (`changeLayers`), set the legend, cancel the round |
+| `expression` | Once per pixel, in the worker | `layersVals`, `inputs`, `this` = the calculation object | The arithmetic itself |
+| `legendColor` | Once per distinct value produced | the value | Colour scale |
+| `afterCalc` | When the round finished - only for a layer with an `expression`: without one nothing is computed and `afterCalc` never runs | the results | Totals, notifying the parent page, enabling UI |
+
+`inputs` is the collected value of every widget declared in that layer's
+`descriptionHtml`, in declaration order, and can also be read on demand with
+`getInputs()`.
+
+## 3. What crosses into the worker
+
+`expression` is the only part of a query that does not run on the page. It is turned into
+text with `toString()` and rebuilt inside a WebWorker, together with the pixel values and
+the plain widget values.
+
+| Crosses into the worker | Stays on the page |
+|---|---|
+| The source text of `expression` | Any variable it closed over — it becomes `undefined` |
+| `layersVals`: one value per named map, in `name` order | `window`, the DOM, the map, the platform objects |
+| `inputs`: the widget values as a **plain array**, in markup order | The name map `inputs.id` (JSON keeps only an array's elements), and widget values that are not plain data (a function, a table object, a manager's methods) |
+| `this`: the calculation object (`isNumeric`, `getValueFromLegend`, `nullValue`) | Your own helpers and globals |
+
+The practical rule: anything an expression needs that is not a pixel value must be computed
+in `beforeCalc` and handed over as an input — and read by position, `inputs[0]`, `inputs[1]`,
+never as `inputs.id[ID]`, which only exists on the page. A widget whose value is an object (a
+loaded CSV table, a picked point) is readable in `beforeCalc`, not inside `expression`; an
+`{{inputmanager}}` arrives as its plain `global` values (`inputs[0].global.key`).
+
+## 4. What triggers a new round
+
+A calculated layer recalculates when:
+
+- a widget that is registered as an input reports its change event — a slider moved, a text
+  field was typed in, a CSV finished downloading, a timeline stepped;
+- code calls `forceRecalc()` on an input manager, or `generateNewLegend()` on the layer;
+- the maps being read change (`changeLayers`, `setLayerOperation`,
+  `setInsideLayerVisibility`);
+- the layer becomes visible again, or the map moves to tiles that have not been computed.
+
+Rounds are cancellable: `pauseAndStopCalculations()` stops the current one and suppresses
+new ones until `resumeCalculations()` is called once per pause. Queries that load an
+external resource before they can compute use this pair, so the user does not see a legend
+computed from half the data.
+
+## 5. Waiting, and why a query must not assume
+
+Several things load independently: the layer catalogue, each layer's own resources, the
+widgets' files (a CSV, a JSON), the legend of a stored map. The platform keeps count of
+what is outstanding and holds the calculation until the count reaches zero, which is why
+`onInputsReady` exists and why `beforeCalc` may legitimately run later than you expect.
+
+Two consequences for a query author:
+
+- **Do not read another layer's data during interpretation.** At that moment the other
+  layer may not exist yet. Read it in `onInputsReady`, in `beforeCalc`, or in a callback.
+- **A resource your own code fetches must be announced**, otherwise the platform may
+  calculate without it. Widgets that download something (`{{loadcsv}}`, `{{loadjson}}`) do
+  this for you; a hand-written `fetch` in a callback does not.
+
+## 6. Tiles, zoom and decoded values
+
+Catalogue and calculated maps are tiled. Two behaviours surprise query authors:
+
+- **Beyond a layer's maximum zoom**, the platform keeps requesting the deepest tile it has
+  and stretches it, instead of requesting a zoom the server does not publish.
+- **The values a calculated layer reads are decoded**, and how they are decoded is chosen
+  per map with `operation`: the original cell value of the most central cell, the packed
+  colour, an area-weighted sum or average, a maximum, a summed-area integral. The tokens
+  are listed with the layer vocabulary in
+  [the layer and group model](/reference/layer-and-group-model/); the decoding requires the map to
+  be published with that operation available.
+
+When the same map appears more than once in `name` with different operations, each
+position in `layersVals` corresponds to one entry of the `name` list — the list is the
+contract between the query and the expression.
+
+## 7. Re-applying a query
+
+Applying a query again — from the editor, or from a parent document — re-evaluates the text
+from scratch: globals are re-registered, layers are rebuilt, widgets are recreated. It does
+not preserve anything the previous evaluation left in a page variable. This is the reason
+shared state belongs in the query's globals, described in
+[the query language](/reference/query-language/).
+
+## 8. Reading the console
+
+The platform narrates this pipeline. The messages worth recognising:
+
+| Message | Means |
+|---|---|
+| A layer is skipped with "source not found by name" | The layer's server was not registered before the array |
+| "Operation X is not defined for layer Y" | The map is not published with the decoding the query asked for |
+| "Global variable can't be redefined" | A query global collides with a page global |
+| A calculation that never finishes | Something is still counted as loading — usually a resource fetched without announcing it (§5) |
