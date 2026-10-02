@@ -12,6 +12,9 @@ api:
   - key: ConfigLayer
     tags: ['group']
 type: Element
+# The live run keeps the toolbar: the background picker is one of its buttons
+live:
+  chrome: false
 try:
   - "Click the Topographic thumbnail at the top right: the basemap under the States layer changes."
   - "Click OpenStreetMap to switch back: only one basemap is visible at a time."

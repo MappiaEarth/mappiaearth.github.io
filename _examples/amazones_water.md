@@ -5,7 +5,7 @@ summary: Process and query map values.
 categories: [LegendHtml, getId, LoadCsv, Slider, changeLayers, Label, Highcharts]
 featured-img: amazones_water
 type: Example
-map-link: lang=eng&map=&queryid=30&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries,capabilities&visiblelayers=-1
+map-link: lang=eng&map=&queryid=30&extent=-443.628,-16.847,-407.373,3.294&tools=zoomextent,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,capabilities&visiblelayers=-1
 api:
   - key: LegendHtml
   - key: LoadCsv

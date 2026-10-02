@@ -9,7 +9,7 @@ featured-img: ranged-slider-widget
 type: Element
 examples:
     - title: Range Slider Example
-      map-link: options=idemetadata,disabledownload,hidestylechooser,overview,capabilities&extent=-443.628,-16.847,-407.373,3.294&visiblelayers=custom&zoomlevels=10&queryid=464
+      map-link: options=hidemetadata,disabledownload,hidestylechooser,overview,capabilities&extent=-443.628,-16.847,-407.373,3.294&visiblelayers=custom&zoomlevels=10&queryid=464&tools=zoomextent
       featured-img: ranged-slider-widget
 api: 
   - key: Slider

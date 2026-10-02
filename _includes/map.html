@@ -15,7 +15,17 @@
         </div>
     </div>
     {% if include.lazy %}
-    <div class="post-map__frame">
+    {% comment %} Loaded on request (a calculator is a whole application); include.poster: a picture of the map meanwhile. {% endcomment %}
+    <style>
+      .post-map--lazy .post-map__frame { position: relative; background: #eef2f7 center / cover no-repeat; border-radius: 8px; overflow: hidden; }
+      .post-map--lazy iframe { display: block; border: 0; }
+      .post-map--lazy .post-map__frame:not(.is-loaded) iframe { height: 170px; visibility: hidden; }
+      .post-map--lazy .post-map__frame--poster:not(.is-loaded) iframe { height: 420px; }
+      .post-map__load { position: absolute; inset: 0; margin: auto; width: 220px; height: 48px; border: 0; border-radius: 24px;
+        background: #277cea; color: #fff; font-weight: 600; font-size: 16px; cursor: pointer; box-shadow: 0 4px 14px rgba(39, 124, 234, .35); }
+      .post-map__frame.is-loaded .post-map__load { display: none; }
+    </style>
+    <div class="post-map__frame{% if include.poster %} post-map__frame--poster{% endif %}"{% if include.poster %} style="background-image: url('{{ site.baseurl }}/assets/img/posts/{{ include.poster }}.jpg')"{% endif %}>
         <iframe id="mapViewer" data-src="{{ site.maps.calculator }}{{ post.map-link }}" width="100%" height="600" title="{{ post.title }}"></iframe>
         <button type="button" class="post-map__load" onclick="var f=document.getElementById('mapViewer');f.src=f.getAttribute('data-src');this.parentNode.classList.add('is-loaded');">Load the live map</button>
     </div>

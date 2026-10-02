@@ -2942,12 +2942,13 @@
       },
       {
         "key": "definitions",
-        "description": "Loads the map's layer catalog (the WMS GetCapabilities the layers are built from)\nfrom a capabilities cache saved in this browser, instead of from the server.\nWithout the parameter the map loads the default catalog: the live one from the\nserver (or, with `options=capabilities`, the query's own). The value is the\nname of a cache saved with `ExtjsUtils.OFFLINE.downloadDefinitions({name})`\n(`ExtjsUtils.OFFLINE.listDefinitions` lists them); the service worker answers\nthe catalog request from it, so the map also starts with the map server\nunreachable. Only the page opened with it is affected: other Mappia pages keep\nthe live catalog. A name with no saved cache falls back to the live catalog.\nFrom code, `ExtjsUtils.OFFLINE.useDefinitions(name)` switches a running map.",
+        "description": "Loads the map's layer catalog (the WMS GetCapabilities the layers are built from)\nfrom a capabilities cache saved in this browser, instead of from the server.\n`definitions=live`, like no parameter at all, loads the default catalog: the live\none from the server (or, with `options=capabilities`, the query's own). Any other value is the\nname of a cache saved with `ExtjsUtils.OFFLINE.downloadDefinitions({name})`\n(`ExtjsUtils.OFFLINE.listDefinitions` lists them); the service worker answers\nthe catalog request from it, so the map also starts with the map server\nunreachable. Only the page opened with it is affected: other Mappia pages keep\nthe live catalog. It needs the page controlled by the service worker: without\none (the first visit, a hard reload) the page warns and loads the live catalog.\nA name with no saved cache also falls back to the live catalog.\nFrom code, `ExtjsUtils.OFFLINE.useDefinitions(name)` switches a running map.",
         "type": "String",
         "examples": [
-          "// the map's catalog from the cache saved as \"fazenda-42\"\nhttps://maps.csr.ufmg.br/calculator/?queryid=&lt;query_id&gt;&definitions=fazenda-42"
+          "// the map's catalog from the cache saved as \"fazenda-42\"\nhttps://maps.csr.ufmg.br/calculator/?queryid=&lt;query_id&gt;&definitions=fazenda-42",
+          "// the live catalog, said explicitly\nhttps://maps.csr.ufmg.br/calculator/?queryid=&lt;query_id&gt;&definitions=live"
         ],
-        "default": "'' (the live catalog)"
+        "default": "'live'"
       },
       {
         "key": "extent",
@@ -3605,10 +3606,10 @@
       },
       {
         "key": "onAdded",
-        "description": "Defines the callback function that is called when the layer is added to the map, with its\nfeatures already loaded: when the layer joins the map while its data is still being fetched\n(`jsonurl`, `geojsonurl`, `csv`, a `load` that fetches), the call waits for that load to end,\nso `this.features` and `this.getDataExtent()` are filled in either way (a failed load still\ncalls it, with whatever features there are). `this` is the layer.\n\nAddedEvent {\n    element: {DOM} 'DOM element of the layer',\n    layer: {OpenLayers.Layer.Vector} 'Javascript Object of the layer',\n    map: {Map} 'MapPanel where the layer was added.',\n    type: {String} 'Type of the event ( added )'\n}",
+        "description": "Called when the layer is on the map with its features loaded. If the layer is still\nfetching (`jsonurl` / `geojsonurl` / `csv` / async `load`), waits for that load to\nfinish first so `this.features` / `this.getDataExtent()` are available (a failed load\nstill calls it). `this` is the layer.\n\nAddedEvent {\n    element: {DOM} 'DOM element of the layer',\n    layer: {OpenLayers.Layer.Vector} 'Javascript Object of the layer',\n    map: {Map} 'MapPanel where the layer was added.',\n    type: {String} 'Type of the event ( added )'\n}",
         "type": "function()",
         "examples": [
-          "onAdded: function(evt) {\n    // zoom to the layer's features\n    var bounds = this.getDataExtent();\n    if (bounds) ExtjsUtils.JS.getMap().zoomToExtent(bounds);\n}"
+          "onAdded: function(evt) {\n    var bounds = this.getDataExtent();\n    if (bounds) ExtjsUtils.JS.getMap().zoomToExtent(bounds);\n}"
         ]
       },
       {
@@ -4520,10 +4521,10 @@
       },
       {
         "key": "getLayerByName",
-        "description": "Returns the OpenLayers layer currently in the map whose `name` equals the given full name\n(`workspace:layer`), or `undefined` when no such layer is loaded. The name is the `name`\ndeclared in the query; a `title` is not matched.\n@param fullLayerName {String} Full layer name, e.g. `'CSR:estados'`.",
+        "description": "Returns the OpenLayers layer currently in the map whose `name` equals the given name, or\n`undefined` when no such layer is loaded. A calculated layer (`source: \"calculate\"`) is\nnamed on the map by the `name` declared in the query (`'CSR:altimetria'`); a plain map\nlayer is named by its `title`. To find a plain layer by the map it shows, filter\n`ExtjsUtils.JS.getMap().layers` on `layer.params.LAYERS === 'CSR:estados'`.\n@param fullLayerName {String} The layer's name on the map: the query `name` of a calculated layer, the `title` of a plain one.",
         "type": "function(fullLayerName) : OpenLayers.Layer|undefined",
         "examples": [
-          "var layer = ExtjsUtils.LAYER.getLayerByName('CSR:estados');\nif (layer) layer.setVisibility(true);"
+          "var layer = ExtjsUtils.LAYER.getLayerByName('CSR:altimetria'); // a calculated layer\nif (layer) layer.setVisibility(true);"
         ],
         "returnDescription": "The layer object, or `undefined` when it is not in the map."
       },
@@ -5016,10 +5017,67 @@
     ],
     "MappiaIO": [
       {
+        "key": "MappiaIO",
+        "description": "Connects your page to a Mappia map in an iframe (or in a window you opened) and returns the\nconnection: `applyQuery` loads a query into the map, `send` delivers an object to the query\nrunning there, `addOnMessageCallback` receives what the query sends back with\n`ExtjsUtils.QUERY.postMessage`. Load the library from the map server\n(`<script src=\"https://maps.csr.ufmg.br/mappia_io.js\">`).\n\nOn creation it greets the map (`mappia__checkDOM`) until the map answers it is listening\n(`mappia__confirmDOM`); everything sent before that is queued and delivered in order, so\n`applyQuery` and `send` may be called right away. Messages travel through `window.postMessage`\nwrapped as `{mappia_iframe: <JSON text>}`, so the page and the map may be on different sites.\n\nDo not open the map with `noopener` or `noreferrer` (on the iframe or in `window.open`): they\ncut the window link the messages travel on. `window.open(url, \"_blank\", \"width=1280,height=860\")`\nworks; `window.open(url, \"_blank\", \"noopener,noreferrer\")` does not.\n@param communicationTarget {String|HTMLIFrameElement|Window} The map to talk to: the id of its\niframe, the iframe element itself, or the window returned by `window.open`.\n@param keepAfterReady {Boolean} `true` keeps listening after the handshake - needed by any\npage that receives messages from the map or applies more than one query. With `false` the\nconnection stops listening once the map has answered.",
+        "type": "function(communicationTarget, keepAfterReady) : Object",
+        "examples": [
+          "<iframe id=\"mappia\" src=\"https://maps.csr.ufmg.br/calculator/?lang=eng&options=scale\"></iframe>\n<script src=\"https://maps.csr.ufmg.br/mappia_io.js\"></script>\n<script>\n  var mappia = MappiaIO(\"mappia\", true);\n  mappia.addOnMessageCallback(function (msg) { console.log(\"from the map:\", msg); });\n  mappia.applyQuery('[{ name: \"CSR:estados\", title: \"States\", visibility: true }]');\n  mappia.send({ operation: \"hello\", message: \"from the page\" });\n</script>"
+        ],
+        "returnDescription": "The connection, whose methods return it again so calls can be chained."
+      },
+      {
         "key": "_information",
-        "completeAPI": "Library to send events between Mappia Iframe and your site.\nIt allows to send events, like: on scroll change visible maps, or click on some links zoom to some region, and any other interaction with the events of your site. Use this library in your site include <a target='_blank' href='http://maps.csr.ufmg.br/theme/app/data/mappia_io.js'>&lt;script type=\"text/javascript\" src=\"//csr.ufmg.br/imagery/mappia_io.js\"&gt;&lt;/script&gt;</a>.",
-        "description": "Library to send events between Mappia Iframe and your site.",
+        "completeAPI": "Connects your page to a Mappia map embedded in it, in both directions. Your page loads <code>https://maps.csr.ufmg.br/mappia_io.js</code>, connects with <code>MappiaIO(iframe, true)</code>, loads queries with <code>applyQuery</code>, sends objects with <code>send</code> and receives with <code>addOnMessageCallback</code>. Inside the map, the query receives with <code>ExtjsUtils.QUERY.setMappiaIoCallback</code> and answers with <code>ExtjsUtils.QUERY.postMessage</code>. Your page's buttons, lists and forms can drive the map (filter, zoom, highlight, edit a record), and the map tells the page what the user clicked, hovered or drew.",
+        "description": "Connects your page to an embedded Mappia map: apply queries, send messages, receive the map's.",
         "name": "MappiaIO"
+      },
+      {
+        "key": "addOnMessageCallback",
+        "description": "Registers a function that receives every message from the map. What the query posts with\n`ExtjsUtils.QUERY.postMessage(object)` arrives as that object; the platform's own notices\narrive as strings starting with `mappia__` - `mappia__queryApplied` once a query sent with\n`applyQuery` is in place, `mappia__confirmQueryListening` when a query registers its\ncallback. Several functions may be registered; each gets every message, about 150 ms after\nit was posted. Needs a connection created with `keepAfterReady` true.\n@param callback {function} `function (message)`, called for each message.",
+        "type": "function(callback) : Object",
+        "examples": [
+          "mappia.addOnMessageCallback(function (msg) {\n  if (msg === \"mappia__queryApplied\") return showStatus(\"Map ready\");\n  if (msg && msg.operation === \"city_clicked\") showDetails(msg.message);\n});"
+        ],
+        "returnDescription": "The connection."
+      },
+      {
+        "key": "addOnRemoveCallback",
+        "description": "Registers a function run when `remove` stops the connection, to tidy up whatever the page\nattached to it.\n@param callback {function} Called with no arguments.",
+        "type": "function(callback) : Object",
+        "returnDescription": "The connection."
+      },
+      {
+        "key": "addReadyCallback",
+        "description": "Runs `callback` once the map has answered the handshake - at once when it already has.\nThe place to start a conversation that needs the map listening: apply the first query\nthere, then send the page's starting state (filters, the record being edited...).\n@param callback {function} Called with no arguments.",
+        "type": "function(callback) : Object",
+        "examples": [
+          "mappia.addReadyCallback(function () {\n  fetch(\"/my-map-query.js\").then(function (r) { return r.text(); }).then(function (text) {\n    mappia.applyQuery(text);\n    mappia.send({ operation: \"setFilters\", message: currentFilters });\n  });\n});"
+        ],
+        "returnDescription": "The connection."
+      },
+      {
+        "key": "applyQuery",
+        "description": "Loads a query into the map - the same text you would type in the Mappia editor, of any\nlength and not saved on the server - replacing the layers the map shows. The map confirms\nwith the message `mappia__queryApplied` once the new layers are in place. One connection\ncan apply query after query; called before the handshake, it waits in the queue.\n@param queryContent {String} The query text.",
+        "type": "function(queryContent) : Object",
+        "examples": [
+          "mappia.applyQuery('[{ name: \"CSR:altimetria\", title: \"Elevation\", visibility: true }]');"
+        ],
+        "returnDescription": "The connection (not a promise: listen for `mappia__queryApplied`)."
+      },
+      {
+        "key": "applyQueryFromUrl",
+        "description": "Fetches the query text at `queryUrl` and applies it as `applyQuery` does - for a query\nkept as a file in your own site or repository. The URL is read with `fetch`, so one on\nanother site must allow cross-origin reads.\n@param queryUrl {String} Address of a file holding query text, such as `[{ name: \"CSR:estados\" }]`.",
+        "type": "function(queryUrl) : Promise.<Object>",
+        "examples": [
+          "mappia.applyQueryFromUrl(\"/queries/my-map.js\");"
+        ],
+        "returnDescription": "Resolves with the connection once the text was fetched and sent -\rnot when the map applied it: wait for the `mappia__queryApplied` message for that."
+      },
+      {
+        "key": "isDomLoaded",
+        "description": "Whether the map has answered the handshake. Until it has, `send` and `applyQuery` queue\ntheir messages and deliver them, in order, as soon as it answers.",
+        "type": "function() : Boolean",
+        "returnDescription": "`true` once the map is listening."
       },
       {
         "key": "postMessage",
@@ -5028,6 +5086,21 @@
         "examples": [
           "ExtjsUtils.QUERY.postMessage({a:1,b:2})"
         ]
+      },
+      {
+        "key": "remove",
+        "description": "Stops listening to the map and runs the functions registered with `addOnRemoveCallback`.\nA connection created with `keepAfterReady` false calls it by itself right after the\nhandshake; call it yourself when the page drops the map (a closed panel, a route change)\nso an old connection does not keep receiving messages.",
+        "type": "function() : Object",
+        "returnDescription": "The connection."
+      },
+      {
+        "key": "send",
+        "description": "Delivers `message` to the query running in the map, which receives it in the function it\nregistered with `ExtjsUtils.QUERY.setMappiaIoCallback`. The shape is yours to choose; by\nconvention an object naming an `operation` and carrying a `message`, plus a `requestId`\nwhen the page waits for an answer. Objects travel as JSON (functions and dates do not\nsurvive); a message carrying a File or Blob (`{operation: \"import\", file: file}`) is sent\nas the object itself, so the file reaches the query intact. Never send strings starting\nwith `mappia__`: the platform reserves them.\n@param message {Object|String} What to deliver to the query.\n@param forceSend {Boolean} Sends at once even before the handshake, skipping the\nqueue. Pages normally leave it out.",
+        "type": "function(message, forceSend) : Object",
+        "examples": [
+          "mappia.send({ operation: \"show_city\", message: { name: \"Belo Horizonte\" } });\nmappia.send({ operation: \"list_cities\", requestId: \"r1\" }); // the query answers with the same requestId"
+        ],
+        "returnDescription": "The connection."
       }
     ],
     "AsyncLoader": [
@@ -7224,7 +7297,7 @@
       },
       {
         "key": "downloadDefinitions",
-        "description": "Downloads the \"definitions\" (not tiles) the query needs to redraw without the\nnetwork: the local WMS GetCapabilities — pruned to the maps actually on the map\nwith `ExtjsUtils.CAPABILITIES.filterText` before it is cached (the full catalog\nis ~2500 layers; the pruned copy is the handful in use) — plus each layer's\nlegend and every registered remote store's capabilities\n(`collectDefinitionUrls`, cached as-is). They go into their own shared cache\nbucket, separate from any area's tiles, because which maps the filter keeps\ndepends on the whole active query, not on one area: several areas of the same\nquery share one copy. The bucket id is derived from the in-use map names, so\nno `queryid` is required — the engine works without one. `downloadArea` and\n`downloadAreaAsZip` call it in parallel with the tiles unless\n`includeDefinitions: false`; call it directly to refresh definitions alone or to\nget their own progress.\n\nEverything it downloads comes from the server, whatever the serving mode\n(`setServingPolicy`) — never from a cache, its own included — and while offline\n(`navigator.onLine` false, or the Offline preset's `forceOffline`) it rejects at\nonce instead of trying.\n\nGive it a `name` to keep a named capabilities cache the user controls: calling it\nagain with the same name updates that cache; `layerNames` (or `full: true`) picks\nwhich catalog it keeps. A cached catalog is never used on its own: a page loads\nits catalog from it only when it asks — `useDefinitions(name)`, or\n`?definitions=<name>` on the map page URL — so different Mappia instances can use\ndifferent caches, or the live catalog, side by side.\n@param options {Object} Download options.\n@param options.name {String} Name of the cache to create or update (see `listDefinitions`); omitted ⇒ an id derived from the map names in use.\n@param options.layerNames {Array.<String>} Maps the cached GetCapabilities keeps; omitted ⇒ the maps on the map now.\n@param options.full {Boolean} `true` to keep the whole GetCapabilities, unfiltered (the full catalog, a few MB).\n@param options.legends {Boolean} `false` to skip the legends.\n@param options.layers {Array.<Object>} Targets from `getCacheableLayers`, scoping the legend/remote-capabilities list only (the GetCapabilities filter always covers the whole map); omitted ⇒ every cacheable layer.\n@param options.signal {AbortSignal} Aborts the pending requests; what was already cached stays.\n@param options.requestTimeoutMs {Number} Longest wait for each request; one that takes longer counts as failed and the rest go on.\n@param options.onProgress {function} Called after each request with `{id, done, total, failed, bytes}`.",
+        "description": "Downloads the \"definitions\" (not tiles) the query needs to redraw without the\nnetwork: the local WMS GetCapabilities — pruned to the maps actually on the map\nwith `ExtjsUtils.CAPABILITIES.filterText` before it is cached (the full catalog\nis ~2500 layers; the pruned copy is the handful in use) — plus each layer's\nlegend and every registered remote store's capabilities\n(`collectDefinitionUrls`, cached as-is). They go into their own shared cache\nbucket, separate from any area's tiles, because which maps the filter keeps\ndepends on the whole active query, not on one area: several areas of the same\nquery share one copy. The bucket id is derived from the in-use map names, so\nno `queryid` is required — the engine works without one. `downloadArea` and\n`downloadAreaAsZip` call it in parallel with the tiles unless\n`includeDefinitions: false`; call it directly to refresh definitions alone or to\nget their own progress.\n\nEverything it downloads comes from the server, whatever the serving mode\n(`setServingPolicy`) — never from a cache, its own included — and while offline\n(`navigator.onLine` false, or the Offline preset's `forceOffline`) it rejects at\nonce instead of trying.\n\nGive it a `name` to keep a named capabilities cache the user controls: calling it\nagain with the same name updates that cache; `layerNames` (or `full: true`) picks\nwhich catalog it keeps. A cached catalog is never used on its own: a page loads\nits catalog from it only when it asks — `useDefinitions(name)`, or\n`?definitions=<name>` on the map page URL — so different Mappia instances can use\ndifferent caches, or the live catalog, side by side.\n@param options {Object} Download options.\n@param options.name {String} Name of the cache to create or update (see `listDefinitions`) — any name but `\"live\"`, which means the live catalog; omitted ⇒ an id derived from the map names in use.\n@param options.layerNames {Array.<String>} Maps the cached GetCapabilities keeps; omitted ⇒ the maps on the map now.\n@param options.full {Boolean} `true` to keep the whole GetCapabilities, unfiltered (the full catalog, a few MB).\n@param options.legends {Boolean} `false` to skip the legends.\n@param options.layers {Array.<Object>} Targets from `getCacheableLayers`, scoping the legend/remote-capabilities list only (the GetCapabilities filter always covers the whole map); omitted ⇒ every cacheable layer.\n@param options.signal {AbortSignal} Aborts the pending requests; what was already cached stays.\n@param options.requestTimeoutMs {Number} Longest wait for each request; one that takes longer counts as failed and the rest go on.\n@param options.onProgress {function} Called after each request with `{id, done, total, failed, bytes}`.",
         "type": "function(options) : Promise.<Object>",
         "examples": [
           "ExtjsUtils.OFFLINE.downloadDefinitions({\n    onProgress: function(p) { console.log(\"definitions \" + p.done + \"/\" + p.total); }\n}).then(function(result) {\n    console.log(result.mapNames, result.failed === 0 ? \"complete\" : \"partial\");\n});",
@@ -7543,12 +7616,12 @@
       },
       {
         "key": "useDefinitions",
-        "description": "Chooses where THIS page loads its catalog (the WMS GetCapabilities) from: a named\ndefinitions cache, or — with `null` — the live server. Only this page is affected:\nevery other Mappia instance keeps its own choice. The catalog is reloaded at once,\nand the query's layers wait for it (`QUERY.sourceLoading`), so a query can make\nthe choice in its `&&` chain before its layer list — e.g. to start from a cached\ncatalog when the map server is unreachable. To choose before the page's first\ncatalog load, open the map page with `?definitions=<name>` instead.\n@param name {String|null} The cache name or id (`listDefinitions`), or `null` for the live catalog.",
+        "description": "Chooses where THIS page loads its catalog (the WMS GetCapabilities) from: a named\ndefinitions cache, or — with `null` or `\"live\"` — the live server. Only this page is affected:\nevery other Mappia instance keeps its own choice. The catalog is reloaded at once,\nand the query's layers wait for it (`QUERY.sourceLoading`), so a query can make\nthe choice in its `&&` chain before its layer list — e.g. to start from a cached\ncatalog when the map server is unreachable. To choose before the page's first\ncatalog load, open the map page with `?definitions=<name>` instead. Only the\nservice worker answers from a cache, so a cache needs this page controlled by it.\n@param name {String|null} The cache name or id (`listDefinitions`), or `null` / `\"live\"` for the live catalog.",
         "type": "function(name) : Promise.<(String|null)>",
         "examples": [
           "// in a query: layers built from the cached catalog \"fazenda-42\"\nExtjsUtils.OFFLINE.useDefinitions(\"fazenda-42\") && [\n    { name: \"CSR:cultivo_cafe_cafe\", title: \"Café\", visibility: true }\n]"
         ],
-        "returnDescription": "Resolves with the choice once the catalog has reloaded."
+        "returnDescription": "Resolves with the choice once the catalog has reloaded; rejects,\n changing nothing, for a cache when no service worker controls this page."
       },
       {
         "key": "verifyAreaServed",

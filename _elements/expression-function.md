@@ -8,10 +8,10 @@ featured-img: expression-simple-example
 type: Element
 examples:
     - title: Simple Expression Example
-      map-link: tools=layerchooser,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened,capabilities&extent=&visiblelayers=1&zoomlevels=10&queryid=469
+      map-link: tools=zoomextent,getfeature&options=scale,startopened,capabilities&extent=&visiblelayers=1&zoomlevels=10&queryid=469
       featured-img: expression-simple-example
     - title: Simple layerVals Example
-      map-link: tools=layerchooser,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened,capabilities&extent=&visiblelayers=1&zoomlevels=10&queryid=470
+      map-link: tools=zoomextent,getfeature&options=scale,startopened,capabilities&extent=&visiblelayers=1&zoomlevels=10&queryid=470
       featured-img: layervals-simple-example
 api:
   - key: LayersFunctions

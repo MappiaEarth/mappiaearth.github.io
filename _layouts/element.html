@@ -99,6 +99,16 @@ layout: compress
     .tool-example__run:hover { background: #1f66c4; }
     .tool-example__run:focus-visible { outline: 3px solid #f39c12; outline-offset: 2px; }
     .tool-example__caption { margin: 8px 0 0; font-size: 13px; color: #6b7280; }
+    .tool-variant { margin: 0 0 30px; padding: 18px 18px 6px; border: 1px solid #e5e7eb; border-radius: 10px; }
+    .tool-variant h3 { margin: 0 0 4px; font-size: 19px; }
+    .tool-variant__summary { margin: 0 0 12px; color: #374151; }
+    .tool-variant__body { display: grid; grid-template-columns: minmax(0, 3fr) minmax(220px, 2fr); gap: 18px; align-items: start; margin-bottom: 12px; }
+    @media (max-width: 900px) { .tool-variant__body { grid-template-columns: 1fr; } }
+    .tool-variant__actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+    .tool-variant__actions .tool-button { padding: 5px 14px; border: 1px solid #277cea; border-radius: 6px; background: #fff; color: #277cea;
+      font-weight: 600; cursor: pointer; text-decoration: none; font-size: 14px; }
+    .tool-variant__actions .tool-button:hover { background: #eff6ff; }
+    .tool-variant .tool-example__query { margin-bottom: 12px; }
     .tool-steps { list-style: none; counter-reset: step; margin: 0; padding: 0; }
     .tool-steps > li { position: relative; padding: 0 0 16px 40px; }
     .tool-steps > li::before { counter-increment: step; content: counter(step); position: absolute; left: 0; top: 0;
@@ -126,12 +136,6 @@ layout: compress
       border: 1px solid #d1d5db; border-radius: 6px; background: #fff; cursor: pointer; }
     .tool-example__copy:hover { border-color: #277cea; color: #277cea; }
     .hero__meta code { background: rgba(255, 255, 255, .14); color: #fff; padding: 1px 6px; border-radius: 4px; }
-    .post-map--lazy .post-map__frame { position: relative; background: #eef2f7; border-radius: 8px; }
-    .post-map--lazy iframe { display: block; border: 0; }
-    .post-map--lazy .post-map__frame:not(.is-loaded) iframe { height: 170px; }
-    .post-map__load { position: absolute; inset: 0; margin: auto; width: 220px; height: 48px; border: 0; border-radius: 24px;
-      background: #277cea; color: #fff; font-weight: 600; font-size: 16px; cursor: pointer; box-shadow: 0 4px 14px rgba(39, 124, 234, .35); }
-    .post-map__frame.is-loaded .post-map__load { display: none; }
   </style>
 
   {% include docs-nav.html %}
@@ -145,6 +149,9 @@ layout: compress
         {% if page.playground %}{% assign toolExample = nil %}{% assign shot = nil %}{% assign runLive = false %}{% endif %}
         {% comment %} disabled: true in front matter - the tool cannot run here right now (disabled_reason says why). {% endcomment %}
         {% if page.disabled %}{% assign shot = nil %}{% assign runLive = false %}{% endif %}
+        {% comment %} More examples: <page>--<name>.query.js files, listed under the main example's variants. {% endcomment %}
+        {% assign variantIds = toolExample.variants %}
+        {% if page.disabled %}{% assign variantIds = nil %}{% endif %}
         {% capture elementCategory %}{{ categories | first }}{% endcapture %}
         {% assign liveMaps = site.examples | concat: site.raw_maps | where_exp:"post", "post.categories contains elementCategory" %}
         {% if page.examples != empty %}{% assign liveMaps = page.examples | concat: liveMaps %}{% endif %}
@@ -161,6 +168,7 @@ layout: compress
           {% unless page.disabled %}<a href="#quick-start">Quick start</a>{% endunless %}
           {% if page.key_params %}<a href="#key-parameters">Key parameters</a>{% endif %}
           {% if toolExample %}<a href="#complete-example">Complete example</a>{% endif %}
+          {% if variantIds.size > 0 %}<a href="#more-examples">More examples ({{ variantIds.size }})</a>{% endif %}
           <a href="#customize">Customize it</a>
           {% if liveMaps != empty %}<a href="#live-maps">Real maps</a>{% endif %}
           <a href="#reference">Reference</a>
@@ -172,11 +180,11 @@ layout: compress
           <div class="tool-quick">
             <div>
               {% if shot or runLive %}
-              <div class="tool-example__stage{% unless shot %} tool-example__stage--empty{% endunless %}" id="tool-live">
+              <div class="tool-example__stage{% unless shot %} tool-example__stage--empty{% endunless %}" id="tool-live" data-example="{{ toolId }}">
                 {% if shot %}
                   {% capture shotImage %}<img src="{{ thumbPath | relative_url }}"
                          srcset="{{ thumbPath | relative_url }} 800w, {{ shotPath | relative_url }} 1600w"
-                         sizes="(max-width: 900px) 100vw, 640px"
+                         sizes="(max-width: 900px) 100vw, 640px" width="800" height="450"
                          loading="lazy"
                          alt="{{ page.title }}: the example of this page running in the Mappia calculator">{% endcapture %}
                   {% if runLive %}
@@ -196,14 +204,9 @@ layout: compress
               {% endif %}
             </div>
             <ol class="tool-steps">
-              {% if toolExample %}
-              <li><strong>Copy the example</strong>
-                <p>The complete query is <a href="#complete-example">below</a>.</p>
-                <button type="button" class="tool-button" data-copy="tool-example-code">Copy the query</button>
-              </li>
+              {% if runLive %}
               <li><strong>Run it</strong>
-                <p>Press <em>Run it live</em> on the picture, paste it into the <a href="{{ site.maps.editor }}" target="_blank" rel="noopener">Mappia editor</a>, or
-                  <a href="{{ '/elements/mappia-io/' | relative_url }}?example={{ toolId }}#try-it">edit it in the playground</a>.</p>
+                <p>Click the picture: the map opens right here and runs the example. Nothing is saved, and nothing to install.</p>
               </li>
               {% endif %}
               <li><strong>Try it</strong>
@@ -213,6 +216,19 @@ layout: compress
                   <p>{{ page.summary }}</p>
                 {% endif %}
               </li>
+              {% if toolExample %}
+              <li><strong>Make it yours</strong>
+                <p>Copy the query, change it - the <a href="#key-parameters">key parameters</a> are below - and run it again in the
+                  <a href="{{ '/elements/mappia-io/' | relative_url }}?example={{ toolId }}#try-it">playground</a>, or paste it into the
+                  <a href="{{ site.maps.editor }}" target="_blank" rel="noopener">Mappia editor</a> to save it as your map.</p>
+                <button type="button" class="tool-button" data-copy="tool-example-code">Copy the query</button>
+              </li>
+              {% endif %}
+              {% if variantIds.size > 0 %}
+              <li><strong>More ways to use it</strong>
+                <ul>{% for variantId in variantIds %}<li><a href="#{{ variantId }}">{{ site.data.widget_examples[variantId].title }}</a></li>{% endfor %}</ul>
+              </li>
+              {% endif %}
             </ol>
           </div>
         </section>
@@ -250,6 +266,50 @@ layout: compress
         </section>
         {% endif %}
 
+        {% if variantIds.size > 0 %}
+        <section class="tool-section" id="more-examples" aria-labelledby="more-examples-title">
+          <h2 id="more-examples-title">More examples</h2>
+          <p class="tool-more">Other ways to use {{ page.title }}, each a complete query that runs as is - like the one above.</p>
+          {% for variantId in variantIds %}
+          {% assign variant = site.data.widget_examples[variantId] %}
+          {% assign variantShotPath = '/assets/img/examples/' | append: variantId | append: '.jpg' %}
+          {% assign variantThumbPath = '/assets/img/examples/' | append: variantId | append: '_thumb.jpg' %}
+          {% assign variantShot = site.static_files | where: "path", variantShotPath | first %}
+          {% assign variantLines = variant.query | newline_to_br | split: "<br />" | size %}
+          <article class="tool-variant" id="{{ variantId }}" aria-labelledby="{{ variantId }}-title">
+            <h3 id="{{ variantId }}-title">{{ variant.title }}</h3>
+            {% if variant.summary %}<p class="tool-variant__summary">{{ variant.summary | markdownify | remove: '<p>' | remove: '</p>' | strip }}</p>{% endif %}
+            <div class="tool-variant__body">
+              <div>
+                <div class="tool-example__stage{% unless variantShot %} tool-example__stage--empty{% endunless %}" data-example="{{ variantId }}">
+                  {% if variantShot %}
+                  <button type="button" class="tool-example__shot" title="Run it live"><img src="{{ variantThumbPath | relative_url }}"
+                       srcset="{{ variantThumbPath | relative_url }} 800w, {{ variantShotPath | relative_url }} 1600w"
+                       sizes="(max-width: 900px) 100vw, 640px" width="800" height="450" loading="lazy"
+                       alt="{{ variant.title | escape }}: this example running in the Mappia calculator"></button>
+                  {% endif %}
+                  <iframe class="tool-example__map" title="Live map running: {{ variant.title | escape }}" hidden></iframe>
+                  <button type="button" class="tool-example__run">&#9654; Run it live</button>
+                </div>
+                <p class="tool-example__caption" role="status" aria-live="polite">
+                  {% if variantShot %}Click the picture to run it live. <a href="{{ variantShotPath | relative_url }}" target="_blank" rel="noopener">Full-size picture</a>{% else %}No picture of this example yet.{% endif %}
+                </p>
+              </div>
+              <div class="tool-variant__actions">
+                <button type="button" class="tool-button" data-copy="code-{{ variantId }}">Copy the query</button>
+                <a class="tool-button" href="{{ '/elements/mappia-io/' | relative_url }}?example={{ variantId }}#try-it">Edit it in the playground</a>
+              </div>
+            </div>
+            <details class="tool-example__query">
+              <summary>The query <span class="tool-example__hint">{{ variantLines }} lines &middot; runs as is</span></summary>
+              <button type="button" class="tool-example__copy" data-copy="code-{{ variantId }}">Copy</button>
+              <div id="code-{{ variantId }}">{% highlight javascript %}{{ variant.query }}{% endhighlight %}</div>
+            </details>
+          </article>
+          {% endfor %}
+        </section>
+        {% endif %}
+
         <section class="tool-section" id="customize" aria-labelledby="customize-title">
           {% if toolExample or shot %}<h2 id="customize-title">Customize it</h2>{% endif %}
           {{ content }}
@@ -278,10 +338,6 @@ layout: compress
         <script>
           (function () {
             Array.prototype.forEach.call(document.querySelectorAll("[data-copy]"), function (button) {
-              var picture = stage.querySelector("button.tool-example__shot");
-              if (picture) {
-                picture.addEventListener("click", function () { button.click(); });
-              }
               button.addEventListener("click", function () {
                 var code = document.getElementById(button.getAttribute("data-copy"));
                 var label = button.textContent;
@@ -295,37 +351,52 @@ layout: compress
         </script>
         {% endif %}
         {% if runLive %}
-        <script type="application/json" id="tool-example-query">{{ toolExample.query | jsonify }}</script>
-        <script src="{{ '/assets/js/mappia-live.js' | relative_url }}"></script>
+        <script type="application/json" id="tool-live-settings">{{ page.live | default: nil | jsonify }}</script>
+        <script type="application/json" id="tool-example-queries">{ {{ toolId | jsonify }}: { "query": {{ toolExample.query | jsonify }}, "view": {{ toolExample.view | jsonify }} }{% for variantId in variantIds %}, {{ variantId | jsonify }}: { "query": {{ site.data.widget_examples[variantId].query | jsonify }}, "view": {{ site.data.widget_examples[variantId].view | jsonify }} }{% endfor %} }</script>
+        <script src="{{ '/assets/js/mappia-live.js' | relative_url }}" data-catalogue="{{ site.maps.catalogue_queryid }}"></script>
         <script>
           (function () {
-            var stage = document.getElementById("tool-live");
-            var button = stage.querySelector(".tool-example__run");
-            var frame = stage.querySelector(".tool-example__map");
-            var caption = document.querySelector(".tool-example__caption");
-            var originalCaption = caption.innerHTML;
-            var query = JSON.parse(document.getElementById("tool-example-query").textContent);
-            button.addEventListener("click", function () {
-              button.hidden = true;
-              frame.hidden = false;
-              stage.classList.add("is-live");
-              caption.textContent = "Loading the map...";
-              MappiaLive.connect(frame)
-                .then(function (live) {
-                  caption.textContent = "Applying the example query...";
-                  return live.apply(query);
-                })
-                .then(function () {
-                  caption.textContent = "Live: the query below, applied with MappiaIO.applyQuery. Nothing is saved.";
-                })
-                .catch(function (error) {
-                  stage.classList.remove("is-live");
-                  frame.hidden = true;
-                  frame.removeAttribute("src");
-                  button.hidden = false;
-                  caption.innerHTML = originalCaption;
-                  caption.insertAdjacentText("afterbegin", "The live map did not answer (" + error.message + "). ");
-                });
+            /* Every stage - the Quick start one and each of More examples - runs its own example
+               (data-example) in its own iframe; clicking its picture does the same as its button. */
+            var queries = JSON.parse(document.getElementById("tool-example-queries").textContent);
+            /* front matter live: {tools, options, chrome, catalogue} - a page whose example needs more of the calculator */
+            var liveSettings = JSON.parse(document.getElementById("tool-live-settings").textContent);
+            Array.prototype.forEach.call(document.querySelectorAll(".tool-example__stage[data-example]"), function (stage) {
+              var button = stage.querySelector(".tool-example__run");
+              var frame = stage.querySelector(".tool-example__map");
+              var caption = stage.parentNode.querySelector(".tool-example__caption");
+              var picture = stage.querySelector("button.tool-example__shot");
+              var example = queries[stage.getAttribute("data-example")];
+              if (!button || !frame || !example) return;
+              var originalCaption = caption ? caption.innerHTML : "";
+              function say(text) { if (caption) caption.textContent = text; }
+              if (picture) {
+                picture.addEventListener("click", function () { button.click(); });
+              }
+              button.addEventListener("click", function () {
+                button.hidden = true;
+                frame.hidden = false;
+                stage.classList.add("is-live");
+                say("Loading the map...");
+                MappiaLive.connect(frame, liveSettings)
+                  .then(function (live) {
+                    say("Applying the example query...");
+                    return live.apply(example.query, { view: example.view }); /* opens on the region of its picture */
+                  })
+                  .then(function () {
+                    say("Live: this example's query, applied with MappiaIO.applyQuery. Nothing is saved.");
+                  })
+                  .catch(function (error) {
+                    stage.classList.remove("is-live");
+                    frame.hidden = true;
+                    frame.removeAttribute("src");
+                    button.hidden = false;
+                    if (caption) {
+                      caption.innerHTML = originalCaption;
+                      caption.insertAdjacentText("afterbegin", "The live map did not answer (" + error.message + "). ");
+                    }
+                  });
+              });
             });
           })();
         </script>

@@ -85,6 +85,7 @@ _site-*/
 # Raw widget screenshots (MappiaExplorer `npm run docs:screenshots`); only their encoded
 # copies in assets/img/examples/ are published (`npm run images:examples`)
 _img/examples/
+_img/posts/*.png
 # Jekyll 4 cache, should the site be upgraded
 .jekyll-cache/
 
@@ -96,3 +97,4 @@ _img/examples/
 #   _data/api_groups.json, _data/reference_sections.json, llms.txt, llms-full.txt
 # The same holds for sw.js (refresh it with `npm run sw` before committing).
 debug.log
+does

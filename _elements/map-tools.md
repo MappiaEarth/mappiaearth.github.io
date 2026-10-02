@@ -10,6 +10,11 @@ api:
   - key: URLProperties
     tags: ['tools', 'options', 'visiblelayers', 'extent', 'lang']
 type: Element
+# The live run shows the tools and options this page is about (and keeps the toolbar)
+live:
+  tools: "legend,measure,getfeature,hovershowlegend,zoomextent,customzoom,metadata,helpintro"
+  options: "scale,grid,overview"
+  chrome: false
 try:
   - "Click the ruler button, then click two points on the map: the distance between them appears."
   - "Turn on the identify button and click a state: the attributes of that state appear."

@@ -9,7 +9,7 @@ featured-img: timeline-panel
 type: Element
 examples:
     - title: Simple Timeline Example
-      map-link: tools=helpintro,layerchooser,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened,capabilities&extent=&visiblelayers=custom&zoomlevels=10&queryid=465
+      map-link: tools=zoomextent,getfeature&options=scale,startopened,capabilities&extent=&visiblelayers=custom&zoomlevels=10&queryid=465
       featured-img: timeline-panel
 api:
     - key: Timeline

@@ -9,7 +9,7 @@ featured-img: inputmanager-widget
 type: Element
 examples:
     - title: Random Value Input
-      map-link: lang=eng&map=&queryid=117&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries,capabilities&visiblelayers=custom
+      map-link: lang=eng&map=&queryid=117&extent=-443.628,-16.847,-407.373,3.294&tools=zoomextent,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,capabilities&visiblelayers=custom
       featured-img: inputmanager_random
 api:
   - key: InputManager

@@ -8,7 +8,7 @@ featured-img: simple-example-file-source
 type: Element
 examples:
     - title: Simple File Source Layer Example
-      map-link: queryid=480&tools=legend,measure,hovershowlegend,getfeature,customzoom,zoomextent,helpintro&options=capabilities,scale,disabledownload,hidemetadata
+      map-link: queryid=480&tools=legend,measure,hovershowlegend,getfeature,zoomextent&options=capabilities,scale,disabledownload,hidemetadata
       featured-img: simple-example-file-source
 api:
   - key: LayersProperties

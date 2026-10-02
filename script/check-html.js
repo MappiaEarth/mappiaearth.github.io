@@ -7,6 +7,10 @@
  *   node script/check-html.js                 every page of _site/
  *   node script/check-html.js _site/api/index.html [...]
  *
+ * It also parses every inline <script> (not run): the layout compresses a page onto one line,
+ * so a // comment in an inline script swallows the rest of it - a syntax error that silently
+ * disables the whole script. Write block comments in inline scripts.
+ *
  * Browsers repair broken markup silently and differently, so this is the only place it shows.
  * It reads the HTML the way a browser tokenizes it (comments, <script>/<style>/<textarea>
  * contents and void elements are skipped; end tags the HTML standard lets you omit - </p>,
@@ -93,6 +97,27 @@ function checkHtml(html) {
             problems.push({ at: left.index, message: `<${left.name}> is never closed (still open at the end of the page)` });
         }
     }
+    return problems.concat(checkInlineScripts(html));
+}
+
+/** Inline scripts that do not parse (JSON and other data blocks are skipped). */
+function checkInlineScripts(html) {
+    const problems = [];
+    const scriptPattern = /<script(\s[^>]*)?>([\s\S]*?)<\/script\s*>/gi;
+    let match;
+    while ((match = scriptPattern.exec(html)) !== null) {
+        const attributes = match[1] || "";
+        if (/\ssrc\s*=/i.test(attributes)) continue;
+        const type = (/\stype\s*=\s*["']?([^"'\s>]+)/i.exec(attributes) || [])[1];
+        if (type && !/^(text|application)\/(javascript|ecmascript)$|^module$/i.test(type)) continue;
+        try {
+            new Function(match[2]); // parsed, never run
+        } catch (error) {
+            const oneLine = match[2].indexOf("\n") === -1;
+            const hint = oneLine && /\/\/[^\n]*\S/.test(match[2]) ? " - a // comment in a one-line script cuts the rest: use a block comment" : "";
+            problems.push({ at: match.index, message: `<script> does not parse: ${error.message}${hint}` });
+        }
+    }
     return problems;
 }
 
@@ -138,4 +163,4 @@ if (require.main === module) {
     main();
 }
 
-module.exports = { checkHtml };
+module.exports = { checkHtml, checkInlineScripts };

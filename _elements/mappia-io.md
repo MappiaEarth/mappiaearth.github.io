@@ -94,6 +94,7 @@ panel, and watch the message arrive.
         {% assign exampleTitle = entry[0] %}
         {% assign examplePage = site.elements | where: "slug", entry[0] | first %}
         {% if examplePage %}{% assign exampleTitle = examplePage.title %}{% endif %}
+        {% if entry[1].page == "tutorial" %}{% assign exampleTitle = "Tutorial: " | append: entry[1].title %}{% elsif entry[1].page %}{% assign variantPage = site.elements | where: "slug", entry[1].page | first %}{% assign exampleTitle = variantPage.title | append: ": " | append: entry[1].title %}{% endif %}
         <option value="{{ entry[0] }}"{% if entry[0] == "mappia-io" %} selected{% endif %}>{{ exampleTitle }}</option>
       {% endfor %}
     </select>
@@ -118,7 +119,7 @@ panel, and watch the message arrive.
   </div>
 </div>
 <script type="application/json" id="io-examples">{{ site.data.widget_examples | jsonify }}</script>
-<script src="{{ '/assets/js/mappia-live.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/mappia-live.js' | relative_url }}" data-catalogue="{{ site.maps.catalogue_queryid }}"></script>
 <script>
   (function () {
     var root = document.getElementById("io-playground");
@@ -151,7 +152,7 @@ panel, and watch the message arrive.
       queryBox.value = (examples[select.value] || { query: "" }).query;
     }
     select.addEventListener("change", showExample);
-    // ?example=<page id>: a tool page's "edit it in the playground" link opens with its example
+    /* ?example=<page id>: a tool page's "edit it in the playground" link opens with its example (a block comment: the compressed page is one line) */
     var requested = /[?&]example=([^&#]+)/.exec(window.location.search);
     if (requested && examples[decodeURIComponent(requested[1])]) {
       select.value = decodeURIComponent(requested[1]);
@@ -163,7 +164,8 @@ panel, and watch the message arrive.
       root.classList.add("is-live");
       log.innerHTML = "";
       write("note", "Loading the map...");
-      MappiaLive.connect(frame).then(function (connection) {
+      /* catalogue: false - the playground applies any query, which may name any map */
+      MappiaLive.connect(frame, { catalogue: false }).then(function (connection) {
         live = connection;
         live.onMessage(function (msg) {
           var isPlatform = typeof msg === "string" && msg.indexOf("mappia__") === 0;
@@ -184,7 +186,7 @@ panel, and watch the message arrive.
       if (!live) return;
       applyButton.disabled = true;
       write("out", "→ applyQuery", queryBox.value.length + " characters");
-      live.apply(queryBox.value).then(function () {
+      live.apply(queryBox.value, { view: (examples[select.value] || {}).view }).then(function () {
         write("note", "Query applied.");
       }).catch(function (error) {
         write("error", error.message);
@@ -537,11 +539,12 @@ MappiaIO is how Mappia maps are put to work inside other products. Three of them
 var mappia = new MappiaIO("mappia-frame", true);
 mappia.addOnMessageCallback(onTenantMessage);
 mappia.addReadyCallback(function () {
-  fetch("/js/imoveis-tenant-query.js")             // the query lives in the site's own code
+  // the query lives in the site's own code
+  fetch("/js/imoveis-tenant-query.js")
     .then(function (r) { return r.text(); })
     .then(function (text) {
       mappia.applyQuery(text);
-      mappia.send({ operation: "setEscala", message: { escala: LARBH_ESCALA } });
+      mappia.send({ operation: "setEscala", message: { escala: priceScale } });
       mappia.send({ operation: "setFilters", message: filters });
     });
 });</code></pre>

@@ -52,7 +52,11 @@ layout: compress
     <div class="container">
       <article class="post-content" itemprop="articleBody">
 
-        {% include map.html %}
+        {% include map.html lazy=true poster=page.featured-img %}
+
+        {% if page.project-url %}
+        <p class="example-project">Part of the project <a href="{{ page.project-url }}" target="_blank" rel="noopener">{{ page.project | default: page.project-url }}</a>.</p>
+        {% endif %}
 
         {{ content }}
 

@@ -5,7 +5,7 @@ summary: Display land-use transition using sankey diagram.
 categories: [Sankey, setQueryGlobalProperties, setCalculateLegend, AsyncLoader, ChangeLayers, Timeline, Combobox, InputManager, Highcharts]
 featured-img: opcoesmitigacao-panel
 type: Example
-map-link: lang=pt&map=&queryid=80&extent=&tools=helpintro,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened&visiblelayers=1
+map-link: lang=pt&map=&queryid=80&extent=&tools=zoomextent,getfeature&options=scale,startopened,capabilities&visiblelayers=1
 api: 
     - key: Sankey
     - key: QUERY

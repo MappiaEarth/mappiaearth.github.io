@@ -6,6 +6,7 @@
 {% assign docsUrl = page.url %}
 {% assign docsCurrent = "" %}
 {% if docsUrl == "/documentation/" %}{% assign docsCurrent = "overview" %}
+{% elsif docsUrl contains "/tutorial/" %}{% assign docsCurrent = "tutorial" %}
 {% elsif docsUrl contains "/tools/" or docsUrl contains "/elements/" %}{% assign docsCurrent = "tools" %}
 {% elsif docsUrl contains "/examples/" or docsUrl contains "/raw_maps/" %}{% assign docsCurrent = "examples" %}
 {% elsif docsUrl contains "/reference/" %}{% assign docsCurrent = "reference" %}
@@ -14,6 +15,7 @@
 <nav class="docs-nav" aria-label="Documentation sections">
   <div class="container docs-nav__inner">
     <a class="docs-nav__tab{% if docsCurrent == 'overview' %} is-current{% endif %}" href="{{ '/documentation/' | relative_url }}">Overview</a>
+    <a class="docs-nav__tab{% if docsCurrent == 'tutorial' %} is-current{% endif %}" href="{{ '/tutorial/' | relative_url }}">Tutorial</a>
     <a class="docs-nav__tab{% if docsCurrent == 'tools' %} is-current{% endif %}" href="{{ '/tools/' | relative_url }}">Tools</a>
     <a class="docs-nav__tab{% if docsCurrent == 'examples' %} is-current{% endif %}" href="{{ '/examples/' | relative_url }}">Examples</a>
     <a class="docs-nav__tab{% if docsCurrent == 'reference' %} is-current{% endif %}" href="{{ '/reference/' | relative_url }}">Reference</a>

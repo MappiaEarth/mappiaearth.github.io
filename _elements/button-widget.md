@@ -9,10 +9,10 @@ featured-img: button-widget
 type: Element
 examples:
     - title: Button Example
-      map-link: lang=eng&map=&queryid=119&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries,capabilities&visiblelayers=2
+      map-link: lang=eng&map=&queryid=119&extent=-443.628,-16.847,-407.373,3.294&tools=zoomextent,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,capabilities&visiblelayers=2
       featured-img: button-widget
     - title: Simple Toggle Button Example
-      map-link: tools=layerchooser,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened,capabilities&extent=&visiblelayers=1&zoomlevels=10&queryid=471
+      map-link: tools=zoomextent,getfeature&options=scale,startopened,capabilities&extent=&visiblelayers=1&zoomlevels=10&queryid=471
       featured-img: toggle-button-simple-example
 api:
   - key: Button

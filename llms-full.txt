@@ -735,7 +735,7 @@ Vector Layer configuration.
 | `hoverStyle` | `Object` | Defines the style that will be applied to the geometry when mouse is hovering. PS: Accepts 'context' and 'rules'. Property 'context': allows definition of functions. Property 'rules': allows definition of filters (only the geometries that fit into this rule… |
 | `llbbox` | `OpenLayers.Bounds` | Bounds of the features currently on the layer, recomputed automatically after features are added or removed (and extended while drawing). Despite the name it is expressed in the map projection, not in lon/lat, so it can be passed straight to… |
 | `loadGeojson` | `function()` | Function to load geojson and draw on the layer. |
-| `onAdded` | `function()` | Defines the callback function that is called when the layer is added to the map, with its features already loaded: when the layer joins the map while its data is still being fetched (`jsonurl`, `geojsonurl`, `csv`, a `load` that fetches), the call waits for… |
+| `onAdded` | `function()` | Called when the layer is on the map with its features loaded. If the layer is still fetching (`jsonurl` / `geojsonurl` / `csv` / async `load`), waits for that load to finish first so `this.features` / `this.getDataExtent()` are available (a failed load still… |
 | `onBeforeFeatureChangeCallback` | `function` | Defines the callback function that is called before a layer feature is added, removed or edited. PS: If it returns false, the change operation is canceled. @param operationType {String} Receive the operation type: 'add' or 'remove' when adding or removing… |
 | `onClick` | `function` | Defines the callback function to the click event on Layer. @param event {Object} The click event Object. @param source {VectorFileSource} Auxiliary functions to deal with Vector Layer. @param inputs {Array.&lt;Object&gt;} Array with all layer input values. |
 | `onClickCfg` | `function` | Defines the callback function to the Click Select controller. The additional parameters are listed in http://dev.openlayers.org/docs/files/OpenLayers/Control/SelectFeature-js.html. |
@@ -1620,8 +1620,9 @@ library the platform serves for that purpose, **`mappia_io.js`**.
 Two halves have to agree: the **parent page**, which creates the connection and sends
 messages, and the **query** inside the iframe, which receives them and answers. This page
 describes both, and the contract between them. Worked examples - applying queries, both
-message directions, request and answer - and a live playground are on the
-[MappiaIO tool page](/elements/mappia-io/).
+message directions, request and answer, start-up order, progress, files - a complete page you
+can copy ([/mappia-io/host-page.html](/mappia-io/host-page.html)), sites that run on it and a
+live playground are on the [MappiaIO tool page](/elements/mappia-io/).
 
 ## 1. The two routes
 
@@ -1784,6 +1785,10 @@ Worth wrapping `send` in one small module per integration, with a function per o
 name, so the host's UI code never repeats a raw string and the contract is written down in
 one place.
 
+A complete, copyable page in this shape - its own buttons driving the map, the map's panel
+button and clicks reporting back, a log of every message - is published at
+[/mappia-io/host-page.html](/mappia-io/host-page.html).
+
 ## 8. Failure modes
 
 | Symptom | Cause |
@@ -1822,6 +1827,7 @@ production: these are the things that actually go wrong.
 | A value is `undefined` only inside `expression` | It came from a closure, a global or the DOM, none of which exist in the calculation worker | Compute it in `beforeCalc`, pass it as an input |
 | `Cannot read properties of undefined (reading '<id>')` from `expression` | `inputs.id[ID]` used inside `expression`: the inputs reach the worker as JSON, which keeps only the array's elements, so the `id` map is gone | Read by position: `inputs[0]` is the first input widget in `descriptionHtml`. `inputs.id[ID]` works only on the page (`beforeCalc`, `functions`, ...) |
 | `filterLegends[...].color.join is not a function` | `setCalculateLegend` given a CSS colour (`"#c0392b"`): the legend entries take `[R, G, B]` | `{ color: [192, 57, 43], value: 1, title: "Above 800 m" }`. Layer and group `color` properties do take CSS colours |
+| An input changes, the countdown runs out, the map stays the same | `beforeCalc` called `setCalculateLegend` with the same legend as before: an unchanged legend skips the redraw, so the new inputs never reach the tiles | Make the legend follow the inputs - list only the classes shown, or put the value in a title (`"Above " + value + " m"`), as the documentation examples do |
 | Works once, then breaks on re-apply | State kept outside the query's globals | `setQueryGlobalProperties` |
 | "Global variable can't be redefined" | A global name collides with one the page already had | Rename it |
 | A widget's tag renders as nothing | Unknown tag name; the console shows `{{MARKUP}} INVALID OBJECT NAME` | Use the exact tag from [the widget markup language](/reference/markup-widgets/) |

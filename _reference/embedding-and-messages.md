@@ -7,6 +7,11 @@ section: "Integration"
 order: 1
 summary: "How a page embeds a Mappia map in an iframe with mappia_io.js, applies a query into it at runtime, and exchanges messages with the query running inside — the envelope, the handshake, the queueing and the failure modes."
 api_keys:
+  - MappiaIO.MappiaIO
+  - MappiaIO.applyQuery
+  - MappiaIO.send
+  - MappiaIO.addOnMessageCallback
+  - MappiaIO.addReadyCallback
   - QUERY.setMappiaIoCallback
   - MappiaIO.postMessage
   - QUERY.setQueryGlobalProperties
@@ -26,8 +31,9 @@ library the platform serves for that purpose, **`mappia_io.js`**.
 Two halves have to agree: the **parent page**, which creates the connection and sends
 messages, and the **query** inside the iframe, which receives them and answers. This page
 describes both, and the contract between them. Worked examples - applying queries, both
-message directions, request and answer - and a live playground are on the
-[MappiaIO tool page](/elements/mappia-io/).
+message directions, request and answer, start-up order, progress, files - a complete page you
+can copy ([/mappia-io/host-page.html](/mappia-io/host-page.html)), sites that run on it and a
+live playground are on the [MappiaIO tool page](/elements/mappia-io/).
 
 ## 1. The two routes
 
@@ -189,6 +195,10 @@ mappia.addReadyCallback(function () {
 Worth wrapping `send` in one small module per integration, with a function per operation
 name, so the host's UI code never repeats a raw string and the contract is written down in
 one place.
+
+A complete, copyable page in this shape - its own buttons driving the map, the map's panel
+button and clicks reporting back, a log of every message - is published at
+[/mappia-io/host-page.html](/mappia-io/host-page.html).
 
 ## 8. Failure modes
 

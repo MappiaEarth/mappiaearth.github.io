@@ -9,13 +9,13 @@ featured-img: hoverpixel-widget
 type: Element
 examples:
     - title: Simple Hoverpixel Example
-      map-link: tools=layerchooser,zoomextent,customzoom,getfeature&options=enablequeries,scale,startopened,capabilities&extent=&visiblelayers=custom&zoomlevels=10&queryid=467
+      map-link: tools=zoomextent,getfeature&options=scale,startopened,capabilities&extent=&visiblelayers=custom&zoomlevels=10&queryid=467
       featured-img: hoverpixel-widget-simple-example
     - title: Hoverpixel - View pixel value on Hovering
-      map-link: lang=eng&map=&queryid=118&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries,capabilities&visiblelayers=custom
+      map-link: lang=eng&map=&queryid=118&extent=-443.628,-16.847,-407.373,3.294&tools=zoomextent,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,capabilities&visiblelayers=custom
       featured-img: hoverpixel_hovering
     - title: Total burned area (ha)
-      map-link: lang=eng&map=&queryid=101&extent=-443.628,-16.847,-407.373,3.294&tools=helpintro,layerchooser,zoomextent,customzoom,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,enablequeries,capabilities&visiblelayers=custom
+      map-link: lang=eng&map=&queryid=101&extent=-443.628,-16.847,-407.373,3.294&tools=zoomextent,getfeature,hovershowlegend&options=scale,startopened,hidestylechooser,capabilities&visiblelayers=custom
       featured-img: hoverpixel_total_burned_area
 api:
   - key: Hoverpixel

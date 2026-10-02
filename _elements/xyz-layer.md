@@ -8,7 +8,7 @@ featured-img: XYZ-layer-example
 type: Element
 examples:
     - title: Simple XYZ Layer Example
-      map-link: tools=hovershowlegend,layerchooser,helpintro&options=onlyfirstvisible,startopened,hidemetadata,disabledownload,hidestylechooser,overview,capabilities&extent=-443.628,-16.847,-407.373,3.294&visiblelayers=1&zoomlevels=10&queryid=473
+      map-link: tools=hovershowlegend&options=onlyfirstvisible,startopened,hidemetadata,disabledownload,hidestylechooser,overview,capabilities&extent=-443.628,-16.847,-407.373,3.294&visiblelayers=1&zoomlevels=10&queryid=473
       featured-img: XYZ-layer-example
 api:
   - key: LayersProperties

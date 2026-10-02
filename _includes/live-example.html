@@ -1,0 +1,119 @@
+{% comment %}
+  One runnable example, anywhere on a page: its picture (click to run it live, in a lean map that
+  opens on the example's region), Copy, "Edit it in the playground", and the query itself.
+    {% include live-example.html id="tutorial-01-first-map" %}
+    chrome=false   keep the calculator's top bar and toolbar (an example about them)
+  The example comes from _data/widget_examples.json (published by MappiaExplorer's
+  publish-docs.js); its picture from assets/img/examples/<id>.jpg. Several on one page are fine.
+  The script uses block comments only: the layout compresses the page onto one line.
+{% endcomment %}
+{% assign liveExample = site.data.widget_examples[include.id] %}
+{% if liveExample %}
+{% assign liveShotPath = '/assets/img/examples/' | append: include.id | append: '.jpg' %}
+{% assign liveThumbPath = '/assets/img/examples/' | append: include.id | append: '_thumb.jpg' %}
+{% assign liveShot = site.static_files | where: "path", liveShotPath | first %}
+{% assign liveLines = liveExample.query | newline_to_br | split: "<br />" | size %}
+<figure class="live-example" id="example-{{ include.id }}">
+  <div class="live-example__stage{% unless liveShot %} live-example__stage--empty{% endunless %}"
+       data-example="{{ include.id }}"{% if include.chrome == false %} data-chrome="false"{% endif %}>
+    {% if liveShot %}
+    <button type="button" class="live-example__shot" title="Run it live"><img src="{{ liveThumbPath | relative_url }}"
+         srcset="{{ liveThumbPath | relative_url }} 800w, {{ liveShotPath | relative_url }} 1600w"
+         sizes="(max-width: 900px) 100vw, 760px" width="800" height="450" loading="lazy"
+         alt="{{ liveExample.title | escape }}: the example running in the Mappia calculator"></button>
+    {% endif %}
+    <iframe class="live-example__map" title="Live map running: {{ liveExample.title | escape }}" hidden></iframe>
+    <button type="button" class="live-example__run">&#9654; Run it live</button>
+  </div>
+  <figcaption class="live-example__caption" role="status" aria-live="polite">
+    {% if liveShot %}Click the picture to run it live - nothing is saved.{% else %}Press the button to run it live - nothing is saved.{% endif %}
+  </figcaption>
+  <div class="live-example__actions">
+    <button type="button" class="live-example__button" data-live-copy="live-code-{{ include.id }}">Copy the query</button>
+    <a class="live-example__button" href="{{ '/elements/mappia-io/' | relative_url }}?example={{ include.id }}#try-it">Edit it in the playground</a>
+  </div>
+  <details class="live-example__query" open>
+    <summary>The query <span>{{ liveLines }} lines &middot; runs as is</span></summary>
+    <div id="live-code-{{ include.id }}">{% highlight javascript %}{{ liveExample.query }}{% endhighlight %}</div>
+  </details>
+  <script type="application/json" class="live-example__data">{ "query": {{ liveExample.query | jsonify }}, "view": {{ liveExample.view | jsonify }} }</script>
+</figure>
+{% unless liveExampleAssets %}
+{% assign liveExampleAssets = true %}
+<style>
+  .live-example { margin: 18px 0 26px; }
+  .live-example__stage { position: relative; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: #eef2f7; }
+  .live-example__stage--empty { aspect-ratio: 16 / 9; }
+  .live-example__shot { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+  .live-example__shot img { display: block; width: 100%; height: auto; }
+  .live-example__shot:hover img { filter: brightness(.95); }
+  .live-example__stage.is-live .live-example__shot { display: none; }
+  .live-example__map { display: block; width: 100%; aspect-ratio: 16 / 9; min-height: 380px; border: 0; background: #fff; }
+  .live-example__map[hidden] { display: none; }
+  .live-example__run { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); padding: 10px 20px; border: 0;
+    border-radius: 24px; background: #277cea; color: #fff; font-weight: 600; font-size: 15px; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(39, 124, 234, .35); }
+  .live-example__stage--empty .live-example__run { bottom: auto; top: 50%; transform: translate(-50%, -50%); }
+  .live-example__run[hidden] { display: none; }
+  .live-example__caption { margin: 8px 0 0; font-size: 13px; color: #6b7280; }
+  .live-example__actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+  .live-example__button { padding: 5px 14px; border: 1px solid #277cea; border-radius: 6px; background: #fff; color: #277cea;
+    font-weight: 600; font-size: 14px; cursor: pointer; text-decoration: none; }
+  .live-example__button:hover { background: #eff6ff; }
+  .live-example__query { border: 1px solid #e5e7eb; border-radius: 8px; background: #fafafa; }
+  .live-example__query > summary { cursor: pointer; padding: 9px 14px; font-weight: 600; }
+  .live-example__query > summary span { font-weight: 400; color: #6b7280; font-size: 14px; margin-left: 6px; }
+  .live-example__query .highlight { margin: 0; }
+</style>
+<script src="{{ '/assets/js/mappia-live.js' | relative_url }}" data-catalogue="{{ site.maps.catalogue_queryid }}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    /* every example block of the page: its picture or button runs it in its own iframe */
+    Array.prototype.forEach.call(document.querySelectorAll(".live-example"), function (block) {
+      var stage = block.querySelector(".live-example__stage");
+      var button = block.querySelector(".live-example__run");
+      var frame = block.querySelector(".live-example__map");
+      var caption = block.querySelector(".live-example__caption");
+      var picture = block.querySelector(".live-example__shot");
+      var example = JSON.parse(block.querySelector(".live-example__data").textContent);
+      var original = caption.innerHTML;
+      if (picture) picture.addEventListener("click", function () { button.click(); });
+      button.addEventListener("click", function () {
+        button.hidden = true;
+        frame.hidden = false;
+        stage.classList.add("is-live");
+        caption.textContent = "Loading the map...";
+        MappiaLive.connect(frame, { chrome: stage.getAttribute("data-chrome") !== "false" })
+          .then(function (live) {
+            caption.textContent = "Applying the query...";
+            return live.apply(example.query, { view: example.view });
+          })
+          .then(function () {
+            caption.textContent = "Live: the query below, applied with MappiaIO.applyQuery. Nothing is saved.";
+          })
+          .catch(function (error) {
+            stage.classList.remove("is-live");
+            frame.hidden = true;
+            frame.removeAttribute("src");
+            button.hidden = false;
+            caption.innerHTML = original;
+            caption.insertAdjacentText("afterbegin", "The live map did not answer (" + error.message + "). ");
+          });
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-live-copy]"), function (copy) {
+      copy.addEventListener("click", function () {
+        var code = document.getElementById(copy.getAttribute("data-live-copy"));
+        var label = copy.textContent;
+        navigator.clipboard.writeText(code.textContent.trim()).then(function () {
+          copy.textContent = "Copied";
+          setTimeout(function () { copy.textContent = label; }, 1500);
+        });
+      });
+    });
+  });
+</script>
+{% endunless %}
+{% else %}
+<p class="live-example__missing">(No example named {{ include.id }} - publish it with MappiaExplorer's publish-docs.js.)</p>
+{% endif %}

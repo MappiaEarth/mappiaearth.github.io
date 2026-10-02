@@ -48,8 +48,10 @@ The handler can do anything on the page, for example show or hide another layer 
 descriptionHtml: "{{checkbox|id=show_states|text=Show state borders|handler=onShowStates}}",
 functions: {
   onShowStates: function (checkbox, checked) {
-    var states = ExtjsUtils.LAYER.getLayerByName("CSR:estados");
-    if (states) states.setVisibility(checked);
+    /* on the map a plain layer is named by its title: find it by the map it shows */
+    this.map.layers.forEach(function (layer) {
+      if (layer.params && layer.params.LAYERS === "CSR:estados") layer.setVisibility(checked);
+    });
   },
 },
 ```
