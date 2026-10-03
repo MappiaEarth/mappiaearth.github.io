@@ -83,18 +83,8 @@ collections:
     output: true
   change_logs:
     output: true
-  # The step-by-step tutorial: _tutorial/NN-slug.md, ordered by their step number.
-  tutorial:
-    output: true
-    permalink: /tutorial/:path/
 
 defaults:
-  - scope:
-      path: "_tutorial"
-      type: "tutorial"
-    values:
-      layout: "tutorial"
-      docs_nav: true
   - scope:
       path: "_change_logs"
     values:

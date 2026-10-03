@@ -1,4 +1,6 @@
 ---
+layout: tutorial
+docs_nav: true
 title: Save, share and embed a map
 step: 9
 permalink: /tutorial/save-and-share/
@@ -15,6 +17,7 @@ more:
   - { title: "Map tools", url: "/elements/map-tools/", why: "the tools and options of a link, running" }
   - { title: "URL parameters in the API reference", url: "/api/#category_URLProperties" }
   - { title: "Page options in the API reference", url: "/api/#category_URLOptions" }
+  - { title: "Where to find it", url: "/reference/where-to-look/", why: "which part of the API to open" }
 ---
 {% raw %}
 ### Save it
@@ -40,7 +43,12 @@ The link takes parameters, each `&name=value`:
 | `lang` | `eng` or `pt`: the language of the interface |
 | `tools` | The optional buttons of the toolbar, separated by commas: `legend`, `measure`, `getfeature`, `hovershowlegend`, `zoomextent`, `customzoom`, `metadata`, `helpintro` |
 | `options` | Page options, separated by commas: `scale` (a scale bar), `startopened` (the layer panel opens), `hidestylechooser`, `hidemetadata`, `disabledownload`, `capabilities`... |
-| `visiblelayers` | Which layers start visible |
+| `visiblelayers` | How many layers start visible - `2` the first two, `0` none - instead of each layer's own `visibility` |
+
+These parameters belong to the **link**, not to the query: another link can open the same saved
+query with other buttons. Without `tools`, the map shows every optional button; with it, only
+the ones listed - zoom and navigation are always there. They are toolbar buttons, not the
+widgets of a layer's panel (step 5).
 
 `options=capabilities` is worth adding to every link of a saved query: the map reads a catalogue
 of **only the maps your query uses** instead of the server's whole catalogue, and opens much

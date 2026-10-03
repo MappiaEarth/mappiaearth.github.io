@@ -1,0 +1,52 @@
+{% comment %}
+  One api.json group: its heading (a link to #category_<group>, the anchor every page and
+  the MCP use), the intro, the example, an index of its entries and the entries
+  (api-entry.html). /api/ (api.html), the tool pages (api-groups.html) and the old
+  publisher page all render a group through this file, so it looks and links the same
+  everywhere.
+
+  include.section  the section key (data-section)
+  include.group    the group key
+  include.entries  its api.json array (the "_information" item first)
+  include.base     "" on /api/; "/api/" elsewhere: in-page anchors of the texts then lead to /api/
+  include.on_api   true on /api/: a completeAPI that only links to the group itself is left out
+  include.tags     optional: show only these member keys (tool pages)
+  include.exclude  optional: member keys to leave out (tool pages)
+{% endcomment %}
+{%- assign G = include.group -%}
+{%- assign info = include.entries | where: "key", "_information" | first -%}
+{%- assign name = info.name | default: G -%}
+{%- capture to_api_dq %} href="{{ include.base }}#{% endcapture -%}
+{%- capture to_api_sq %} href='{{ include.base }}#{% endcapture -%}
+{%- assign shown = "" | split: "" -%}
+{%- for entry in include.entries -%}
+  {%- if entry.key == "_information" -%}{%- continue -%}{%- endif -%}
+  {%- if include.exclude and include.exclude contains entry.key -%}{%- continue -%}{%- endif -%}
+  {%- if include.tags and include.tags.size > 0 -%}{%- unless include.tags contains entry.key -%}{%- continue -%}{%- endunless -%}{%- endif -%}
+  {%- assign shown = shown | push: entry -%}
+{%- endfor -%}
+<section class="api-group" id="category_{{ G }}" data-section="{{ include.section }}" data-group="{{ G }}"{% if info.markupTag %} data-markup="{{ info.markupTag }}"{% endif %}>
+<header class="api-group__head"><h3 class="api-group__title"><a href="#category_{{ G }}">{{ name | xml_escape }}</a></h3><code class="api-group__key">{{ G }}</code><span class="api-group__count">{{ shown.size }} {% if shown.size == 1 %}entry{% else %}entries{% endif %}</span></header>
+{%- if info.markupTag %}<p class="api-group__usage">Written in a layer's <code>descriptionHtml</code> as <code>&#123;&#123;{{ info.markupTag }}|parameter=value|...&#125;&#125;</code></p>{% endif -%}
+{%- if info.descriptionHtml or info.description -%}
+  {%- if info.descriptionHtml %}{% assign intro = info.descriptionHtml %}{% else %}{% assign intro = info.description | newline_to_br %}{% endif -%}
+  {%- if include.base != "" %}{% assign intro = intro | replace: ' href="#', to_api_dq | replace: " href='#", to_api_sq %}{% endif %}
+<div class="api-group__intro">{{ intro }}</div>
+{%- endif -%}
+{%- if info.completeAPI and info.completeAPI != "" -%}
+  {%- unless include.on_api and info.completeAPISelfOnly -%}
+    {%- if info.completeAPIHtml %}{% assign more = info.completeAPIHtml %}{% else %}{% assign more = info.completeAPI | newline_to_br %}{% endif -%}
+    {%- if include.base != "" %}{% assign more = more | replace: ' href="#', to_api_dq | replace: " href='#", to_api_sq %}{% endif %}
+<div class="api-group__more">{{ more }}</div>
+  {%- endunless -%}
+{%- endif -%}
+{%- if info.example -%}
+  {%- assign example_text = info.example | replace: "&lt;", "<" | replace: "&gt;", ">" | replace: "&quot;", '"' | replace: "&amp;", "&" -%}
+  {%- assign example_lines = example_text | newline_to_br | split: "<br" | size %}
+<details class="api-example-block"{% if example_lines <= 4 %} open{% endif %}><summary>Example</summary><pre class="api-example" data-lang="{% if example_text contains '://' %}url{% elsif example_text contains '{{' %}markup{% else %}js{% endif %}"><code>{{ example_text | xml_escape }}</code></pre></details>
+{%- endif -%}
+{%- if shown.size > 1 %}
+<nav class="api-group__index" aria-label="Entries of {{ name | xml_escape }}">{% for entry in shown %}<a href="#{{ G }}.{{ entry.key }}" data-key="{{ entry.key }}" tabindex="-1"></a>{% endfor %}</nav>
+{%- endif %}
+<div class="api-group__entries">{% for entry in shown %}{% include api-entry.html entry=entry group=G base=include.base %}{% endfor %}</div>
+</section>

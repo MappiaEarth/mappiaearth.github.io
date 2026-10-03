@@ -1,7 +1,12 @@
 ---
+layout: tutorial
+docs_nav: true
 title: Your first map
 step: 1
 permalink: /tutorial/first-map/
+wizard:
+  step: turn-it-on
+  covers_try: true
 summary: "A Mappia map is described by a query: one JavaScript expression whose value is the list of layers to show."
 learn:
   - "What a query is: one JavaScript expression whose value is the list of layers."

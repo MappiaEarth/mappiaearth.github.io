@@ -1,7 +1,12 @@
 ---
+layout: tutorial
+docs_nav: true
 title: Organising layers in groups
 step: 6
 permalink: /tutorial/groups/
+wizard:
+  step: menu-group
+  covers_try: true
 summary: "Groups with a title become entries of the top menu; viewTitle groups become headings in the layer panel; defaultProperties is shared by every layer inside."
 learn:
   - "The two kinds of group: top-menu entries (`title`) and panel headings (`viewTitle`)."
@@ -18,9 +23,9 @@ more:
 {% raw %}
 A real map has dozens of layers. Groups organise them, at two levels:
 
-- A group with **`title`** and **`elements`** is an entry of the **top menu** - like *Maps*, the
-  entry the platform makes for layers outside any group. Opening it lists all its layers, each
-  with a switch.
+- A top-level group with **`title`** and **`elements`** is an entry of the **top menu** - like
+  *Maps*, the entry the platform makes for layers outside any group. Opening it lists all its
+  layers, each with a switch.
 - A group with **`viewTitle`** and **`elements`** is a **heading in the layer panel**, above
   those of its layers that are on.
 
@@ -37,7 +42,8 @@ itself. Above, both terrain layers get `opacity: 0.7` and start off - except *El
 sets `visibility: true` itself. Use it for what a whole theme shares: a source, an opacity, a set
 of buttons.
 
-`openGroup: true` starts a group expanded; `color` colours its entry and its layers' rows.
+`openGroup: true` starts a `viewTitle` heading expanded. The `color` of a top-level group colours
+its menu entry and the rows of all its layers; a nested group's `color` colours its heading.
 
 ### A reserved group
 

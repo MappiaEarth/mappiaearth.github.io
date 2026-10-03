@@ -14,7 +14,7 @@ api_keys:
   - SummedArea
   - Hoverpixel
   - LayersProperties.maxQntEntries
-  - ConfigLayer.type
+  - FileLayer.type
   - QUERY.setQueryGlobalProperties
 ---
 

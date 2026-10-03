@@ -1,196 +1,70 @@
-{% assign api_groups = include.api | default: page.api %}
-{% assign api = include.api | page.api %}
-{% if api %}
-{% include prevent-selection.html selector=".property-key" %}
-<div class="api-toolbar">
-  <div class="api-toolbar__left-panel">
-    <h2>Mappia API</h2>
-  </div>
-  <div class="api-toolbar__right-panel">
-    <div class="toggle-all-container">
-      <div id="toggle-all-name">Expand All</div>
-      <span id="toggle-all-properties" class="toggle-all-properties" onclick="DocUtils.API.toggleAllProperties()"
-      title="Expand all properties">&nbsp;</span>
-    </div>
-    <div class="input-container">
-      <div class="icon-container hidden" id="loading-icon">
-        <i class="loader"></i>
-      </div>
-      <input id="filter-members" class="filter-members" type="search" placeholder="Filter members"
-      oninput="DocUtils.API.filterVisibleProperties()">
-    </div>
-  </div>
+{% comment %}
+  The whole API reference (/api/): a sticky bar (search, where you are, "Expand group"), the
+  contents (sections and groups, with counts) and every section of api.json, each group
+  rendered by api-group.html.
+
+  include.api: the section keys to show, in order (api.md passes all of them).
+
+  Anchors other pages and the MCP link to, kept as they were: #group_<Section_key> and
+  #category_<Group>. Every entry adds #<Group>.<key>. assets/js/api-ref.js adds the search,
+  the contents that follow the reading position, deep-link opening and copy buttons; without
+  it the page still reads and every link works (native <details> and fragments).
+{% endcomment %}
+{%- assign api_sections = include.api | default: page.api -%}
+{%- if api_sections -%}
+{%- assign total = 0 -%}
+{%- for S in api_sections -%}{%- for category in site.data.api[S] -%}{%- unless category[0] == "_information" -%}{%- assign total = total | plus: category[1].size | minus: 1 -%}{%- endunless -%}{%- endfor -%}{%- endfor -%}
+<div class="api-ref" id="api-ref">
+<div class="api-bar">
+<button type="button" class="api-bar__toc" id="api-toc-btn" aria-controls="api-toc" aria-expanded="false">&#9776; Contents</button>
+<div class="api-search" role="search">
+<input id="api-search" type="search" autocomplete="off" spellcheck="false" placeholder="Search {{ total }} entries" role="combobox" aria-expanded="false" aria-controls="api-search-results" aria-autocomplete="list" aria-label="Search the API: a name, ExtjsUtils.LAYER.x, this.x, &#123;&#123;slider, ?queryid or words">
+<kbd title="Press / to search">/</kbd>
+<ul id="api-search-results" class="api-search__results" role="listbox" aria-label="Search results" hidden></ul>
 </div>
-<div id="api-container" class="d-flex">
-  <div class="position-sticky overflow-auto" style="width: 300px; height: 90vh; top: 10vh; padding: 15px;">
-    {% for groupID in api_groups %}
-    <div>
-      <h4 class="group-title link-primary" key="{{groupID}}" onclick="DocUtils.API.scrollToElement(this)">
-        {{groupID}}
-      </h4>
-      {% for category in site.data.api[groupID] %}
-      {% assign category_name = category[0] %}
-      {% assign key = category_name %}
-      {% unless category_name == "_information" %}
-      {% assign info = category[1][0] %}
-      {% assign name = info.name %}
-      <div class="link-primary index-item" key="{{key}}" style="font-size: 18px; padding-top: 7px; padding-bottom: 7px; padding-left: 5px; border-left: rgba(39, 124, 234, 0.3) solid 1px;"
-      onclick="DocUtils.API.scrollToElement(this)">{{ name | xml_escape }}</div>
-      {% endunless %}
-      {% endfor %}
-    </div>
-    {% endfor %}
-  </div>
-  <div style="flex: 0 0 auto; width: calc(100% - 300px); padding: 20px 0 0 20px;">
-    <div id="empty-filter-results" class="hidden">No results found.</div>
-    {% for groupID in api_groups %}
-      {% comment %}
-        One wrapper per section, opened and closed here whether the section has an intro or not
-        (it used to open only with the intro and close always, leaving a stray </div>).
-        Texts printed as HTML - the intros - come from api.json with any stray tag already
-        escaped (generate-docs.js, checked by publish-docs.js); everything else is escaped here.
-      {% endcomment %}
-      {% assign info = site.data.api[groupID]["_information"] %}
-      <div class="group-container" id="group_{{ groupID | replace: ' ', '_'  }}">
-        <h3>{{ groupID | xml_escape }}</h3>
-        {% if info %}
-          <pre class="group-description">{{ info.description }}</pre>
-          {% if info.example %}
-            {% highlight js %}{{ info.example }}{% endhighlight %}
-          {% endif %}
-        {% endif %}
-      {% for category in site.data.api[groupID] %}
-        {% assign category_name = category[0] %}
-        {% unless category_name == "_information" %}
-        {% assign key = category_name %}
-        {% assign tags = site.data.api[groupID][category_name] %}
-        {% assign informationData = site.data.api[groupID][category_name] | where: "key", "_information" | first %}
-        {% assign informationTags = "_description, _name" | split: ", " %}
-        {% assign apiConfig = page.apiConfig | default: nil %}
-
-        {% if category.tags or category.exclude %}
-          {% assign hasIncompleteAPI = false %}
-          {% if category.tags %}
-            {% assign informationToFilter = category.tags | where_exp: "tag", "tag contains '_'" %}
-            {% if category.tags != informationToFilter %}
-              {% assign hasIncompleteAPI = true %}
-            {% endif %}
-          {% endif %}
-          {% if category.exclude and hasIncompleteAPI == false %}
-            {% assign informationToFilter = category.exclude | where_exp: "tag", "tag contains '_'" %}
-            {% if informationToFilter != category.exclude %}
-              {% assign hasIncompleteAPI = true %}
-            {% endif %}
-          {% endif %}
-
-          {% if hasIncompleteAPI == true %}
-            {% assign informationTags = informationTags | push: "_completeAPI" %}
-          {% endif %}
-        {% endif %}
-
-        {% if category.tags %}
-          {% assign informationTags = category.tags | where_exp: "tag", "tag contains '_'" | default: informationTags %}
-          {% if category.tags != informationTags %}
-            {% assign tags = tags | where_exp: "tag", "category.tags contains tag.key" %}
-          {% endif %}
-        {% endif %}
-
-        {% if category.exclude %}
-          {% assign filteredTags = '' | split: '' %}
-          {% for tag in tags %}
-            {% unless category.exclude contains tag.key %}
-              {% assign filteredTags = filteredTags | push: tag %}
-            {% endunless %}
-          {% endfor %}
-          {% assign tags = filteredTags %}
-
-          {% assign filteredInformation = '' | split: '' %}
-            {% for informationTag in informationTags %}
-            {% unless category.exclude contains informationTag %}
-              {% assign filteredInformation = filteredInformation | push: informationTag %}
-            {% endunless %}
-          {% endfor %}
-
-          {% assign informationTags = filteredInformation %}
-        {% endif %}
-
-        {% assign tagsWithoutMetadata = '' | split: '' %}
-        {% for tag in tags %}
-          {% unless tag.key contains '_' %}
-            {% assign tagsWithoutMetadata = tagsWithoutMetadata | push: tag %}
-          {% endunless %}
-        {% endfor %}
-        {% assign tags = tagsWithoutMetadata | uniq %}
-        <div class="property-category {% if apiConfig and apiConfig.startPropertiesOpen %}open{% endif %}"
-          id="category_{{ key }}">
-          <div class="property-category__metadata {% if apiConfig and apiConfig.startPropertiesOpen %}open{% endif %}">
-            <a class="left-anchor" onclick="DocUtils.API.toggleCategoryOpen(this)">
-              <span class="arrow">&nbsp;</span>
-            </a>
-            {% if informationTags contains "_name" %}
-              <span class="property-category__metadata__name" onclick="DocUtils.API.toggleCategoryOpen(this)">{{
-                informationData.name | xml_escape }}</span>
-            {% endif %}
-
-            {% if informationTags contains "_description" %}
-              <div class="property-category__metadata__description">{{ informationData.description | newline_to_br }}</div>
-            {% endif %}
-
-            {% if informationTags contains "_completeAPI" %}
-              <div class="property-category__metadata__completeAPI">{{ informationData.completeAPI | newline_to_br }}</div>
-            {% endif %}
-            
-            {% if informationData.example %}
-              <pre class="property-category__metadata__example"><code>{{ informationData.example | xml_escape }}</code></pre>
-            {% endif %}
-          </div>
-          <div class="properties-container">
-            {% for tag in tags %}
-            <div class="property">
-              <a class="left-anchor" onclick="DocUtils.API.togglePropertyOpen(this)">
-                <span class="arrow">&nbsp;</span>
-              </a>
-              <h3 class="property__title">
-                <span>
-                  <span class="property-key" onclick="DocUtils.API.togglePropertyOpen(this)">{{ tag.key | xml_escape }}</span>:
-                  <span class="property_type">{{ tag.type | xml_escape }}</span>
-                </span>
-                {% if tag.required %}
-                  <span class="property-required">required</span>
-                {% endif %}
-              </h3>
-              <pre class="element-description">
-                <p>{{ tag.description | xml_escape }}</p>
-              </pre>
-              <div class="property__expanded">
-                {% for see in tag.see %}
-                  <pre class="element-description">{{- see | markdownify -}}</pre>
-                {% endfor %}
-                {% for example in tag.examples %}
-                  <div style="margin-bottom: 5px;"><b>Example:</b></div>
-                  {% highlight js %}{{ example }}{% endhighlight %}
-                {% endfor %}
-                {% if tag.default %}
-                  <span>Defaults to <code>{{ tag.default | xml_escape }}</code></span>
-                {% endif %}
-              </div>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-        {% endunless %}
-      {% endfor %}
-      </div>
-    {% endfor %}
-  </div>
+<nav class="api-crumbs" id="api-crumbs" aria-label="Where you are"></nav>
+<button type="button" class="api-bar__expand" id="api-expand" title="Open every entry of the group you are reading">Expand group</button>
 </div>
-<script defer>
-  {% include apitooltip.js %}
-</script>
-<script>
-  window.addEventListener("load", function () {
-    document.addEventListener('scroll', DocUtils.API.colorCurrentTopic);
-  });
-  document.getElementsByClassName('header')[0].classList.add("disable-fix");
-</script>
-{% endif %}
+<div class="api-layout">
+<nav class="api-toc" id="api-toc" aria-label="API contents">
+<button type="button" class="api-toc__close" aria-label="Close the contents">&times;</button>
+{%- for S in api_sections -%}
+  {%- assign sinfo = site.data.api[S]["_information"] -%}
+  {%- assign scount = 0 -%}
+  {%- for category in site.data.api[S] -%}{%- unless category[0] == "_information" -%}{%- assign scount = scount | plus: category[1].size | minus: 1 -%}{%- endunless -%}{%- endfor %}
+<details class="api-toc__section" data-section="{{ S }}"><summary><a href="#group_{{ S | replace: ' ', '_' }}">{{ sinfo.title | default: S | xml_escape }}</a><span class="api-count">{{ scount }}</span></summary><ul>
+  {%- for category in site.data.api[S] -%}
+    {%- unless category[0] == "_information" -%}
+      {%- assign ginfo = category[1] | where: "key", "_information" | first -%}
+<li><a href="#category_{{ category[0] }}" data-group="{{ category[0] }}">{{ ginfo.name | default: category[0] | xml_escape }}<span class="api-count">{{ category[1].size | minus: 1 }}</span></a></li>
+    {%- endunless -%}
+  {%- endfor -%}
+</ul></details>
+{%- endfor %}
+</nav>
+<div class="api-main" id="api-main">
+{%- for S in api_sections -%}
+  {%- assign sinfo = site.data.api[S]["_information"] %}
+<section class="api-section" id="group_{{ S | replace: ' ', '_' }}" data-section="{{ S }}">
+<h2 class="api-section__title">{{ sinfo.title | default: S | xml_escape }}</h2>
+  {%- if sinfo.descriptionHtml %}<div class="api-section__intro">{{ sinfo.descriptionHtml }}</div>
+  {%- elsif sinfo.description %}<div class="api-section__intro">{{ sinfo.description | newline_to_br }}</div>{% endif -%}
+  {%- if sinfo.example -%}
+    {%- assign example_text = sinfo.example | replace: "&lt;", "<" | replace: "&gt;", ">" | replace: "&quot;", '"' | replace: "&amp;", "&" %}
+<details class="api-example-block"><summary>Example</summary><pre class="api-example" data-lang="{% if example_text contains '://' %}url{% else %}js{% endif %}"><code>{{ example_text | xml_escape }}</code></pre></details>
+  {%- endif -%}
+  {%- for category in site.data.api[S] -%}
+    {%- unless category[0] == "_information" -%}
+      {%- comment %} Jekyll's include takes plain variable names only (not category[0]). {% endcomment -%}
+      {%- assign groupKey = category[0] -%}{%- assign groupEntries = category[1] -%}
+      {%- include api-group.html section=S group=groupKey entries=groupEntries base="" on_api=true -%}
+    {%- endunless -%}
+  {%- endfor %}
+</section>
+{%- endfor %}
+</div>
+</div>
+</div>
+<script src="{{ '/assets/js/api-ref.js' | relative_url }}" defer></script>
+<script>document.getElementsByClassName('header')[0].classList.add("disable-fix");</script>
+{%- endif -%}

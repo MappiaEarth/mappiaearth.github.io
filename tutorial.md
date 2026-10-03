@@ -1,66 +1,49 @@
 ---
-layout: page-uncentered
+layout: tutorial-wizard
 title: Tutorial
 permalink: /tutorial/
 docs_nav: true
-description: Learn Mappia in ten short steps - from a one-line map to calculated layers, groups, globals, the ExtjsUtils helpers and embedding with MappiaIO, each with a map you run in the page.
+description: Learn Mappia step by step on one live map - change a query, press Run, and the tutorial checks the map shows what the step asked for. Then the chapter notes, from a one-line map to calculated layers, groups, globals, the ExtjsUtils helpers and MappiaIO.
 ---
-
-<div class="container tutorial-index">
-  <p class="tutorial-index__lead">
-    Ten short steps, from a one-line map to a map that talks to your own page. Each step teaches
-    one idea, with an example you run right in the page - nothing to install, nothing saved - and
-    a few changes to try. About 45 minutes in all; you only need a browser.
+{% comment %}
+  /tutorial/ is the wizard (_layouts/tutorial-wizard.html, data in _data/tutorial.json). This
+  content follows it: the chapter notes - the ten pages tutorial/NN-slug.md (layout tutorial),
+  the same ideas written out, with their tables and examples.
+{% endcomment %}
+{% assign notes = site.pages | where: "layout", "tutorial" | sort: "step" %}
+<section class="tutorial-notes" aria-labelledby="tutorial-notes-title">
+  <h2 id="tutorial-notes-title">The chapter notes</h2>
+  <p class="tutorial-notes__lead">
+    Every idea of the tutorial, written out with its tables and a full example you can run - for
+    reading, printing, or going further than the steps. {% unless site.data.tutorial %}The live,
+    step-by-step version of this page is being prepared.{% endunless %}
   </p>
-
-  <div class="tutorial-index__how">
-    <div><strong>1. Read</strong><span>A short explanation of one idea.</span></div>
-    <div><strong>2. Run</strong><span>Click the picture: the example runs in a live map.</span></div>
-    <div><strong>3. Change</strong><span>Copy it, change it in the playground, run it again.</span></div>
-  </div>
-
-  {% comment %} site.tutorial is empty on a Jekyll server started before the collection was added to _config.yml (restart it) {% endcomment %}
-  {% assign steps = site.tutorial %}{% if steps %}{% assign steps = steps | sort: "step" %}{% else %}{% assign steps = "" | split: "," %}{% endif %}
-  <ol class="tutorial-index__steps">
-    {% for step in steps %}
+  <ol class="tutorial-notes__list">
+    {% for note in notes %}
     <li>
-      <a href="{{ step.url | relative_url }}">
-        <span class="tutorial-index__number">{{ step.step }}</span>
-        <span class="tutorial-index__text">
-          <strong>{{ step.title }}</strong>
-          <span>{{ step.summary }}</span>
-        </span>
+      <a href="{{ note.url | relative_url }}">
+        <span class="tutorial-notes__number">{{ note.step }}</span>
+        <span class="tutorial-notes__text"><strong>{{ note.title }}</strong><span>{{ note.summary }}</span></span>
       </a>
     </li>
     {% endfor %}
   </ol>
-
-  {% assign firstStep = steps | first %}
-  <p class="tutorial-index__start"><a class="tutorial-index__button" href="{{ firstStep.url | relative_url }}">Start with step 1 &rarr;</a></p>
-
-  <p class="tutorial-index__after">
+  <p class="tutorial-notes__after">
     After the tutorial: the <a href="{{ '/tools/' | relative_url }}">tools</a> (every widget and
     layer type, each with runnable examples), the <a href="{{ '/examples/' | relative_url }}">real
     maps</a> built with Mappia, and the <a href="{{ '/reference/' | relative_url }}">reference</a>.
   </p>
-</div>
+</section>
 
 <style>
-  .tutorial-index { max-width: 860px; }
-  .tutorial-index__lead { font-size: 18px; }
-  .tutorial-index__how { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 22px 0; }
-  .tutorial-index__how div { padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fafafa; }
-  .tutorial-index__how strong { display: block; color: #277cea; }
-  .tutorial-index__how span { font-size: 14px; color: #4b5563; }
-  .tutorial-index__steps { list-style: none; margin: 26px 0; padding: 0; }
-  .tutorial-index__steps li { margin: 0 0 10px; }
-  .tutorial-index__steps a { display: flex; gap: 16px; align-items: flex-start; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 8px; color: inherit; }
-  .tutorial-index__steps a:hover { border-color: #277cea; background: #f8fbff; }
-  .tutorial-index__number { flex: none; width: 34px; height: 34px; border-radius: 50%; background: #277cea; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-  .tutorial-index__text strong { display: block; color: #111827; }
-  .tutorial-index__text span { color: #4b5563; font-size: 15px; }
-  .tutorial-index__button { display: inline-block; padding: 10px 22px; border-radius: 24px; background: #277cea; color: #fff; font-weight: 600; }
-  .tutorial-index__button:hover { background: #1f66c4; color: #fff; }
-  .tutorial-index__after { color: #4b5563; }
-  @media (max-width: 700px) { .tutorial-index__how { grid-template-columns: 1fr; } }
+  .tutorial-notes { max-width: 860px; margin: 18px 0 30px; }
+  .tutorial-notes h2 { font-size: 22px; }
+  .tutorial-notes__lead { color: #4b5563; }
+  .tutorial-notes__list { list-style: none; margin: 18px 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+  .tutorial-notes__list a { display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; color: inherit; height: 100%; }
+  .tutorial-notes__list a:hover { border-color: #277cea; background: #f8fbff; }
+  .tutorial-notes__number { flex: none; width: 28px; height: 28px; border-radius: 50%; background: #e5edfb; color: #277cea; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .tutorial-notes__text strong { display: block; color: #111827; }
+  .tutorial-notes__text span { color: #4b5563; font-size: 14px; }
+  .tutorial-notes__after { color: #4b5563; }
 </style>

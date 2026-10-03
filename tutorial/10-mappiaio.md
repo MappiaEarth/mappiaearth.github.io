@@ -1,4 +1,6 @@
 ---
+layout: tutorial
+docs_nav: true
 title: Your page and the map - MappiaIO
 step: 10
 permalink: /tutorial/mappiaio/
@@ -55,5 +57,7 @@ sites built this way - a real-estate search and a tool for offline maps.
 You now know the parts every Mappia map is made of: layers and their names, sources and servers,
 calculations and controls, groups, the `&&` chain and globals, the `ExtjsUtils` helpers, saving
 and sharing, and MappiaIO. From here, the [tools](/tools/) show each widget and layer type with
-runnable examples, and the [real maps](/examples/) show them together, at full scale.
+runnable examples, and the [real maps](/examples/) show them together, at full scale. When you
+look something up, [Where to find it](/reference/where-to-look/) says which part of the
+[API reference](/api/) to open.
 {% endraw %}

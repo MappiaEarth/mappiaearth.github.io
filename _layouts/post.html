@@ -32,8 +32,13 @@ layout: compress
           {% else %}
             {% assign categories = page.categories %}
           {% endif %}
+          {% comment %}
+            A label links to /api/ when the word is a group or the key of exactly one entry
+            (_data/api_anchors.json, written by MappiaExplorer publish-docs.js); other words stay plain.
+          {% endcomment %}
           {% for category in categories %}
-            <a class="label" href="{{site.baseurl}}/api/#category_{{category|slugize}}">{{category}}</a>
+            {% assign apiWord = category | downcase %}{% assign apiAnchor = site.data.api_anchors[apiWord] %}
+            {% if apiAnchor %}<a class="label" href="{{site.baseurl}}/api/#{{ apiAnchor }}">{{category}}</a>{% else %}<span class="label label--plain">{{category}}</span>{% endif %}
             {% unless forloop.last %}&nbsp;{% endunless %}
           {% endfor %}
         </div>

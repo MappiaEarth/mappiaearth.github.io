@@ -58,6 +58,19 @@ layout: compress
           question is:
         </p>
 
+        <a class="docs-start" href="{{ '/tutorial/' | relative_url }}">
+          <span class="docs-start__kicker">New to Mappia?</span>
+          <span class="docs-start__title">Start with the tutorial &rarr;</span>
+          <span class="docs-start__text">Ten short steps with a live map in each: layers and their names, sources and WMS servers, calculated maps, groups, globals, the ExtjsUtils helpers, saving and sharing, and MappiaIO.</span>
+        </a>
+        <style>
+          .docs-start { display: block; margin: 0 0 22px; padding: 18px 22px; border-radius: 10px; background: #277cea; color: #fff; }
+          .docs-start:hover { background: #1f66c4; color: #fff; }
+          .docs-start__kicker { display: block; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; opacity: .85; }
+          .docs-start__title { display: block; font-size: 22px; font-weight: 700; margin: 2px 0 4px; }
+          .docs-start__text { display: block; opacity: .92; }
+        </style>
+
         <div class="docs-doors">
           <a class="docs-door" href="{{ '/tools/' | relative_url }}">
             <span class="docs-door__kicker">Build</span>
@@ -86,7 +99,8 @@ layout: compress
           <li><strong>Publish your maps.</strong> Upload data and styles from QGIS -
             <a href="{{ '/mappia_publisher/' | relative_url }}">the publishing tutorial</a>.</li>
           <li><strong>Write your first query.</strong> It can be one line -
-            <a href="{{ '/reference/query-language/' | relative_url }}">how a query is evaluated</a>.</li>
+            <a href="{{ '/tutorial/' | relative_url }}">the tutorial</a> walks you through it, step by step;
+            <a href="{{ '/reference/query-language/' | relative_url }}">how a query is evaluated</a> has the rules.</li>
           <li><strong>Add tools.</strong> Pick one from <a href="{{ '/tools/' | relative_url }}">Tools</a>, copy its
             example, then adapt it - <a href="{{ '/reference/markup-widgets/' | relative_url }}">the widget markup language</a>
             explains the rules.</li>

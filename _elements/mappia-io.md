@@ -98,8 +98,8 @@ panel, and watch the message arrive.
         <option value="{{ entry[0] }}"{% if entry[0] == "mappia-io" %} selected{% endif %}>{{ exampleTitle }}</option>
       {% endfor %}
     </select>
-    <label class="io-playground__label" for="io-query">Query text - edit it freely</label>
-    <textarea id="io-query" rows="9" spellcheck="false"></textarea>
+    <p class="io-playground__label" id="io-query-label">Query text - edit it freely (Ctrl+Enter applies it)</p>
+    <div class="io-playground__editor" id="io-query"></div>
     <button type="button" id="io-apply" disabled>applyQuery</button>
 
     <h3>2. Send a message <code>send(object)</code></h3>
@@ -118,7 +118,13 @@ panel, and watch the message arrive.
     </ol>
   </div>
 </div>
-<script type="application/json" id="io-examples">{{ site.data.widget_examples | jsonify }}</script>
+{% comment %} The examples as escaped JSON in a hidden <pre>: the compress layout keeps a <pre> as it is, so the
+   queries keep their indentation (inside a <script> every run of spaces was folded to one). {% endcomment %}
+<pre id="io-examples" hidden>{{ site.data.widget_examples | jsonify | escape }}</pre>
+<pre id="io-messages" hidden>{% if site.data.tutorial %}{{ site.data.tutorial.messages | jsonify | escape }}{% else %}{}{% endif %}</pre>
+<script src="{{ '/assets/js/vendor/mappia-cm6.min.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/mappia-editor.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/mappia-probe.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/mappia-live.js' | relative_url }}" data-catalogue="{{ site.maps.catalogue_queryid }}"></script>
 <script>
   (function () {
@@ -127,7 +133,16 @@ panel, and watch the message arrive.
     var frame = root.querySelector("iframe");
     var start = root.querySelector(".io-playground__start");
     var select = document.getElementById("io-example");
-    var queryBox = document.getElementById("io-query");
+    /* the shared editor (assets/js/mappia-editor.js): highlighting, line numbers, the parse check, Ctrl+Enter */
+    /* the tutorial's plain-English wording table for parse errors (_data/tutorial.json messages) */
+    var wording = {};
+    try { wording = JSON.parse(document.getElementById("io-messages").textContent) || {}; } catch (e) { wording = {}; }
+    var queryBox = MappiaEditor.create(document.getElementById("io-query"), {
+      messages: wording,
+      label: "Query text (JavaScript). Ctrl+Enter applies it. Esc then Tab leaves the editor.",
+      maxHeight: "340px",
+      onRun: function () { applyButton.click(); }
+    });
     var messageBox = document.getElementById("io-message");
     var applyButton = document.getElementById("io-apply");
     var sendButton = document.getElementById("io-send");
@@ -149,7 +164,7 @@ panel, and watch the message arrive.
     }
 
     function showExample() {
-      queryBox.value = (examples[select.value] || { query: "" }).query;
+      queryBox.setValue((examples[select.value] || { query: "" }).query);
     }
     select.addEventListener("change", showExample);
     /* ?example=<page id>: a tool page's "edit it in the playground" link opens with its example (a block comment: the compressed page is one line) */
@@ -164,13 +179,16 @@ panel, and watch the message arrive.
       root.classList.add("is-live");
       log.innerHTML = "";
       write("note", "Loading the map...");
-      /* catalogue: false - the playground applies any query, which may name any map */
-      MappiaLive.connect(frame, { catalogue: false }).then(function (connection) {
-        live = connection;
-        live.onMessage(function (msg) {
-          var isPlatform = typeof msg === "string" && msg.indexOf("mappia__") === 0;
-          write(isPlatform ? "platform" : "in", isPlatform ? "← platform" : "← from the map", msg);
-        });
+      /* catalogue: false - the playground applies any query, which may name any map. A session (assets/js/mappia-live.js)
+         answers every apply with what the map shows, so a broken query is told apart from a good one. */
+      var session = MappiaLive.session(frame, { catalogue: false });
+      session.onMessage(function (msg) {
+        if (msg && typeof msg === "object" && /^tutorial__/.test(msg.operation || "")) return; /* the session's own probe */
+        var isPlatform = (typeof msg === "string" && msg.indexOf("mappia__") === 0) || (msg && typeof msg === "object" && /^mappia__/.test(msg.action || ""));
+        write(isPlatform ? "platform" : "in", isPlatform ? "← platform" : "← from the map", msg);
+      });
+      session.ready.then(function () {
+        live = session;
         applyButton.disabled = false;
         sendButton.disabled = false;
         write("note", "Connected to " + live.origin + ". Applying the selected example...");
@@ -184,16 +202,41 @@ panel, and watch the message arrive.
 
     applyButton.addEventListener("click", function () {
       if (!live) return;
+      var text = queryBox.getValue();
+      var problem = MappiaEditor.problem(text, wording);
+      if (problem) {
+        write("error", "Not sent - " + problem.text);
+        return;
+      }
       applyButton.disabled = true;
-      write("out", "→ applyQuery", queryBox.value.length + " characters");
-      live.apply(queryBox.value, { view: (examples[select.value] || {}).view }).then(function () {
-        write("note", "Query applied.");
-      }).catch(function (error) {
-        write("error", error.message);
+      write("out", "→ applyQuery", text.length + " characters");
+      live.apply(text, { view: (examples[select.value] || {}).view }).then(function (result) {
+        if (result.superseded) return;
+        if (result.ok) {
+          var layers = result.snapshot.layers.map(function (layer) { return layer.title + (layer.visible ? "" : " (off)"); });
+          var missing = (result.snapshot.warnings || []).filter(function (w) { return /Could not create layer record|Error loading Source/.test(w); }).map(plainWarning);
+          write(missing.length ? "error" : "note", "Query applied: " + (layers.length ? layers.join(", ") : "no layer on the map") + "." + (missing.length ? " " + missing.join(" ") : ""));
+        } else if (result.error) {
+          write("error", result.error.kind === "timeout" ? result.error.message :
+            "The map could not run the query" + (result.error.line ? " (line " + result.error.line + ")" : "") + ": " + (result.error.name ? result.error.name + ": " : "") + result.error.message);
+        }
       }).then(function () {
         applyButton.disabled = false;
       });
     });
+
+    /* a platform warning in plain words, with the tutorial's wording table (messages.warnings: {match, message}) */
+    function plainWarning(text) {
+      var rules = (wording && wording.warnings) || [];
+      for (var i = 0; i < rules.length; i++) {
+        var m = null;
+        try { m = new RegExp(rules[i].match).exec(text); } catch (e) { m = null; }
+        if (!m) continue;
+        var values = Object.assign({ message: text }, m.groups || {});
+        return String(rules[i].message).replace(/\{(\w+)\}/g, function (all, key) { return values[key] !== undefined ? values[key] : all; });
+      }
+      return "The map says: " + text;
+    }
 
     function sendText(text) {
       var message;
@@ -230,6 +273,8 @@ panel, and watch the message arrive.
   .io-playground__panel h3 code { font-size: 13px; font-weight: 400; }
   .io-playground__label { display: block; font-size: 13px; color: #4b5563; margin: 6px 0 2px; }
   .io-playground__panel select, .io-playground__panel textarea { width: 100%; box-sizing: border-box; font-size: 13px; }
+  #io-examples, #io-messages { display: none !important; }
+  .io-playground__editor .cm-editor { font-size: 13px; }
   .io-playground__panel textarea { font-family: Menlo, Consolas, monospace; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 6px; }
   .io-playground__panel button { margin-top: 6px; padding: 5px 14px; border: 1px solid #277cea; border-radius: 6px; background: #fff;
     color: #277cea; font-weight: 600; cursor: pointer; }

@@ -164,7 +164,25 @@ messages — they delay them.
 Two of those platform messages also reach the parent's `addOnMessageCallback` handlers, as
 plain strings: `mappia__queryApplied` after every `applyQuery` — the way to know the new
 query is in place — and `mappia__confirmQueryListening` whenever a query registers its
-callback. Handlers should skip strings starting with `mappia__` they do not use. The waiting mechanism is the same one described in
+callback. Handlers should skip strings starting with `mappia__` they do not use.
+
+`mappia__queryApplied` also arrives when the query did not run (a syntax or runtime error, or
+a value that is not a list of layers), leaving an empty map. Such a query is announced first by
+an object, `{action: "mappia__queryError", error: {name, message, line, column}}` — line and
+column in the text you sent, when the browser gives them (it does for runtime errors, not for
+syntax errors). Check for it before trusting the confirmation:
+
+```javascript
+mappia.addOnMessageCallback(function (msg) {
+  if (msg && msg.action === "mappia__queryError") showProblem(msg.error.message, msg.error.line);
+  else if (msg === "mappia__queryApplied") markApplied();
+});
+```
+
+A page that must not depend on it (the message is new in 2026-10: an older map server sends
+only the confirmation) parses the text first, with the same wrapper as the platform —
+`new Function("return (function(){return true && " + text + "\n})()")` throws on a syntax
+error — and treats an empty map after a confirmation as suspect. The waiting mechanism is the same one described in
 [the execution model](/reference/execution-model/) §5.
 
 ## 7. A complete parent-side integration

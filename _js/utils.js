@@ -138,7 +138,12 @@ window.DocUtils = {
                         propertySelector.removeClass("hidden");
                         categorySelector.removeClass("hidden");
                     } else {
-                        var querySelector = "div:contains(" + filterText + ")";
+                        // Ignores case, and takes any text: a "div:contains(...)" selector was
+                        // case-sensitive and broke on quotes and parentheses.
+                        var lowerFilter = filterText.toLowerCase();
+                        var querySelector = function () {
+                            return $(this).text().toLowerCase().indexOf(lowerFilter) !== -1;
+                        };
                         var filteredProperties = propertySelector.filter(querySelector);
                         var filteredCategories = categorySelector.filter(querySelector);
                         var propertiesToHide = propertySelector.not(filteredProperties);
@@ -216,15 +221,16 @@ window.DocUtils = {
                     }
                 }
                 //  Obtem o elemento do indice referente ao container
-                let id = container.id;
-                let keyArray = id.split("_");
-                let key = keyArray[keyArray.length - 1];
-                let filterNode = document.querySelector(`[key="${key}"]`);
+                // The whole key after "category_": keys can hold "_" themselves (REQ_PARAMS).
+                let key = container.id.replace(/^category_/, "");
+                let filterNode = document.querySelector(`.index-item[key="${key}"]`);
                 const oldSelected = document.getElementsByClassName("currentApiTopic");
                 for (let i = 0; i < oldSelected.length; i++) {
                     oldSelected[i].classList.remove("currentApiTopic");
                 }
-                filterNode.classList.add("currentApiTopic");
+                if (filterNode) {
+                    filterNode.classList.add("currentApiTopic");
+                }
             } else {
                 const oldSelected = document.getElementsByClassName("currentApiTopic");
                 for (let i = 0; i < oldSelected.length; i++) {

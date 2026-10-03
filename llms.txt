@@ -6,6 +6,7 @@ Each page below is also served as markdown at the same path under /assets/refere
 
 ## Writing a query
 
+- [Where to find it: layers, settings and links](https://mappia.earth/assets/reference/where-to-look.md): Everything you change in a Mappia map is written in a layer, before the list of layers, or in the map's link. Find the place first: it tells you which part of the API reference to open.
 - [How a query is evaluated](https://mappia.earth/assets/reference/query-language.md): A query is plain JavaScript - one expression whose value is the list of layers to show. This page is the contract around it: how the platform evaluates it, where state lives, and which parts of it run in a worker instead of on the page.
 - [Execution model](https://mappia.earth/assets/reference/execution-model.md): What the platform does between reading a query and painting a tile — when each callback runs, what waits for what, and which code crosses into the calculation worker.
 
@@ -29,7 +30,7 @@ Each page below is also served as markdown at the same path under /assets/refere
 
 ## Generated API reference
 
-- [api.json](https://mappia.earth/assets/api.json): every documented member of the query API (838 entries: layer and group properties, widget parameters, URL options, helper functions), generated from the platform source.
+- [api.json](https://mappia.earth/assets/api.json): every documented member of the query API (845 entries: layer and group properties, widget parameters, URL options, helper functions), generated from the platform source.
 - [Browsable API](https://mappia.earth/api/): the same data as a page.
 
 ## Optional

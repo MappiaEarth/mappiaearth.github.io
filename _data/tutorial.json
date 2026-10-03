@@ -1,0 +1,796 @@
+{
+  "chapters": [
+    {
+      "id": "first-map",
+      "title": "Your first map",
+      "notes": "/tutorial/first-map/",
+      "steps": [
+        "turn-it-on",
+        "name-it",
+        "reader-switch",
+        "names-exist",
+        "one-expression"
+      ]
+    },
+    {
+      "id": "layers",
+      "title": "Layers and their properties",
+      "notes": "/tutorial/layers/",
+      "steps": [
+        "second-layer",
+        "see-through",
+        "starts-off"
+      ]
+    },
+    {
+      "id": "catalogue",
+      "title": "Where maps come from",
+      "notes": "/tutorial/where-maps-come-from/",
+      "steps": [
+        "catalogue-name"
+      ]
+    },
+    {
+      "id": "groups",
+      "title": "Organising layers in groups",
+      "notes": "/tutorial/groups/",
+      "steps": [
+        "menu-group",
+        "panel-heading",
+        "nest",
+        "defaults",
+        "your-map"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "turn-it-on",
+      "chapter": "first-map",
+      "title": "Turn it on",
+      "text_html": "A Mappia map is described by a <strong>query</strong>: a list of layers, written in JavaScript. This one has a single layer, the states of Brazil - a published map named <code>CSR:estados</code>. It starts switched off, so the map is empty.",
+      "task_html": "Change <code>visibility</code> to <code>true</code>, then press <strong>Run</strong>.",
+      "start": "// One layer: the states of Brazil\n[\n  {\n    name: \"CSR:estados\",\n    title: \"States\",\n    visibility: false,\n  },\n];",
+      "carry": false,
+      "solution": "// One layer: the states of Brazil\n[\n  {\n    name: \"CSR:estados\",\n    title: \"States\",\n    visibility: true,\n  },\n];",
+      "wrong": [
+        {
+          "query": "// One layer: the states of Brazil\n[\n  {\n    name: \"CSR:estados\",\n    title: \"States\",\n    visibility: True,\n  },\n];",
+          "expect": "lower case"
+        }
+      ],
+      "before": null,
+      "check": {
+        "layers": [
+          {
+            "name": "CSR:estados",
+            "visible": true
+          }
+        ]
+      },
+      "messages": {
+        "layers.CSR:estados.visible": "The States layer is still off: set visibility to true, then Run."
+      },
+      "hints_html": [
+        "<code>visibility</code> decides whether the layer is drawn when the map opens.",
+        "The line should read <code>visibility: true,</code> - lower case, no quotes."
+      ],
+      "highlight": [
+        "visibility"
+      ],
+      "chrome": "lean",
+      "view": [
+        -74,
+        -34,
+        -34.5,
+        5.5
+      ]
+    },
+    {
+      "id": "name-it",
+      "chapter": "first-map",
+      "title": "Give it a name",
+      "text_html": "<code>title</code> is the name the reader sees in the layer list and in the menus. <code>name</code> stays as it is: it points at the published map.",
+      "task_html": "Change the title to <code>&quot;States of Brazil&quot;</code> and Run.",
+      "start": null,
+      "carry": true,
+      "solution": "// One layer: the states of Brazil\n[\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+      "wrong": [
+        {
+          "query": "// One layer: the states of Brazil\n[\n  {\n    name: \"CSR:estados\",\n    title: States of Brazil,\n    visibility: true,\n  },\n];",
+          "expect": "quotes"
+        },
+        {
+          "query": "// One layer: the states of Brazil\n[\n  {\n    name: \"CSR:estados\",\n    title: \"Brazil\",\n    visibility: true,\n  },\n];",
+          "expect": "States of Brazil"
+        }
+      ],
+      "before": null,
+      "check": {
+        "layers": [
+          {
+            "name": "CSR:estados",
+            "visible": true,
+            "title": "States of Brazil"
+          }
+        ]
+      },
+      "messages": {
+        "layers.CSR:estados.title": "The title must read exactly States of Brazil - check the spelling and the capitals.",
+        "layers.CSR:estados.visible": "The layer is off again: keep visibility: true."
+      },
+      "hints_html": [
+        "Change only the text between the quotes after <code>title:</code>.",
+        "The line should read <code>title: &quot;States of Brazil&quot;,</code> - text keeps its quotes."
+      ],
+      "highlight": [
+        "title"
+      ],
+      "chrome": "lean",
+      "view": null
+    },
+    {
+      "id": "reader-switch",
+      "chapter": "first-map",
+      "title": "The reader decides",
+      "text_html": "Your query decides how the map <strong>opens</strong>: <code>visibility: true</code> means <em>States of Brazil</em> is drawn when the map starts. After that, whoever reads the map can switch each layer off and on with the map itself - the <strong>eye button</strong> on the layer's row, at the top left of the map, or <strong>Maps</strong>, the map's own menu bar along its top edge.",
+      "task_html": "No code this time. In the map on the right, hide <em>States of Brazil</em> with the eye button on its row, then show it again.",
+      "start": null,
+      "carry": true,
+      "solution": "// One layer: the states of Brazil\n[\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+      "wrong": [
+        {
+          "query": "// One layer: the states of Brazil\n[\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: false,\n  },\n];",
+          "expect": "Use the map itself"
+        }
+      ],
+      "before": null,
+      "check": {
+        "reader": [
+          {
+            "name": "CSR:estados",
+            "visible": false
+          },
+          {
+            "name": "CSR:estados",
+            "visible": true
+          }
+        ]
+      },
+      "messages": {
+        "reader": "Use the map itself: hide States of Brazil with the eye button on its row (top left of the map), then show it again.",
+        "pass": "Done: you switched the layer with the map itself, and the query did not change - visibility: true only decides how the map opens."
+      },
+      "hints_html": [
+        "Look inside the map: at its top left, the row <em>States of Brazil</em> has an eye button. Click it once to hide the layer, once more to show it.",
+        "Or click <strong>Maps</strong> in the thin bar along the top edge of the map (not this page's menus), then the switch next to <em>States of Brazil</em>, twice."
+      ],
+      "highlight": [],
+      "chrome": "full",
+      "view": null
+    },
+    {
+      "id": "names-exist",
+      "chapter": "first-map",
+      "title": "A name must exist",
+      "text_html": "<code>name</code> must be a map that the server publishes, written <code>WORKSPACE:map</code>. A name that is not in the catalogue is not drawn - the first thing to check when a layer is missing. Break it on purpose, to see the message you will get.",
+      "task_html": "Change the name to <code>&quot;CSR:does_not_exist&quot;</code>, Run, and read the message. The next step puts the map back.",
+      "start": null,
+      "carry": true,
+      "solution": "// One layer: the states of Brazil\n[\n  {\n    name: \"CSR:does_not_exist\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+      "wrong": [
+        {
+          "query": "// One layer: the states of Brazil\n[\n  {\n    name: \"CSR:estados\",\n    title: \"CSR:does_not_exist\",\n    visibility: true,\n  },\n];",
+          "expect": "name:"
+        }
+      ],
+      "before": null,
+      "check": {
+        "warningSeen": "Could not create layer record"
+      },
+      "messages": {
+        "warningSeen": "The name still points at a real map: change the text after name: (not the title) to CSR:does_not_exist, then Run."
+      },
+      "hints_html": [
+        "Only the text inside the quotes after <code>name:</code> changes.",
+        "The line should read <code>name: &quot;CSR:does_not_exist&quot;,</code>."
+      ],
+      "highlight": [
+        "name:"
+      ],
+      "chrome": "lean",
+      "view": null
+    },
+    {
+      "id": "one-expression",
+      "chapter": "first-map",
+      "title": "One expression, not a program",
+      "text_html": "The platform does not run a query line by line: it reads the whole text as <strong>one expression</strong>, whose value is the list of layers. A statement such as <code>var x = 1;</code> before the list breaks it. This page catches that before anything reaches the map.",
+      "task_html": "Type <code>var x = 1;</code> on a new line just before the <code>[</code> and Run: read the message. Then delete that line and Run again, so the map comes back.",
+      "start": "// The map from the first steps\n[\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+      "carry": false,
+      "solution": "// The map from the first steps\n[\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+      "wrong": [
+        {
+          "query": "// The map from the first steps\n// var x = 1;\n[\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+          "expect": "not as a comment"
+        },
+        {
+          "query": "// The map from the first steps\nvar x = 1;\n[\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+          "expect": "delete the line"
+        }
+      ],
+      "before": "// The map from the first steps\nvar x = 1;\n[\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+      "check": {
+        "parseErrorSeen": true,
+        "layers": [
+          {
+            "name": "CSR:estados",
+            "visible": true
+          }
+        ]
+      },
+      "messages": {
+        "parseErrorSeen": "The query ran without a problem. Type var x = 1; on its own line before the [ (not as a comment), then Run.",
+        "parseErrorSeenNext": "Good, that is the message. Now delete the line var x = 1; and Run again, so the map comes back.",
+        "layers.CSR:estados.present": "The states are not back on the map yet: keep their { } entry, delete only the line var x = 1;, then Run.",
+        "pass": "Done: a statement broke the query, and without it the query is one expression again - the map is back."
+      },
+      "hints_html": [
+        "Put the cursor at the start of the <code>[</code> line, type <code>var x = 1;</code> and press Enter, then Run.",
+        "After the message, delete the whole line <code>var x = 1;</code> - the query starts with the <code>[</code> again - and Run."
+      ],
+      "highlight": [
+        "["
+      ],
+      "chrome": "lean",
+      "view": [
+        -74,
+        -34,
+        -34.5,
+        5.5
+      ]
+    },
+    {
+      "id": "second-layer",
+      "chapter": "layers",
+      "title": "A second layer",
+      "text_html": "A map is usually several maps on top of each other. Each entry of the list, between <code>{ }</code>, is one layer, and entries are separated by commas. The first entry is drawn on top: the relief you add will cover the state borders - the next step fixes that.",
+      "task_html": "Add <code>{ name: &quot;CSR:altimetria&quot;, title: &quot;Elevation&quot;, visibility: true }</code> as the first entry of the list, then Run.",
+      "start": "// Each entry of the list is one layer\n[\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+      "carry": false,
+      "solution": "// Each entry of the list is one layer\n[\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+      "wrong": [
+        {
+          "query": "// Each entry of the list is one layer\n[\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n  }\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+          "expect": "comma"
+        },
+        {
+          "query": "// Each entry of the list is one layer\n[\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n  },\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+          "expect": "switched off"
+        },
+        {
+          "query": "// Each entry of the list is one layer\n[\n  {\n    name: \"CSR:altimetry\",\n    title: \"Elevation\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+          "expect": "There is no"
+        },
+        {
+          "query": "// Each entry of the list is one layer\n[\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n  },\n];",
+          "expect": "first entry"
+        }
+      ],
+      "before": null,
+      "check": {
+        "layers": [
+          {
+            "name": "CSR:altimetria",
+            "visible": true,
+            "above": "CSR:estados"
+          },
+          {
+            "name": "CSR:estados",
+            "visible": true
+          }
+        ]
+      },
+      "messages": {
+        "layers.CSR:altimetria.above": "Elevation is drawn under the states: move its { } entry before the States entry - the first entry of the list is drawn on top.",
+        "layers.CSR:altimetria": "There is no Elevation layer on the map yet. Its name is CSR:altimetria - copy it exactly.",
+        "layers.CSR:altimetria.visible": "Elevation is in the list but switched off: add visibility: true to it.",
+        "layers.CSR:estados": "The States layer went missing: keep its { } entry in the list.",
+        "layers.CSR:estados.visible": "The States layer is off: keep its visibility: true."
+      },
+      "hints_html": [
+        "Copy the whole <code>{ ... },</code> block of the states, paste it right after the <code>[</code>, then change its name and title.",
+        "Between the two <code>{ }</code> blocks there must be a comma: <code>},</code> then <code>{</code>."
+      ],
+      "highlight": [
+        "["
+      ],
+      "chrome": "lean",
+      "view": [
+        -74,
+        -34,
+        -34.5,
+        5.5
+      ]
+    },
+    {
+      "id": "see-through",
+      "chapter": "layers",
+      "title": "Half transparent",
+      "text_html": "<code>opacity</code> goes from 0 (invisible) to 1 (opaque) - a fraction, not a percentage. Below 1, what is under the layer shows through: here the state borders and the basemap's towns, under the relief.",
+      "task_html": "Make the Elevation layer half transparent, then Run.",
+      "start": null,
+      "carry": true,
+      "solution": "// Each entry of the list is one layer\n[\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n    opacity: 0.5,\n  },\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+      "wrong": [
+        {
+          "query": "// Each entry of the list is one layer\n[\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n    opacity: 50,\n  },\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n];",
+          "expect": "between 0.3 and 0.7"
+        },
+        {
+          "query": "// Each entry of the list is one layer\n[\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n    opacity: 0.5,\n  },\n];",
+          "expect": "between 0.3 and 0.7"
+        }
+      ],
+      "before": null,
+      "check": {
+        "layers": [
+          {
+            "name": "CSR:altimetria",
+            "visible": true,
+            "opacity": [
+              0.3,
+              0.7
+            ]
+          },
+          {
+            "name": "CSR:estados",
+            "visible": true
+          }
+        ]
+      },
+      "messages": {
+        "layers.CSR:altimetria.opacity": "The Elevation layer's opacity must be between 0.3 and 0.7: 0 is invisible, 1 is opaque (it is not a percentage).",
+        "layers.CSR:estados.visible": "The States layer is off: keep its visibility: true."
+      },
+      "hints_html": [
+        "Add a property to the Elevation entry - the one on top - next to its <code>visibility</code>.",
+        "Add the line <code>opacity: 0.5,</code> inside the Elevation <code>{ }</code> - a number, without quotes."
+      ],
+      "highlight": [
+        "CSR:altimetria"
+      ],
+      "chrome": "lean",
+      "view": null
+    },
+    {
+      "id": "starts-off",
+      "chapter": "layers",
+      "title": "A layer the reader turns on",
+      "text_html": "A layer can start switched off and wait in the top menu until the reader wants it. That keeps the first view simple. Here: the forest biomass of the Amazon.",
+      "task_html": "Add <code>{ name: &quot;CSR:biomassa_baccini_bioma_am&quot;, title: &quot;Forest biomass (Amazon)&quot;, visibility: false }</code> at the end of the list and Run. Then switch it on from <strong>Maps</strong>, the menu bar along the top edge of the map - a layer that is off has no row with an eye button yet.",
+      "start": null,
+      "carry": true,
+      "solution": "// Each entry of the list is one layer\n[\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n    opacity: 0.5,\n  },\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:biomassa_baccini_bioma_am\",\n    title: \"Forest biomass (Amazon)\",\n    visibility: false,\n  },\n];",
+      "wrong": [
+        {
+          "query": "// Each entry of the list is one layer\n[\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n    opacity: 0.5,\n  },\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:biomassa_baccini_bioma_am\",\n    title: \"Forest biomass (Amazon)\",\n    visibility: true,\n  },\n];",
+          "expect": "from Maps"
+        }
+      ],
+      "before": null,
+      "check": {
+        "layers": [
+          {
+            "name": "CSR:biomassa_baccini_bioma_am"
+          }
+        ],
+        "reader": [
+          {
+            "name": "CSR:biomassa_baccini_bioma_am",
+            "visible": true
+          }
+        ]
+      },
+      "messages": {
+        "layers.CSR:biomassa_baccini_bioma_am": "The biomass layer is not on the map yet: add its { } entry at the end of the list, with a comma before it.",
+        "reader": "Leave it off in the query, then switch on Forest biomass (Amazon) from Maps, the menu bar along the top edge of the map."
+      },
+      "hints_html": [
+        "The new <code>{ ... },</code> entry goes just before the final <code>];</code> - check there is a comma after the <code>}</code> above it.",
+        "Keep <code>visibility: false</code> in the query; the switch in <strong>Maps</strong> turns it on."
+      ],
+      "highlight": [
+        "];"
+      ],
+      "chrome": "full",
+      "view": null
+    },
+    {
+      "id": "catalogue-name",
+      "chapter": "catalogue",
+      "title": "Names come from the catalogue",
+      "text_html": "The map server publishes a <strong>catalogue</strong> of its maps, each with a name such as <code>CSR:altimetria</code>. A layer's <code>name</code> must be one of them, copied exactly. Each map also covers its own region. Some names in this tutorial's catalogue: <code>CSR:bioma_cerrado_declividade</code> (slope, Cerrado), <code>CSR:biomassa_baccini_bioma_am</code> (forest biomass, Amazon), <code>CSR:precip_annual_average</code> (annual rainfall, Mozambique).",
+      "task_html": "Add the slope of the Cerrado, <code>CSR:bioma_cerrado_declividade</code>, titled &quot;Slope (Cerrado)&quot;, as the first entry - on top of the others - and Run.",
+      "start": "// The map so far: three layers\n[\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n    opacity: 0.5,\n  },\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:biomassa_baccini_bioma_am\",\n    title: \"Forest biomass (Amazon)\",\n    visibility: false,\n  },\n];",
+      "carry": false,
+      "solution": "// The map so far: three layers\n[\n  {\n    name: \"CSR:bioma_cerrado_declividade\",\n    title: \"Slope (Cerrado)\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n    opacity: 0.5,\n  },\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:biomassa_baccini_bioma_am\",\n    title: \"Forest biomass (Amazon)\",\n    visibility: false,\n  },\n];",
+      "wrong": [
+        {
+          "query": "// The map so far: three layers\n[\n  {\n    name: \"CSR:slope\",\n    title: \"Slope (Cerrado)\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n    opacity: 0.5,\n  },\n  {\n    name: \"CSR:estados\",\n    title: \"States of Brazil\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:biomassa_baccini_bioma_am\",\n    title: \"Forest biomass (Amazon)\",\n    visibility: false,\n  },\n];",
+          "expect": "There is no"
+        }
+      ],
+      "before": null,
+      "check": {
+        "layers": [
+          {
+            "name": "CSR:bioma_cerrado_declividade",
+            "visible": true
+          }
+        ]
+      },
+      "messages": {
+        "layers.CSR:bioma_cerrado_declividade": "There is no slope layer on the map yet. Copy its name exactly: CSR:bioma_cerrado_declividade.",
+        "layers.CSR:bioma_cerrado_declividade.visible": "The slope layer is switched off: add visibility: true."
+      },
+      "hints_html": [
+        "Names are copied from the catalogue, not guessed: workspace, colon, map.",
+        "Right after the <code>[</code>, add <code>{ name: &quot;CSR:bioma_cerrado_declividade&quot;, title: &quot;Slope (Cerrado)&quot;, visibility: true },</code>."
+      ],
+      "highlight": [
+        "["
+      ],
+      "chrome": "lean",
+      "view": [
+        -74,
+        -34,
+        -34.5,
+        5.5
+      ]
+    },
+    {
+      "id": "menu-group",
+      "chapter": "groups",
+      "title": "A group in the top menu",
+      "text_html": "A real map has dozens of layers; groups organise them. A group with a <code>title</code> becomes an <strong>entry of the top menu</strong>, and its layers go in <code>elements</code>, a list like the query itself.",
+      "task_html": "Wrap the States layer in <code>{ title: &quot;Boundaries&quot;, elements: [ ... ] }</code>, Run, and open <em>Boundaries</em> in the top menu.",
+      "start": "// Relief and borders, not organised yet\n[\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:bioma_cerrado_declividade\",\n    title: \"Slope (Cerrado)\",\n  },\n  {\n    name: \"CSR:estados\",\n    title: \"States\",\n    visibility: true,\n    opacity: 0.5,\n  },\n];",
+      "carry": false,
+      "solution": "// Relief and borders, not organised yet\n[\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:bioma_cerrado_declividade\",\n    title: \"Slope (Cerrado)\",\n  },\n  {\n    title: \"Boundaries\",\n    elements: [\n      {\n        name: \"CSR:estados\",\n        title: \"States\",\n        visibility: true,\n        opacity: 0.5,\n      },\n    ],\n  },\n];",
+      "wrong": [
+        {
+          "query": "// Relief and borders, not organised yet\n[\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:bioma_cerrado_declividade\",\n    title: \"Slope (Cerrado)\",\n  },\n  {\n    viewTitle: \"Boundaries\",\n    elements: [\n      {\n        name: \"CSR:estados\",\n        title: \"States\",\n        visibility: true,\n        opacity: 0.5,\n      },\n    ],\n  },\n];",
+          "expect": "top menu"
+        },
+        {
+          "query": "// Relief and borders, not organised yet\n[\n  {\n    name: \"CSR:altimetria\",\n    title: \"Elevation\",\n    visibility: true,\n  },\n  {\n    name: \"CSR:bioma_cerrado_declividade\",\n    title: \"Slope (Cerrado)\",\n  },\n  {\n    title: \"Boundaries\",\n    name: \"CSR:estados\",\n    visibility: true,\n    opacity: 0.5,\n  },\n];",
+          "expect": "top menu"
+        }
+      ],
+      "before": null,
+      "check": {
+        "layers": [
+          {
+            "name": "CSR:estados",
+            "visible": true,
+            "menu": "Boundaries"
+          }
+        ]
+      },
+      "messages": {
+        "layers.CSR:estados.menu": "States is not under Boundaries in the top menu yet: the group needs title: \"Boundaries\" and elements: [ ... ] around the layer.",
+        "layers.CSR:estados": "The States layer went missing: its whole { } entry goes inside elements: [ ... ]."
+      },
+      "hints_html": [
+        "The group is an entry of the list too: <code>{ title: &quot;Boundaries&quot;, elements: [</code> before the States block, <code>] },</code> after it.",
+        "Inside <code>elements: [ ... ]</code> the States block stays exactly as it was."
+      ],
+      "highlight": [
+        "CSR:estados"
+      ],
+      "chrome": "full",
+      "view": [
+        -74,
+        -34,
+        -34.5,
+        5.5
+      ]
+    },
+    {
+      "id": "panel-heading",
+      "chapter": "groups",
+      "title": "A heading in the layer panel",
+      "text_html": "A group with <code>viewTitle</code> instead of <code>title</code> is a <strong>heading in the layer panel</strong>, above those of its layers that are on. <code>openGroup: true</code> starts it expanded.",
+      "task_html": "Wrap Elevation and Slope in <code>{ viewTitle: &quot;Terrain&quot;, openGroup: true, elements: [ ... ] }</code> and Run.",
+      "start": null,
+      "carry": true,
+      "solution": "// Relief and borders, not organised yet\n[\n  {\n    viewTitle: \"Terrain\",\n    openGroup: true,\n    elements: [\n      {\n        name: \"CSR:altimetria\",\n        title: \"Elevation\",\n        visibility: true,\n      },\n      {\n        name: \"CSR:bioma_cerrado_declividade\",\n        title: \"Slope (Cerrado)\",\n      },\n    ],\n  },\n  {\n    title: \"Boundaries\",\n    elements: [\n      {\n        name: \"CSR:estados\",\n        title: \"States\",\n        visibility: true,\n        opacity: 0.5,\n      },\n    ],\n  },\n];",
+      "wrong": [
+        {
+          "query": "// Relief and borders, not organised yet\n[\n  {\n    title: \"Terrain\",\n    openGroup: true,\n    elements: [\n      {\n        name: \"CSR:altimetria\",\n        title: \"Elevation\",\n        visibility: true,\n      },\n      {\n        name: \"CSR:bioma_cerrado_declividade\",\n        title: \"Slope (Cerrado)\",\n      },\n    ],\n  },\n  {\n    title: \"Boundaries\",\n    elements: [\n      {\n        name: \"CSR:estados\",\n        title: \"States\",\n        visibility: true,\n        opacity: 0.5,\n      },\n    ],\n  },\n];",
+          "expect": "viewTitle"
+        }
+      ],
+      "before": null,
+      "check": {
+        "layers": [
+          {
+            "name": "CSR:altimetria",
+            "panel": "Terrain"
+          },
+          {
+            "name": "CSR:bioma_cerrado_declividade",
+            "panel": "Terrain"
+          },
+          {
+            "name": "CSR:estados",
+            "menu": "Boundaries"
+          }
+        ]
+      },
+      "messages": {
+        "layers.CSR:altimetria.panel": "Elevation has no Terrain heading in the layer panel: use viewTitle: \"Terrain\" (a title makes a top-menu entry instead).",
+        "layers.CSR:bioma_cerrado_declividade.panel": "Slope is not under the Terrain heading: put its { } entry inside the same elements: [ ... ] as Elevation.",
+        "layers.CSR:estados.menu": "Keep the Boundaries group of the previous step around States."
+      },
+      "hints_html": [
+        "One group holds both layers: <code>{ viewTitle: &quot;Terrain&quot;, openGroup: true, elements: [</code> before Elevation, <code>] },</code> after Slope.",
+        "Use <code>viewTitle</code>, not <code>title</code>: <code>title</code> makes a top-menu entry."
+      ],
+      "highlight": [
+        "CSR:altimetria",
+        "CSR:bioma_cerrado_declividade"
+      ],
+      "chrome": "full",
+      "view": null
+    },
+    {
+      "id": "nest",
+      "chapter": "groups",
+      "title": "Groups inside groups",
+      "text_html": "Groups nest: a group's <code>elements</code> can hold layers or other groups. A top-menu group around the Terrain heading gives both - an entry in the top menu and a heading in the panel. Its <code>color</code> colours the menu entry and the rows of its layers.",
+      "task_html": "Put the whole Terrain group inside <code>{ title: &quot;Relief&quot;, color: &quot;#8d4925&quot;, elements: [ ... ] }</code>, Run, and open <em>Relief</em> in the top menu.",
+      "start": null,
+      "carry": true,
+      "solution": "// Relief and borders, not organised yet\n[\n  {\n    title: \"Relief\",\n    color: \"#8d4925\",\n    elements: [\n      {\n        viewTitle: \"Terrain\",\n        openGroup: true,\n        elements: [\n          {\n            name: \"CSR:altimetria\",\n            title: \"Elevation\",\n            visibility: true,\n          },\n          {\n            name: \"CSR:bioma_cerrado_declividade\",\n            title: \"Slope (Cerrado)\",\n          },\n        ],\n      },\n    ],\n  },\n  {\n    title: \"Boundaries\",\n    elements: [\n      {\n        name: \"CSR:estados\",\n        title: \"States\",\n        visibility: true,\n        opacity: 0.5,\n      },\n    ],\n  },\n];",
+      "wrong": [
+        {
+          "query": "// Relief and borders, not organised yet\n[\n  {\n    title: \"Relief\",\n    color: \"#8d4925\",\n    elements: [\n      {\n        name: \"CSR:altimetria\",\n        title: \"Elevation\",\n        visibility: true,\n      },\n      {\n        name: \"CSR:bioma_cerrado_declividade\",\n        title: \"Slope (Cerrado)\",\n      },\n    ],\n  },\n  {\n    title: \"Boundaries\",\n    elements: [\n      {\n        name: \"CSR:estados\",\n        title: \"States\",\n        visibility: true,\n        opacity: 0.5,\n      },\n    ],\n  },\n];",
+          "expect": "Terrain heading"
+        }
+      ],
+      "before": null,
+      "check": {
+        "layers": [
+          {
+            "name": "CSR:altimetria",
+            "menu": "Relief",
+            "panel": "Terrain"
+          },
+          {
+            "name": "CSR:bioma_cerrado_declividade",
+            "menu": "Relief",
+            "panel": "Terrain"
+          }
+        ]
+      },
+      "messages": {
+        "layers.CSR:altimetria.menu": "Elevation is not under Relief in the top menu: wrap the Terrain group in { title: \"Relief\", elements: [ ... ] }.",
+        "layers.CSR:bioma_cerrado_declividade.menu": "Slope is not under Relief in the top menu: it belongs in the Terrain group, inside Relief.",
+        "layers.CSR:altimetria.panel": "Keep the Terrain heading: the whole { viewTitle: \"Terrain\", ... } group goes inside Relief's elements.",
+        "layers.CSR:bioma_cerrado_declividade.panel": "Keep the Terrain heading: the whole { viewTitle: \"Terrain\", ... } group goes inside Relief's elements."
+      },
+      "hints_html": [
+        "The same move as Boundaries, one level up: Relief's <code>elements</code> holds the Terrain group.",
+        "<code>{ title: &quot;Relief&quot;, color: &quot;#8d4925&quot;, elements: [</code> before <code>{ viewTitle: &quot;Terrain&quot;</code>, and <code>] },</code> after the Terrain group's closing <code>},</code>."
+      ],
+      "highlight": [
+        "viewTitle"
+      ],
+      "chrome": "full",
+      "view": null
+    },
+    {
+      "id": "defaults",
+      "chapter": "groups",
+      "title": "Properties a group shares",
+      "text_html": "<code>defaultProperties</code> on a group is given to every layer inside it - unless the layer sets the property itself. Use it for what a whole theme shares: an opacity, a starting state.",
+      "task_html": "Give the Terrain group <code>defaultProperties: { visibility: false, opacity: 0.7 }</code> and Run. Elevation keeps its own <code>visibility: true</code>.",
+      "start": null,
+      "carry": true,
+      "solution": "// Relief and borders, not organised yet\n[\n  {\n    title: \"Relief\",\n    color: \"#8d4925\",\n    elements: [\n      {\n        viewTitle: \"Terrain\",\n        openGroup: true,\n        defaultProperties: { visibility: false, opacity: 0.7 },\n        elements: [\n          {\n            name: \"CSR:altimetria\",\n            title: \"Elevation\",\n            visibility: true,\n          },\n          {\n            name: \"CSR:bioma_cerrado_declividade\",\n            title: \"Slope (Cerrado)\",\n          },\n        ],\n      },\n    ],\n  },\n  {\n    title: \"Boundaries\",\n    elements: [\n      {\n        name: \"CSR:estados\",\n        title: \"States\",\n        visibility: true,\n        opacity: 0.5,\n      },\n    ],\n  },\n];",
+      "wrong": [
+        {
+          "query": "// Relief and borders, not organised yet\n[\n  {\n    title: \"Relief\",\n    color: \"#8d4925\",\n    elements: [\n      {\n        viewTitle: \"Terrain\",\n        openGroup: true,\n        elements: [\n          {\n            name: \"CSR:altimetria\",\n            title: \"Elevation\",\n            visibility: true,\n            opacity: 0.7,\n          },\n          {\n            name: \"CSR:bioma_cerrado_declividade\",\n            title: \"Slope (Cerrado)\",\n          },\n        ],\n      },\n    ],\n  },\n  {\n    title: \"Boundaries\",\n    elements: [\n      {\n        name: \"CSR:estados\",\n        title: \"States\",\n        visibility: true,\n        opacity: 0.5,\n      },\n    ],\n  },\n];",
+          "expect": "defaultProperties"
+        }
+      ],
+      "before": null,
+      "check": {
+        "layers": [
+          {
+            "name": "CSR:altimetria",
+            "visible": true,
+            "opacity": [
+              0.65,
+              0.75
+            ]
+          },
+          {
+            "name": "CSR:bioma_cerrado_declividade",
+            "visible": false,
+            "opacity": [
+              0.65,
+              0.75
+            ]
+          }
+        ]
+      },
+      "messages": {
+        "layers.CSR:bioma_cerrado_declividade.opacity": "Slope did not get the shared opacity: put defaultProperties: { ... } on the Terrain group, next to its viewTitle.",
+        "layers.CSR:altimetria.opacity": "Elevation did not get the shared opacity: defaultProperties goes on the Terrain group, which holds it.",
+        "layers.CSR:altimetria.visible": "Elevation should stay on: its own visibility: true wins over the group's default.",
+        "layers.CSR:bioma_cerrado_declividade.visible": "Slope should start off: the group's defaultProperties sets visibility: false."
+      },
+      "hints_html": [
+        "<code>defaultProperties</code> is a property of the group, next to <code>viewTitle</code> and <code>openGroup</code>.",
+        "Add the line <code>defaultProperties: { visibility: false, opacity: 0.7 },</code> under <code>openGroup: true,</code>."
+      ],
+      "highlight": [
+        "viewTitle"
+      ],
+      "chrome": "lean",
+      "view": null
+    },
+    {
+      "id": "your-map",
+      "chapter": "groups",
+      "title": "Make it yours",
+      "text_html": "That is the core of every Mappia map: layers with a name and their properties, organised in groups. This last step has no task to check - change anything you like and Run. The next chapters (servers, calculated maps, controls) build on this map.",
+      "task_html": "Change any title, opacity or group, Run, and look at the map. Copy the query when you are happy with it.",
+      "start": null,
+      "carry": true,
+      "solution": "// Relief and borders, not organised yet\n[\n  {\n    title: \"Relief\",\n    color: \"#8d4925\",\n    elements: [\n      {\n        viewTitle: \"Terrain\",\n        openGroup: true,\n        defaultProperties: { visibility: false, opacity: 0.7 },\n        elements: [\n          {\n            name: \"CSR:altimetria\",\n            title: \"Elevation\",\n            visibility: true,\n          },\n          {\n            name: \"CSR:bioma_cerrado_declividade\",\n            title: \"Slope (Cerrado)\",\n          },\n        ],\n      },\n    ],\n  },\n  {\n    title: \"Boundaries\",\n    elements: [\n      {\n        name: \"CSR:estados\",\n        title: \"My states\",\n        visibility: true,\n        opacity: 0.5,\n      },\n    ],\n  },\n];",
+      "wrong": [
+        {
+          "query": "// Relief and borders, not organised yet\n[\n  {\n    title: \"Relief\",\n    color: \"#8d4925\",\n    elements: [\n      {\n        viewTitle: \"Terrain\",\n        openGroup: true,\n        defaultProperties: { visibility: false, opacity: 0.7 },\n        elements: [\n          {\n            name: \"CSR:altimetria\",\n            title: \"Elevation\",\n            visibility: true,\n          },\n          {\n            name: \"CSR:bioma_cerrado_declividade\",\n            title: \"Slope (Cerrado)\",\n          },\n        ],\n      },\n    ],\n  },\n  {\n    title: \"Boundaries\",\n    elements: [\n      {\n        name: \"CSR:estados\",\n        title: myTitle,\n        visibility: true,\n        opacity: 0.5,\n      },\n    ],\n  },\n];",
+          "expect": "myTitle"
+        }
+      ],
+      "before": null,
+      "check": {
+        "free": true
+      },
+      "messages": {},
+      "hints_html": [
+        "Try a new <code>color</code> for Relief, or another opacity for Boundaries.",
+        "If something breaks, the message says which line - and the last working map stays on screen."
+      ],
+      "highlight": [],
+      "chrome": "lean",
+      "view": null
+    }
+  ],
+  "messages": {
+    "parse": [
+      {
+        "match": "^The query is empty",
+        "message": "The query is empty. A query is a list of layers: it needs at least [ and ]."
+      },
+      {
+        "match": "is not complete|still open",
+        "message": "The query is not complete: a ], } or quote is still open. Every [ needs its ], every { its }."
+      },
+      {
+        "match": "^Unexpected token",
+        "where": "end",
+        "message": "The query is not complete: a ], } or quote is still open. Every [ needs its ], every { its }."
+      },
+      {
+        "match": "^Unexpected (token|keyword)",
+        "token": "^(var|let|const|function|if|for|while|return)$",
+        "message": "Line {line}: a query is one expression - the list of layers - so it cannot contain a statement like `{token} ...;`. Values shared by the query are declared with setQueryGlobalProperties, joined to the list with &&."
+      },
+      {
+        "match": "^Unexpected token",
+        "token": "^[\\]})]$",
+        "where": "line-start",
+        "message": "Line {line} closes with {token}, but something above is not closed the same way. Check that every { has its } and every [ its ], in that order."
+      },
+      {
+        "match": "^Unexpected token",
+        "where": "line-start",
+        "message": "Something is missing at the end of line {prevLine} - often a comma. Each property, and each layer { }, ends with a comma."
+      },
+      {
+        "match": "^Unexpected token",
+        "token": "^;$",
+        "message": "Line {line}: inside { } a property ends with a comma, not a semicolon."
+      },
+      {
+        "match": "^Unexpected token",
+        "token": "^[\\]})]$",
+        "message": "Line {line}: this {token} does not match an opening bracket - one too many here, or one missing before it."
+      },
+      {
+        "match": "^Unexpected token",
+        "message": "Line {line}, near `{token}`: this is not valid here. Text needs quotes (\"like this\"), and each property ends with a comma."
+      },
+      {
+        "match": "^Unexpected character '(?<char>[“”‘’])'",
+        "message": "Line {line}: curly quotes ({char}) come from word processors. Type straight quotes (\") instead."
+      },
+      {
+        "match": "^Unexpected character '(?<char>.+)'",
+        "message": "Line {line}: the character {char} is not allowed here."
+      },
+      {
+        "match": "^Unterminated string constant",
+        "message": "Line {line}: a text has no closing quote. Add the \" at its end."
+      },
+      {
+        "match": "^Unterminated comment",
+        "message": "Line {line}: a /* comment is never closed with */."
+      },
+      {
+        "match": "^Identifier directly after number",
+        "message": "Line {line}: a number is followed by letters. A number has digits only (0.5); text goes in quotes."
+      },
+      {
+        "match": "^Shorthand property assignments",
+        "message": "Line {line}: write a colon between a property and its value (title: \"States\"), not an equals sign."
+      },
+      {
+        "match": "^Unexpected keyword '(?<word>[^']+)'",
+        "message": "Line {line}: `{word}` is a reserved word of JavaScript and cannot be used here."
+      },
+      {
+        "match": "^(?<original>.+)$",
+        "message": "Line {line}: the query is not valid JavaScript here ({original})."
+      }
+    ],
+    "runtime": [
+      {
+        "match": "^ReferenceError: (?<name>True|False|TRUE|FALSE|Null|NULL) is not defined",
+        "message": "Line {line}: JavaScript only knows true, false and null in lower case - `{name}` is not one of them."
+      },
+      {
+        "match": "^ReferenceError: (?<name>[\\w$]+) is not defined",
+        "message": "Line {line}: `{name}` is not a value Mappia knows. Text needs quotes (\"{name}\"); a name shared by the query must be declared before the list, with setQueryGlobalProperties."
+      },
+      {
+        "match": "^TypeError: [\\w$.]*\\.map is not a function|is not iterable",
+        "message": "The query must end with the list of layers [ ... ]. In an && chain, the last part is the list."
+      },
+      {
+        "match": "^TypeError: (?:[\\w$]+\\.)*(?<name>[\\w$]+) is not a function",
+        "message": "Line {line}: `{name}` is not a function Mappia has. Check its spelling - the API reference lists them."
+      },
+      {
+        "match": "^TypeError: Cannot read propert(y|ies) (of (undefined|null) )?\\(?reading '(?<name>[^']+)'\\)?",
+        "message": "Line {line}: the query reads `{name}` from something that does not exist (yet)."
+      },
+      {
+        "match": "^(?<original>.+)$",
+        "message": "The map could not run the query: {original}"
+      }
+    ],
+    "warnings": [
+      {
+        "match": "Could not create layer record for layer '(?<typed>[^']+)'",
+        "message": "There is no map called {typed} in the catalogue - check its spelling."
+      },
+      {
+        "match": "^Error loading Source: (?<name>.+)$",
+        "message": "The map server \"{name}\" did not answer - this is not your mistake. Press Run again in a moment."
+      },
+      {
+        "match": "^Source (?<name>.+) will be ignored$",
+        "message": "The layers of the server \"{name}\" are left out because it did not answer."
+      }
+    ]
+  },
+  "catalogue_queryid": ""
+}

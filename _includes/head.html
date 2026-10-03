@@ -43,6 +43,8 @@
   </style>
   <link rel="preload" href="/assets/css/alertify.css" as="style" onload="this.rel='stylesheet'">
   <link rel="preload" href="/assets/css/main.css" as="style" onload="this.rel='stylesheet'">
+  {% comment %} Pages that print API entries (api.html, api-groups.html): their styles, outside the precompiled main.css. {% endcomment %}
+  {% if page.api or page.apiConfig %}<link rel="stylesheet" href="/assets/css/api-ref.css">{% endif %}
   <script src="/assets/js/alertify.min.js" type="text/javascript"></script>
   <noscript><link rel="stylesheet" href="/assets/css/main.css"></noscript>
   <script type="text/javascript">

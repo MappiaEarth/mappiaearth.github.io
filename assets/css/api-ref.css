@@ -1,0 +1,178 @@
+/* The API reference: /api/ (_includes/api.html) and the "Reference" block of the tool pages
+   (_includes/api-groups.html), both made of _includes/api-group.html + api-entry.html.
+   A file of its own because assets/css/main.css is precompiled (the gulp pipeline does not run);
+   every class here is api-*, and main.css's element rules that reach this markup (pre, code,
+   summary, p, h4, input) are set explicitly below. Linked from head.html on pages with an API. */
+
+.api-ref {
+  --api-ink: #1f2937; --api-muted: #5b6472; --api-line: #e3e6eb; --api-soft: #f5f7fa;
+  --api-brand: #277cea; --api-brand-ink: #3d4e8c; --api-type: #6258fd; --api-hit: #fff3b0;
+  --api-bar-h: 56px; --api-toc-w: 290px; --api-mono: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  color: var(--api-ink);
+}
+.api-ref *, .api-ref *::before, .api-ref *::after { box-sizing: border-box; }
+
+/* ---- sticky bar ---- */
+.api-bar { position: sticky; top: 0; z-index: 20; height: var(--api-bar-h); display: flex; align-items: center; gap: 12px;
+  padding: 0 4px; background: #fff; border-bottom: 1px solid var(--api-line); }
+.api-bar button, .api-ref .api-toc__close { height: 34px; padding: 0 12px; font: inherit; font-size: 14px; color: var(--api-ink);
+  border: 1px solid #c9ced6; border-radius: 6px; background: #fff; cursor: pointer; white-space: nowrap; }
+.api-bar button:hover { border-color: var(--api-brand); color: var(--api-brand); }
+.api-bar button:disabled, .api-bar button:disabled:hover { opacity: .45; cursor: default; color: var(--api-ink); border-color: #c9ced6; background: #fff; }
+.api-bar__toc { display: none; }
+.api-search { position: relative; flex: 0 0 auto; width: calc(var(--api-toc-w) - 12px); }
+.api-ref .api-search input { display: block; width: 100%; height: 38px; margin: 0; padding: 0 34px 0 12px; font: inherit; font-size: 15px;
+  line-height: normal; color: var(--api-ink); border: 1px solid #c9ced6; border-radius: 6px; background: var(--api-soft); }
+.api-ref .api-search input:focus { outline: 2px solid var(--api-brand); outline-offset: -1px; background: #fff; border-color: #c9ced6; }
+.api-search kbd { position: absolute; right: 9px; top: 9px; font: 12px/18px var(--api-mono); padding: 0 6px; border: 1px solid #c9ced6;
+  border-radius: 4px; color: var(--api-muted); background: #fff; pointer-events: none; }
+.api-search input:focus + kbd { display: none; }
+.api-search__results { position: absolute; top: 44px; left: 0; width: min(660px, calc(100vw - 32px)); max-height: min(72vh, 660px); overflow: auto;
+  background: #fff; border: 1px solid #c9ced6; border-radius: 8px; box-shadow: 0 12px 32px rgba(0, 0, 0, .18); padding: 4px 0; margin: 0; list-style: none; z-index: 40; }
+.api-search__results[hidden] { display: none; }
+.api-search__results li { margin: 0; padding: 7px 12px; cursor: pointer; border-left: 3px solid transparent; }
+.api-search__results li[aria-selected="true"] { background: #eaf2fd; border-left-color: var(--api-brand); }
+.api-search__results .r1 { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.api-search__results .rk { font-weight: 700; color: var(--api-brand-ink); font-family: var(--api-mono); }
+.api-search__results .rt { color: var(--api-type); font-size: 13px; font-family: var(--api-mono); overflow-wrap: anywhere; }
+.api-search__results .rg { margin-left: auto; font-size: 12px; color: var(--api-muted); }
+.api-search__results .rs { font-size: 13px; color: var(--api-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.api-search__results .rhead { font-size: 12px; color: var(--api-muted); padding: 6px 12px 2px; cursor: default; }
+.api-search__results mark { background: var(--api-hit); color: inherit; padding: 0; }
+.api-crumbs { flex: 1 1 auto; min-width: 0; font-size: 14px; color: var(--api-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.api-crumbs a { color: var(--api-muted); }
+.api-crumbs a:hover { color: var(--api-brand); text-decoration: underline; }
+.api-crumbs .sep { margin: 0 6px; opacity: .6; }
+.api-crumbs .cur { color: var(--api-ink); font-weight: 600; }
+.api-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1f2937; color: #fff; padding: 8px 14px;
+  border-radius: 6px; font-size: 14px; z-index: 10000; }
+
+/* ---- columns: contents | text ---- */
+.api-layout { display: flex; align-items: flex-start; }
+.api-toc { position: sticky; top: var(--api-bar-h); flex: 0 0 var(--api-toc-w); width: var(--api-toc-w); max-height: calc(100vh - var(--api-bar-h));
+  overflow: auto; padding: 10px 10px 40px 0; border-right: 1px solid var(--api-line); font-size: 14px; overscroll-behavior: contain; }
+.api-toc__close { display: none; }
+.api-toc__section > summary { display: flex; align-items: baseline; gap: 6px; list-style: none; cursor: pointer; padding: 6px; border-radius: 6px; font-weight: 600; }
+.api-toc__section > summary::-webkit-details-marker { display: none; }
+.api-toc__section > summary::before { content: "\25b8"; flex: 0 0 10px; color: var(--api-muted); transition: transform .1s; }
+.api-toc__section[open] > summary::before { transform: rotate(90deg); }
+.api-toc__section > summary:hover { background: var(--api-soft); }
+.api-toc__section > summary a { flex: 1; color: var(--api-ink); }
+.api-toc__section > summary a:hover { color: var(--api-brand); }
+.api-toc__section ul { list-style: none; margin: 0 0 6px 10px; padding: 0 0 0 14px; border-left: 1px solid var(--api-line); }
+.api-toc__section li { margin: 0; }
+.api-toc__section li a { display: flex; gap: 6px; padding: 4px 8px; border-radius: 5px; color: #3b4452; line-height: 1.3; }
+.api-toc__section li a:hover { background: var(--api-soft); color: var(--api-brand); }
+.api-toc__section li a[aria-current] { background: #eaf2fd; color: var(--api-brand-ink); font-weight: 600; box-shadow: inset 3px 0 0 var(--api-brand); }
+.api-count { margin-left: auto; padding-left: 6px; font-size: 12px; font-weight: 400; color: #8a929e; }
+.api-main { flex: 1 1 auto; min-width: 0; max-width: 1000px; padding: 4px 0 40vh 28px; }
+
+/* ---- sections and groups: every id lands below the sticky bar ---- */
+.api-section, .api-group, .api-entry { scroll-margin-top: calc(var(--api-bar-h) + 8px); }
+.api-ref--embedded .api-group, .api-ref--embedded .api-entry { scroll-margin-top: 80px; }
+.api-section { margin-top: 30px; }
+.api-ref .api-section__title { margin: 6px 0 6px; font-size: 26px; color: var(--api-brand-ink); }
+.api-section__intro, .api-group__intro, .api-group__usage { font-size: 15px; color: #374151; }
+.api-group { margin: 24px 0 0; padding-top: 14px; border-top: 2px solid var(--api-line); }
+.api-group__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.api-ref .api-group__title { margin: 0; font-size: 21px; }
+.api-group__title a { color: var(--api-brand-ink); }
+.api-group__title a:hover { text-decoration: underline; }
+.api-ref .api-group__key { font: 13px var(--api-mono); color: var(--api-muted); background: var(--api-soft); padding: 1px 6px; border-radius: 4px; }
+.api-group__count { font-size: 13px; color: var(--api-muted); }
+.api-ref .api-group__usage { margin: 4px 0 0; }
+.api-group__intro { margin-top: 6px; }
+.api-group__more { margin-top: 6px; font-size: 14px; color: var(--api-muted); }
+.api-example-block { margin: 8px 0; font-size: 14px; }
+.api-example-block > summary { display: list-item; cursor: pointer; color: var(--api-brand); }
+.api-example-block:not([open]) > :not(summary) { display: none; }
+.api-group__index { display: flex; flex-wrap: wrap; gap: 4px 6px; margin: 10px 0 6px; font-size: 13px; }
+.api-group__index a { font-family: var(--api-mono); padding: 1px 8px; border: 1px solid var(--api-line); border-radius: 12px; color: #374151; }
+.api-group__index a::before { content: attr(data-key); }  /* text from CSS: Ctrl+F counts each key once, on its entry */
+.api-group__index a:hover { border-color: var(--api-brand); color: var(--api-brand); }
+
+/* ---- entries: a row, the body when open ---- */
+.api-entry { border-bottom: 1px solid var(--api-line); }
+.api-ref .api-entry__head { display: grid; grid-template-columns: auto auto auto 1fr auto auto; column-gap: 10px; align-items: baseline;
+  list-style: none; cursor: pointer; padding: 8px 4px 8px 22px; position: relative; }
+.api-entry__head::-webkit-details-marker { display: none; }
+.api-entry__head::before { content: "\25b8"; position: absolute; left: 6px; top: 9px; color: #9aa3ad; transition: transform .1s; }
+.api-entry[open] > .api-entry__head::before { transform: rotate(90deg); }
+.api-entry__head:hover { background: #fafbfc; }
+.api-ref .api-entry__title { margin: 0; font-size: 15px; font-weight: 700; }
+.api-ref .api-entry__key { padding: 0; font: 700 15px var(--api-mono); color: var(--api-brand-ink); background: none; }
+.api-ref .api-entry__type { padding: 0; font: 13px var(--api-mono); color: var(--api-type); background: none; overflow-wrap: anywhere; }
+.api-ref .api-entry__default { padding: 0; font: 13px var(--api-mono); color: #0f766e; background: none; overflow-wrap: anywhere; }
+.api-entry__required { font-size: 12px; font-weight: 600; color: #b42318; }
+.api-entry__kind { grid-column: 5; font-size: 12px; color: var(--api-muted); border: 1px solid var(--api-line); border-radius: 10px; padding: 0 7px; white-space: nowrap; }
+.api-entry__self { grid-column: 6; color: #b3bac4; font-weight: 700; padding: 0 4px; }
+.api-entry__self:hover, .api-entry__self:focus { color: var(--api-brand); }
+.api-entry__summary { grid-column: 1 / -1; margin-top: 2px; font-size: 14px; color: #4b5563; }
+.api-entry[open] .api-entry__summary { display: none; }
+.api-entry:target > .api-entry__head, .api-entry.api-flash > .api-entry__head { background: #fff8db; }
+/* Every body is in the HTML. On a desktop a closed <details> keeps it findable: Ctrl+F opens the entry
+   that holds the words. On phones closed bodies take no layout at all (below), which is 1.2 s less
+   blocking on a slow phone, where the search box (it indexes the bodies) replaces in-page find. */
+.api-entry__body { padding: 4px 8px 14px 22px; font-size: 15px; }
+.api-ref .api-entry__body p { margin: 6px 0; }
+.api-entry__body ul, .api-entry__body ol { margin: 6px 0; padding-left: 22px; }
+.api-entry__desc--plain { white-space: pre-line; }
+.api-ref .api-entry__body code, .api-ref .api-entry__summary code, .api-ref .api-group__intro code, .api-ref .api-group__usage code,
+.api-ref .api-section__intro code, .api-ref .api-group__more code {
+  font: 13px var(--api-mono); color: inherit; background: var(--api-soft); padding: 1px 4px; border-radius: 3px; }
+.api-ref .api-ref code { color: var(--api-brand); }
+.api-ref .api-ref:hover code { text-decoration: underline; }
+.api-entry__alias { font-size: 13px; color: var(--api-muted); }
+.api-entry__actions { float: right; margin-left: 8px; }
+.api-entry__actions button, .api-copy { font-size: 12px; color: var(--api-ink); border: 1px solid var(--api-line); background: #fff; border-radius: 5px;
+  padding: 2px 8px; cursor: pointer; }
+.api-entry__actions button:hover, .api-copy:hover { border-color: var(--api-brand); color: var(--api-brand); }
+.api-entry__params { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 10px 0; padding-top: 8px;
+  border-top: 1px solid var(--api-line); font-size: 14px; }
+.api-entry__params dt { font: 600 14px var(--api-mono); color: var(--api-brand-ink); }
+.api-entry__params dt i { display: block; max-width: 260px; font: 400 12px var(--api-mono); color: var(--api-type); overflow-wrap: anywhere; }
+.api-entry__params dd { margin: 0; }
+.api-entry__returns, .api-entry__see { font-size: 14px; }
+.api-ref pre.api-example { position: relative; max-width: 100%; margin: 24px 0 4px; padding: 10px 12px; overflow-x: auto; white-space: pre;
+  font: 13px/1.45 var(--api-mono); color: #25292e; background: #f6f8fa; border: 1px solid var(--api-line); border-radius: 6px; }
+.api-ref pre.api-example > code { padding: 0; font: inherit; background: none; white-space: pre; }
+.api-ref pre.api-example::before { content: "Example"; position: absolute; top: -20px; left: 0; font: 600 12px/1 -apple-system, "Segoe UI", sans-serif; color: var(--api-muted); }
+.api-ref pre.api-example[data-lang="url"]::before { content: "Example link"; }
+.api-ref pre.api-example[data-lang="markup"]::before { content: "Example markup"; }
+.api-ref .api-example-block pre.api-example { margin-top: 6px; }
+.api-ref .api-example-block pre.api-example::before { content: none; }
+.api-copy { position: absolute; top: 6px; right: 6px; }
+
+/* long links and code in texts wrap instead of widening the page (phones) */
+.api-section__intro, .api-group__intro, .api-group__usage, .api-group__more, .api-entry__desc, .api-entry__summary, .api-entry__params dd { overflow-wrap: anywhere; }
+.api-ref pre { max-width: 100%; overflow-x: auto; }
+.api-section__intro pre, .api-group__intro pre, .api-group__more pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* ---- tool pages: the same groups, no bar or contents ---- */
+.api-ref--embedded .api-group:first-of-type { margin-top: 12px; }
+
+/* ---- phones and narrow windows ---- */
+@media (max-width: 899px) {
+  .api-ref { --api-bar-h: 96px; }
+  .api-bar { flex-wrap: wrap; align-content: center; gap: 6px 8px; padding: 0; }
+  .api-bar__toc { display: inline-block; }
+  .api-search { flex: 1 1 auto; width: auto; }
+  .api-search kbd, .api-bar__expand { display: none; }
+  .api-search__results { position: fixed; top: var(--api-bar-h); left: 0; width: 100vw; max-height: calc(100vh - var(--api-bar-h)); border-radius: 0; border-left: 0; border-right: 0; }
+  .api-crumbs { order: 3; flex-basis: 100%; font-size: 13px; }
+  .api-toc { position: fixed; z-index: 10001; top: 0; left: 0; height: 100vh; max-height: none; width: min(86vw, 340px); padding: 56px 10px 40px 12px;
+    background: #fff; transform: translateX(-102%); transition: transform .15s; box-shadow: 4px 0 24px rgba(0, 0, 0, .2); }
+  .api-toc-open .api-toc { transform: none; }
+  .api-ref .api-toc__close { display: block; position: absolute; top: 10px; right: 10px; }
+  .api-main { padding: 4px 0 40vh; }
+  .api-entry:not([open]) > .api-entry__body { display: none; }
+  .api-ref .api-entry__head { grid-template-columns: auto 1fr auto; padding-left: 20px; }
+  .api-entry__type { grid-column: 1 / -1; grid-row: 2; }
+  .api-entry__default { grid-column: 1 / -1; grid-row: 3; }
+  .api-entry__kind { grid-column: 2; justify-self: end; }
+  .api-entry__self { grid-column: 3; }
+  .api-entry__summary { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .api-entry__body { padding-left: 8px; padding-right: 0; }
+  .api-entry__params { grid-template-columns: 1fr; }
+  .api-entry__params dd { margin-bottom: 8px; }
+}

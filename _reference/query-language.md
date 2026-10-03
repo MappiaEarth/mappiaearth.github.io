@@ -26,8 +26,8 @@ its parent document.
 **There is no Mappia language.** A query is plain JavaScript, evaluated by the browser. What
 the platform adds is an **API**: the objects, the layer and group properties, the widgets and
 the callbacks that this reference declares — the layer and group properties in
-[the property catalogue](property-catalogue), the widgets in
-[the widget catalogue](widget-catalogue), and all of it, generated from the platform source,
+[the property catalogue](/reference/property-catalogue/), the widgets in
+[the widget catalogue](/reference/widget-catalogue/), and all of it, generated from the platform source,
 in the [API reference](/api/).
 
 What this page describes is the *contract* around that JavaScript: it is evaluated as a

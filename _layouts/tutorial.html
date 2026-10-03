@@ -10,14 +10,15 @@ layout: compress
 
 {% include header.html %}
 {% comment %}
-  A step of the tutorial (_tutorial/*.md, ordered by front matter step):
+  A step of the tutorial: an ordinary page in tutorial/NN-slug.md with `layout: tutorial` and
+  `step: N` (ordered by it), so a running `jekyll serve` picks a new step up like any other page
+  (a collection needed a _config.yml entry, which a running server never re-reads).
     learn:  what the step teaches (a short list, shown first)
     try:    things to change in its example (shown after the text)
     more:   [{title, url}] further reading
   The body places its runnable example(s) with {% include live-example.html id="..." %}.
 {% endcomment %}
-{% comment %} site.tutorial is empty on a Jekyll server started before the collection was added to _config.yml (restart it) {% endcomment %}
-  {% assign steps = site.tutorial %}{% if steps %}{% assign steps = steps | sort: "step" %}{% else %}{% assign steps = "" | split: "," %}{% endif %}
+{% assign steps = site.pages | where: "layout", "tutorial" | sort: "step" %}
 {% assign stepCount = steps | size %}
 {% for candidate in steps %}
   {% if candidate.url == page.url %}
@@ -29,9 +30,10 @@ layout: compress
 
   <div class="hero--small dark-bg">
     <div class="hero__wrap">
-      <p class="tutorial-hero__step">Tutorial &middot; step {{ page.step }} of {{ stepCount }}</p>
+      <p class="tutorial-hero__step">Tutorial notes &middot; chapter {{ page.step }} of {{ stepCount }}</p>
       <h1 class="hero__title">{{ page.title }}</h1>
-      <div class="tutorial-progress" aria-hidden="true"><span style="width: {{ page.step | times: 100 | divided_by: stepCount }}%"></span></div>
+      {% comment %} stepCount is 0 while steps are being moved or renamed: no bar rather than a division by zero {% endcomment %}
+      {% if stepCount > 0 %}<div class="tutorial-progress" aria-hidden="true"><span style="width: {{ page.step | times: 100 | divided_by: stepCount }}%"></span></div>{% endif %}
     </div>
   </div>
 
@@ -48,6 +50,17 @@ layout: compress
       </nav>
 
       <article class="post-content tutorial__body" itemprop="articleBody">
+        {% comment %}
+          wizard: {step: <step id>, covers_try: true} - this chapter is also a part of the live
+          tutorial (/tutorial/, the wizard): a banner sends the reader there, and when the wizard
+          covers this page's "Try this", the list is left out here.
+        {% endcomment %}
+        {% if page.wizard %}
+        <a class="tutorial__wizard" href="{{ '/tutorial/' | relative_url }}#{{ page.wizard.step }}">
+          <strong>Do it on the live map &rarr;</strong>
+          <span>This chapter is part of the interactive tutorial: one live map, your own code, each step checked as you go.</span>
+        </a>
+        {% endif %}
         {% if page.learn %}
         <div class="tutorial__learn">
           <strong>In this step you learn</strong>
@@ -57,12 +70,12 @@ layout: compress
 
         {{ content }}
 
-        {% if page.try %}
+        {% if page.try %}{% unless page.wizard.covers_try %}
         <section class="tutorial__try" aria-labelledby="try-this">
           <h2 id="try-this">Try this</h2>
           <ol>{% for item in page.try %}<li>{{ item | markdownify | remove: '<p>' | remove: '</p>' | strip }}</li>{% endfor %}</ol>
         </section>
-        {% endif %}
+        {% endunless %}{% endif %}
 
         {% if page.more %}
         <section class="tutorial__more" aria-labelledby="read-more">
@@ -94,12 +107,22 @@ layout: compress
     .tutorial-progress { width: min(420px, 80%); height: 6px; margin: 14px auto 0; border-radius: 3px; background: rgba(255, 255, 255, .2); overflow: hidden; }
     .tutorial-progress span { display: block; height: 100%; background: #f39c12; }
     .tutorial { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 36px; align-items: start; padding-top: 26px; }
+    /* The theme's .post-content { margin: 0 auto } made the article size to its content: a long
+       query line widened it past the page. It keeps its column; wide code scrolls inside. */
+    .tutorial__body { margin: 0; min-width: 0; max-width: 100%; }
+    .tutorial__body pre { max-width: 100%; overflow-x: auto; }
+    .tutorial__body p code, .tutorial__body li code, .tutorial__body td code { overflow-wrap: anywhere; }
+    .tutorial__body table { display: block; max-width: 100%; overflow-x: auto; }
     .tutorial__steps { position: sticky; top: 16px; font-size: 14px; }
     .tutorial__home { display: block; font-weight: 700; color: #111827; margin-bottom: 8px; }
     .tutorial__steps ol { margin: 0; padding-left: 22px; }
     .tutorial__steps li { margin: 6px 0; color: #6b7280; }
     .tutorial__steps li a { color: #374151; }
     .tutorial__steps li.is-current a { color: #277cea; font-weight: 700; }
+    .tutorial__wizard { display: block; margin: 0 0 18px; padding: 14px 18px; border-radius: 8px; background: #277cea; color: #fff; }
+    .tutorial__wizard:hover { background: #1f66c4; color: #fff; }
+    .tutorial__wizard strong { display: block; font-size: 17px; }
+    .tutorial__wizard span { display: block; opacity: .92; font-size: 14px; }
     .tutorial__learn { margin: 0 0 22px; padding: 14px 18px; border-left: 4px solid #277cea; background: #f0f7ff; border-radius: 4px; }
     .tutorial__learn ul { margin: 6px 0 0; }
     .tutorial__try { margin-top: 30px; padding: 16px 20px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fafafa; }

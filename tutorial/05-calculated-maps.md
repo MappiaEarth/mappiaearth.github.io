@@ -1,4 +1,6 @@
 ---
+layout: tutorial
+docs_nav: true
 title: Calculated maps and controls
 step: 5
 permalink: /tutorial/calculated-maps/
@@ -22,6 +24,10 @@ A calculated layer (`source: "calculate"`) does not show a published map as it i
 **values** of the maps in its `name` - an elevation in metres, a biomass in tonnes - and an
 **`expression`** turns them into a new map. Controls placed in the layer's panel (sliders, lists,
 text boxes) are **inputs** of that calculation.
+
+The value of a pixel is read from the map's legend: the elevation map has a class every few
+metres, so a pixel's value is the class it falls in. Maps published as *raw maps* also give the
+exact cell value, with `operation: "raw"` on the layer.
 {% endraw %}
 
 {% include live-example.html id="tutorial-05-calculated-map" %}
@@ -32,7 +38,8 @@ text boxes) are **inputs** of that calculation.
 1. **The panel**: `descriptionHtml` holds text and widgets, written in a small markup -
    `{{slider|id=minimum|...}}` is a slider whose value is the input `minimum`.
 2. **The reader moves the slider.** After a short countdown (so several changes make one
-   calculation) the layer is calculated again.
+   calculation) the layer is calculated again. With `updateAutomatically: true` on the layer it
+   is calculated at once, with no countdown.
 3. **`beforeCalc(inputs)`** runs first, on the page: here it sets the legend with
    `this.setCalculateLegend([...])`. On the page, an input is read by its id:
    `inputs.id["minimum"]`.
@@ -46,4 +53,14 @@ of the page is not there. Values it needs come in as inputs.
 
 The legend title carries the slider's value. Besides telling the reader what is shown, a legend
 that changes is what makes the map redraw - see the [pitfalls](/reference/pitfalls/).
+
+### Yours, or the layer's
+
+`beforeCalc` and `expression` are functions **you write**; the platform calls them.
+`this.setCalculateLegend` is a function the layer **already has**; you call it. The API lists
+them apart: *Layer callbacks* for the first, *Calculated layers: methods* for the second.
+
+`paramsButtonConfig: [{ type: "query", pressed: true }]` presses the layer's *query* button at
+the start, so its panel opens with the slider. Only calculated, file and tile layers have this
+panel; the row of a published map shows its legend and styles instead.
 {% endraw %}

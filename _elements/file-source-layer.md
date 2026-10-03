@@ -13,10 +13,8 @@ examples:
 api:
   - key: LayersProperties
     tags: ['source']
-  - key: ConfigLayer
-    tags: ['type']
   - key: FileLayer
-    tags: ['json']
+    tags: ['type', 'json']
   - key: VectorLayer
     tags: ['fromProj', 'onClick', 'defaultStyle', 'onAdded']
 try:

@@ -7,462 +7,462 @@ Mappia reference, section "Tools". Page: https://mappia.earth/reference/widget-c
 
 Every tag the widget markup accepts, as the platform declares it. A widget's parameters are written inside its braces (`{{slider|id=year|minValue=2000}}`); the entries below are that parameter list, plus the methods and the input value each widget exposes to a layer's callbacks. How the markup itself is parsed - escaping, nested keys, handler resolution - is in the previous chapter.
 
-## Button — Button tool
-
-Create a simple button to user interact with the map.
-
-| Name | Type | Description |
-|---|---|---|
-| `enableToggle` | `Boolean` | Defines the button type as toggle. Set true to use as toggle, false otherwise. PS: When its true the callback is 'toggleHandler', otherwise the callback is 'handler'. |
-| `fieldLabel` | `String` | Defines the button label. |
-| `handler` | `function` | Defines the callback function on button click event. This should be used when the enableToggle property is false. `this` inside the callback is the layer. The value is resolved in this order: (1) a key of the layer `functions` object with that name; (2) a… |
-| `hidden` | `Boolean` | Set true to create the button hidden (Ext `hidden` config); show it later with `Ext.getCmp(id).show()`. This is one example of the pass-through: every other `Ext.Button` config (`iconCls`, `tooltip`, `cls`, `width`, `disabled`, `scale`...) written in the… |
-| `id` | `String` | Defines the id to identify the object. |
-| `pressed` | `Boolean` | Defines the button initial state. Set it true to start pressed (only if enableToggle = true), false otherwise. |
-| `text` | `String` | Defines the button text. |
-| `toggle` | `function` | Alias of `toggleHandler`: a function given as `toggle=` is moved to `toggleHandler` (unless one is already defined), so the Ext `toggle()` method of the button is never overwritten. Prefer `toggleHandler`. |
-| `toggleHandler` | `function` | Defines the callback function on button toggle event. This should be used when the enableToggle property is true. `this` inside the callback is the layer. The value is resolved in this order: (1) a key of the layer `functions` object with that name; (2) a… |
-
-Full descriptions, defaults and examples: [Button in the API reference](/api/#category_Button).
-
-## Combobox — Combobox tool
-
-It creates an input of ComboBox tool where the value is selectable from a list. Usage: '{{combobox}}' or <a href='/elements/combobox-widget/'>examples</a>.
-
-| Name | Type | Description |
-|---|---|---|
-| `data` | `Array.<Array.<String>>` | Defines the data that will be displayed in the Combobox. |
-| `editable` | `Boolean` | Determines if the Combobox is editable. That is, if it allows the user to type inside the input field. Set it true to allow it, false otherwise. |
-| `fieldLabel` | `String` | Defines a label for the Combobox. It will be shown at the left of the Combobox, by default. |
-| `getValue` | `function() : String` | Returns the currently selected value (the text of the chosen `data` entry). Call it on the component (`Ext.getCmp(id)` or a `getid=` reference); `inputs.id[ID]` already holds the same value. |
-| `hideLabel` | `Boolean` | Defines if the label of the Combobox should be displayed. Set true to hide the label, false to show it. |
-| `id` | `String` | Defines the id to identify the object. |
-| `labelStyle` | `String` | Defines the style of the label. You can use CSS to style the label element. |
-| `onSelect` | `function` | Defines a callback run when the user picks an entry. It receives the Ext `select` event arguments `(combo, record, index)` — read the chosen text with `record.get('value')` — and `this` is the layer. The value is resolved as a key of the layer `functions`… |
-| `setValue` | `function(value)` | Selects an entry from code. Pass one of the `data` values; it does not fire `select`, so call `forceRecalc()` on an InputManager (or fire the event) when the layer must be recalculated. @param value {String} One of the values listed in `data`. |
-| `value` | `String` | Value stored in `inputs.id[ID]` (and `inputs[i]`): the selected entry of `data` as a string (the first entry is selected initially). The layer recalculates on the combobox `select` event (user choice). |
-| `width` | `Number` | Defines the width of the combobox in pixels. |
-
-Full descriptions, defaults and examples: [Combobox in the API reference](/api/#category_Combobox).
-
-## Hoverpixel — HoverPixel tool
-
-Create a tool to instantly inspect pixel under mouse. The value of the map can also be used as input for another functions. Usage: {{hoverpixel}}
-
-| Name | Type | Description |
-|---|---|---|
-| `checked` | `Boolean` | Defines if the hoverPixel should start enabled. Set true to start enabled, false otherwise. |
-| `fieldLabel` | `String` | Define the text that will be displayed at the left of the toggler |
-| `getLayerValues` | `function(evt, layer) : Array.<Number>\|null` | Reads the values of the composed map under a mouse event: one value per inner layer (from the legend colours of the rendered tiles) plus one extra entry with the result of the layer `expression` for those values. This is the `layerVals` argument of… |
-| `hideLabel` | `Boolean` | Defines if the label of the HoverPixel should be displayed. Set true to hide the label, false to show it. |
-| `iconCls` | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. |
-| `id` | `String` | Defines the id to identify the object. |
-| `labelBefore` | `Boolean` | Set true to render the `text` label before (left of) the toggle switch instead of after it. |
-| `labelStyle` | `String` | Defines the style of the label at the HoverPixel toggler. You can use CSS to style the label element. |
-| `notify` | `Boolean` | Set false to suppress the notification shown when the tool is activated ("click on the map..."). |
-| `runOnClick` | `function` | Defines a callback when the user clicks on the map. It passes the following parameters for the callback function: handleOnClick(layerVals, inputs, coordinates, clickEvent, lastCoordinates) @param layerVals {Array} Array with the values of the maps at the… |
-| `runOnClickOutside` | `function` | True to run the callback function even when clicking outside of the layer, False to disable. (Default False) |
-| `runOnHover` | `function` | Defines a callback when the user hovers the map. It passes the following parameters for the callback function: handleOnClick(layerVals, inputs, coordinates, clickEvent, lastCoordinates) @param layerVals {Array} Array with the values of the maps at the pixel… |
-| `runOnHoverOutside` | `function` | True to run the callback function even when hovering outside of the layer, False to disable. (Default False) |
-| `text` | `String` | Define the text that will be displayed at the right of the toggler |
-| `unselect` | `Boolean` | Only changes the activation message: with the default `true` it says a single point is expected, with `false` several. The hoverpixel is never deactivated automatically after a click. |
-| `value` | `Object` | Value stored in `inputs.id[ID]`: the `lastInfo` object `{click, hover}` with the coordinates (`{lon, lat}` in EPSG:4326, or `null` before the first event) of the last click and of the last mouse move while the tool is active. The object is updated in place,… |
-
-Full descriptions, defaults and examples: [Hoverpixel in the API reference](/api/#category_Hoverpixel).
-
-## LegendHtml — Legend
-
-Create a tool with the map legends at any place of the query description. Usage: '{{legendhtml}}'
-
-| Name | Type | Description |
-|---|---|---|
-| `autoWidth` | `Boolean` | Set true (default) to let the legend panel take the width of its container; set false to give it a fixed `width`. |
-| `filterLayers` | `Array.<Number>` | Defines an array of indexes of layers to be included in map legend (from 0 to quantity of layers). If not defined, all layer legends are shown by default. Otherwise, only the listed indexes are included. Ex: A composed layer with three maps: name:… |
-| `id` | `String` | Defines the id of the legend panel component (`Ext.getCmp(id)`), e.g. to `show()`/`hide()` it or to find the legend entries inside it. Generated when omitted. Other `GeoExt.WMSLegend`/`Ext.Panel` configs (`cls`, `style`, `hidden`, `useScaleParameter`,… |
-| `legendId` | `String` | Defines the legend container id. You can use this id to toggle each legend filter individually. |
-| `preventClick` | `Boolean` | Defines if the user can filter the maps categories by clicking on the legend. Set it true to ignore the legend click, false otherwise. |
-| `reverseLegend` | `Boolean` | Defines if it should sort the legend on the decreasing order. Set it true to use the decreasing order, false otherwise. |
-| `useScaleParameter` | `Boolean` | Set true to request a new legend image from the server whenever the map scale changes (GeoServer `SCALE` parameter), for styles that depend on the scale. Off by default: the legend is generated once and reused, which is faster and keeps the click-to-filter… |
-
-Full descriptions, defaults and examples: [LegendHtml in the API reference](/api/#category_LegendHtml).
-
-## OpacitySlider — Opacity slider tool
-
-Create a slider to change the map opacity. Usage: '{{opacityslider}}'
-
-| Name | Type | Description |
-|---|---|---|
-| `aggressive` | `Boolean` | Set true to apply the opacity while the thumb is being dragged instead of only when it is released. |
-| `changeVisibility` | `Boolean` | Set true to let the slider also control the layer visibility: the layer is hidden when the slider reaches `minValue` and shown again when it leaves it. The layer must be visible when the slider is created. |
-| `complementaryLayer` | `OpenLayers.Layer` | A second layer that is hidden when the slider reaches `maxValue` (GeoExt option to fade between two layers). GeoExt expects a layer object here, which the markup cannot express (a string is not resolved to a layer), so this option is only usable from code;… |
-| `id` | `String` | Defines the id of the slider component (`Ext.getCmp(id)`), e.g. to read `getValue()` or to `hide()` it. Generated when omitted. Every parameter of the tool is passed to `GeoExt.LayerOpacitySlider` / `Ext.slider.SingleSlider` unchanged (`width`, `cls`,… |
-| `inverse` | `Boolean` | Set true to make the slider work with transparency instead of opacity (100 = fully transparent). |
-| `maxValue` | `Number` | Defines the maximum value of the slider (opacity percent at the right end). |
-| `minValue` | `Number` | Defines the minimum value of the slider (opacity percent at the left end). |
-| `value` | `Number` | Defines the initial slider value (opacity in percent). It is only used when the layer has no opacity yet (`opacity` not set on the layer): otherwise the slider starts at the layer's current opacity. |
-
-Full descriptions, defaults and examples: [OpacitySlider in the API reference](/api/#category_OpacitySlider).
-
-## LoadCsv — Csv manager tool
-
-Describes the API to read and manipulate ExtjsUtils.CSV.CsvTable files from URL.
-
-| Name | Type | Description |
-|---|---|---|
-| `columnNameToInd` | `function(columnName) : Number` | Get the index of a column with the 'columnName' name. @param columnName {String} Column name to search for. |
-| `columnNamesToIndexes` | `function(columnNames) : Array.<Number>` | Resolves column names to column indexes: every string entry is looked up in the header (`-1` when absent) and every numeric entry is kept as it is. A single value is accepted in place of the array. This is what `getLines`/`createIndexes` do with their… |
-| `cors` | `Boolean` | Downloads the CSV through the Mappia CORS proxy; use it for servers that do not send CORS headers. |
-| `createIndexes` | `function(columns)` | Create indexes for faster search. PS: Indexes are used to faster results on "getLines" calls, apply only when all [columns] are indexes. @param columns {Array} (Optional) Array of indexes/names of the filtered columns. |
-| `getColunsInd` | `function() : Array.<String>` | Returns a copy of the header row — the column names, in order — so query code can discover columns instead of hard-coding indexes. The name is a historical typo of `getColumnsInd`, kept for compatibility (the platform and many queries call it by this… |
-| `getLineCount` | `function() : Number` | Number of data lines in the table (the header line is not counted). |
-| `getLines` | `function(columns, values, includeHeader) :…` | Returns the lines (arrays of cell strings) whose cells in `columns` equal the corresponding entries of `values`. Columns may be given by index or by header name; to filter on several columns give one value per column, e.g. `getLines([1, "Year"], ["Park A",… |
-| `getValue` | `function(column, line, includeHeader) : String` | Get a value by the matrix index and column. @param column {Number} Column index (First index is 0). @param line {Number} Line index (First index is 0). @param includeHeader {boolean} True to include the header line in the matrix index, False to ignore. |
-| `id` | `String` | Defines the id of the input; it is the key used to read the table in `inputs.id[ID]` (required, the tool renders nothing visible). |
-| `removeEmptyLines` | `boolean` | Ignore the empty lines, removing them from the parsed CSV. True to remove the empty lines from the CSV. |
-| `setValue` | `function(column, line, value)` | Change a cell value by its cell index. @param column {Numeric} Column index. @param line {Numeric} Line index to change (ignore the header information when it exists). @param value {*} New value to replace the older value. |
-| `trim` | `Boolean` | Requests that cell values be trimmed of surrounding whitespace. The flag is accepted and forwarded to the CSV parser, but the current parser ignores it (cells are stored as written, quotes removed), so trim values yourself when needed. Kept for compatibility… |
-| `url` | `String` | Defines the URL of the CSV file to download (required). Relative URLs are resolved against the Mappia host, so backend endpoints such as `/wmtp/calc/...` work; escape `=` inside query strings as `\=`. The layer waits for the download before calculating. |
-| `value` | `ExtjsUtils.CSV.CsvTable` | Value stored in `inputs.id[ID]`: an `ExtjsUtils.CSV.CsvTable` wrapping the parsed file (first row = header). Read it with the CsvTable methods listed in this group (`getLines`, `getValue`, `columnNameToInd`, `createIndexes`, `getLineCount`...). It is… |
-
-Full descriptions, defaults and examples: [LoadCsv in the API reference](/api/#category_LoadCsv).
-
-## Slider — Slider tool
-
-Tool that allows users to create a slider that the user can drag and change its value as map input.
-
-| Name | Type | Description |
-|---|---|---|
-| `backgroundColors` | `Array.<String>` | Array of colors of background slider values, to define background slider color based in slider value. The values are defined from most to minimum with two properties each: - color: {String} CSS color definition for the current interval. i.e.… |
-| `cls` | `String` | Extra CSS class(es) added to the slider element (appended to the default `clickable`). |
-| `disabled` | `Boolean` | Set true to render the slider disabled (Ext `disabled`); enable it later with `Ext.getCmp(id).enable()`. |
-| `fieldLabel` | `String` | Defines the label shown at the left of the slider (Ext `fieldLabel`). |
-| `getValue` | `function() : Number` | Returns the current value of a single-thumb slider. Call it on the component (`Ext.getCmp(id)` or a `getid=` reference), not on `inputs.id[ID]`, which already holds the plain value. |
-| `getValues` | `function() : Array.<Number>` | Returns the value of every thumb; use it for range sliders created with `values=[lo, hi]`. |
-| `gradient` | `Boolean` | Set true to blend the `backgroundColors` into a continuous gradient along the filled part of the slider (each colour fading into the next from its `startValue`). With the default `false` each interval is a solid colour, with a short blend only around the… |
-| `hideLabel` | `Boolean` | Set true to hide the label and the space reserved for it (Ext `hideLabel`). |
-| `id` | `String` | Defines the id to identify the object. |
-| `increment` | `Number` | Defines the step of each increment or decrement in the actual value of the slider when being dragged. |
-| `maxValue` | `Number` | Defines the maximum value of the slider. |
-| `minValue` | `Number` | Defines the minimum value of the slider. |
-| `setValue` | `function(value, animate)` | Sets the slider value from code. Firing the `change` event (the default) also updates `inputs.id[ID]` and recalculates the layer. For a range slider pass the thumb index first: `setValue(index, value)`. @param value {Number} New value (clamped to… |
-| `thumbStyle` | `String` | Defines extra CSS class(es) added to the slider thumb (the draggable handle), to restyle it. |
-| `value` | `Number` | Defines the initial value of the slider (default 100). At runtime the same value is what `inputs.id[ID]` (and `inputs[i]`) holds in `beforeCalc`/`expression`: a number, or an array `[lower, upper]` when the `values` range form is used. The layer recalculates… |
-| `values` | `Array.<Number>` | Defines the slider interval limits. If defined, the slider will be displayed as a range slider. It's return at the 'inputs' parameter will be a array of two values. |
-| `width` | `Number` | Defines the slider width in pixels. Any other `Ext.slider.SingleSlider` config (`cls`, `fieldLabel`, `hideLabel`, `disabled`, `style`, `keyIncrement`...) is also passed through unchanged. |
-
-Full descriptions, defaults and examples: [Slider in the API reference](/api/#category_Slider).
-
-## Textfield — Textfield tool
-
-Tool that allows the user to input a single line of text. Usage: '{{textfield}}'
-
-| Name | Type | Description |
-|---|---|---|
-| `afteredit` | `Event` | Event fired once the field loses focus (blur) and its text differs from the value it had when editing started; the listener receives the TextField. Unlike `keyup` it fires a single time per edit, so use it for expensive reactions. Attach it with… |
-| `fieldLabel` | `String` | Defines the TextField label. |
-| `getRawValue` | `function() : String` | Returns the text currently in the field, unprocessed (this is what `inputs.id[ID]` holds). Call it on the component (`Ext.getCmp(id)`). |
-| `hideLabel` | `Boolean` | Defines if it should completely hide the label element (label and separator) of the TextField. That is, if this property is set to true, the label will be hidden. Otherwise, the label will be shown by default. PS: Since the label will be shown by default,… |
-| `id` | `String` | Defines the id to identify the object. |
-| `isnumeric` | `boolean` | Defines the TextField content as numeric only. |
-| `setRawValue` | `function(value)` | Replaces the text of the field from code. It does not fire `keyup`, so call `forceRecalc()` on an InputManager (or fire the event) when the layer must be recalculated with the new text. @param value {String} New text for the field. |
-| `style` | `String` | Defines the TextField style properties. You can use CSS style rules to customize it. |
-| `value` | `String` | Defines the initial value to the TextField content. At runtime `inputs.id[ID]` (and `inputs[i]`) holds the current text exactly as typed (`getRawValue()`, always a string — convert it with `parseFloat` when `isnumeric` is used). The layer recalculates on… |
-
-Full descriptions, defaults and examples: [Textfield in the API reference](/api/#category_Textfield).
-
-## Label
-
-Create a simple label element to display some text. Usage: {{label\|}}
-
-| Name | Type | Description |
-|---|---|---|
-| `cls` | `String` | Extra CSS class(es) added to the `<label>` element. |
-| `forId` | `String` | Defines the id of the form field the label is for (rendered as the `for` attribute of the `<label>`), so clicking the label focuses that field. |
-| `html` | `String` | Defines the content of the label as raw HTML (not escaped). Everything after `html=` up to the next `\|` is the value, so it may contain `=` characters. `text` wins when both are given. |
-| `id` | `String` | Defines the id of the label component (`Ext.getCmp(id)`), needed to change its text from code or to reference it with `getid=` in another tag. Generated when omitted. |
-| `style` | `String` | Inline CSS applied to the `<label>` element. Any other `Ext.form.Label`/`Ext.Component` config (`hidden`, `width`...) is passed through unchanged. |
-| `text` | `String` | Defines the text of the label. It is HTML-escaped, so use `html` when markup is needed. Update it later with `Ext.getCmp(id).setText(text)` (typically from an `on_change=` listener of a slider or textfield through `getid=`). |
-
-Full descriptions, defaults and examples: [Label in the API reference](/api/#category_Label).
-
-## HTML — HTML contents
-
-Any HTML is possible to be added to the layer description.
-
-| Name | Type | Description |
-|---|---|---|
-| `content` | `String` | Free HTML inside a layer's `descriptionHtml`: everything that is not a `{{tag}}` is passed through to the panel untouched, so a description can carry headings, images, links, tables and the container elements a chart or a custom control needs. Widgets and… |
-
-Full descriptions, defaults and examples: [HTML in the API reference](/api/#category_HTML).
-
-## LoadJson — LoadJson tool
-
-Tool to load a remote JSON and use it with map, this object can store string, values and functions. Usage: {{loadjson}}
-
-| Name | Type | Description |
-|---|---|---|
-| `cors` | `Boolean` | Loads the JSON through the Mappia CORS proxy (for servers without CORS headers). |
-| `id` | `String` | Defines an id for the stored info on layerInputs. |
-| `url` | `String` | Defines the url to load the json from. |
-| `value` | `Object\|Array` | Value stored in `inputs.id[ID]`: the parsed JSON (`JSON.parse` of the response body — an object or an array; an empty response gives `[]`). It is `undefined` until the download finishes: the layer waits for the resource and recalculates on its `waitend`… |
-
-Full descriptions, defaults and examples: [LoadJson in the API reference](/api/#category_LoadJson).
-
-## PickPoint — PickPoint tool
-
-Creates an input that allows users to interact with the real cell or feature value at any position. The returned values are from the original mal to the selected point, in case of RASTER is returned a cell value, in case of shapefile the geometry is returned too. Usage: {{pickpoint}}
-
-| Name | Type | Description |
-|---|---|---|
-| `checked` | `Boolean` | Defines if Pickpoint should start selected. Set it true to start it enabled, false otherwise. |
-| `fieldLabel` | `String` | Sets the label for the 'pickpoint' button widget. |
-| `geometryColor` | `String` | If defined sets a color to use when drawing a geometry by this tool. Otherwise a random color will be used at each interaction. |
-| `getAttributes` | `function(mapIndex) : Array.<Object>` | Returns the attributes of every selected point for one of the layers of the composed map: one object per selection (in click order) holding the feature `data` of that layer, or `{}` when the click hit nothing on it (e.g. a raster). This is the usual way to… |
-| `getLastEvent` | `function() : OpenLayers.Event\|null` | Returns the map click event handled by the last selection (its `type` is set to `add` or `remove`), or `null` before the first click. Use `evt.xy` for the pixel and `ExtjsUtils.COORDINATE.getLatLong(evt)` for the coordinate. |
-| `getPointPos` | `function() : Array.<Number>` | Returns the geographic position of the last clicked point (the marker), in the map's desired projection (normally EPSG:4326 — longitude, latitude). |
-| `iconCls` | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. `labelBefore=true` places the text before the switch, and `inputValue` sets the DOM `value` of the checkbox input (both passed through to the checkbox). |
-| `id` | `String` | Defines the id of the tool (required). It is the key used in `inputs.id[ID]` and the id of the checkbox component (`Ext.getCmp(id)`), so it must be unique in the page. |
-| `inputValue` | `String` | Defines the DOM `value` attribute of the underlying checkbox input (useful when the tool is inside an HTML form). It does not affect what `inputs.id[ID]` holds. |
-| `label` | `String` | Defines a text template drawn on the map next to each selected feature. `${attr}` placeholders are replaced by the attribute values of the clicked feature (vector layers only; a raster cell has no attributes). Without it no label is drawn. |
-| `labelBefore` | `Boolean` | Set true to render the `text` label before (left of) the toggle switch instead of after it. |
-| `lat` | `Number` | Defines the initial latitude (EPSG:4326, decimal degrees) of the marker shown when the tool is activated, before any click. Use it with `lon`; default 0. |
-| `lon` | `Number` | Defines the initial longitude (EPSG:4326, decimal degrees) of the marker shown when the tool is activated, before any click. Use it with `lat` to start on a point of interest; default 0. |
-| `markLayerInd` | `Number` | Defines by layer index which one to draw its geometry when a click event happens. (0-indexed) |
-| `movePoint` | `function(evt)` | Moves the marker of the last click to the position of a map mouse event. The tool calls it on every click; call it yourself only to relocate the marker from a synthetic event. @param evt {OpenLayers.Event} Map mouse event carrying the pixel position in… |
-| `notify` | `Boolean` | Set false to prevent the notify messages from appear (the "click on the map..." notification shown when the tool is activated). |
-| `onMark` | `function` | Callback function called after clicking on a feature with this 'pickpoint' widget, once the feature info of every layer of the composed map has been received. `this` is the pickpoint checkbox (or `scope`), so `this.value` is the PointAttributeManager. The… |
-| `onefeature` | `boolean` | Defines if PickPoint should keep only the last feature selected. Set it true to keep only the last one, false otherwise. |
-| `pointVisibility` | `Boolean` | Defines if Pickpoint should show where the last click was. Set it true to show, false otherwise. |
-| `removeAll` | `function()` | Clears the whole selection: every selected feature is removed from the map and from the list returned by `getAttributes`. Typical use: a "Clear" button handler, followed by a recalculation. |
-| `removeAttribute` | `function(index)` | Removes one selection (by its position in the `getAttributes` list) from the map and from the selection list. An invalid index changes nothing. @param index {Number} 0-based index of the selection to remove (same order as `getAttributes`). |
-| `runOnClick` | `function` | Alias of `onMark`, kept so the pickpoint accepts the same callback name as the other map tools (hoverpixel, summedarea, areaintegral). When both are written, `onMark` wins. See {@link PickPoint.onMark} for the callback signature. |
-| `runOnHover` | `function` | Defines a callback function to run when clicking at the map. Defines a callBack with following parameters function(mouseEvt, coordinates) --mouseEvt: {MouseEvent} Mouse hover event. --coordinates: {Openlayers.LatLon} Coordinate of the cursor over the map. PS:… |
-| `runOnHoverOutside` | `function` | True to run the callback function even when hovering outside of the layer, False to disable. (Default False) |
-| `scope` | `Object` | Defines the object used as `this` inside the `onMark`/`runOnClick` callback. By default it is the pickpoint checkbox component (so `this.value` is the PointAttributeManager). From the markup it can only reference an element created earlier in the same… |
-| `searchAttribute` | `function(mapIndex, propName, value) : Object\|null` | Finds, among the selected features of one layer, the first whose attribute `propName` equals `value` and returns its attributes. Useful to check whether a given feature is already selected. @param mapIndex {Number} 0-based index of the layer inside the… |
-| `setFeatureVisibility` | `function(state, feature)` | Adds a feature to, or removes it from, the auxiliary vector layer where the tool draws its selections. Lets a callback draw extra geometries (an `OpenLayers.Feature.Vector`) with the selection, or hide one of the selected features without forgetting it.… |
-| `setPointVisibility` | `function(state)` | Shows or hides the marker drawn at the last clicked position (the same marker controlled by the `pointVisibility` parameter). @param state {Boolean} `true` to show the marker, `false` to hide it. |
-| `text` | `String` | Defines the text shown next to the toggle. When omitted the label shows the coordinate of the last click, `(lat, lon)`, and is updated at every click. |
-| `toggle` | `function(forceState)` | Activates or deactivates the pick mode from code (same as clicking the switch): the map cursor, the click listeners and the marker follow the new state. Call it on the checkbox component (`Ext.getCmp(id)`). Without an argument the state is inverted. @param… |
-| `togglePoint` | `function(pointFeatures, evt) : Object` | Adds a set of features (one array per layer of the composed map, as returned by GetFeatureInfo) to the selection, or removes it when the same features were already selected. With `onefeature=true` the previous selection is cleared first. The tool calls it… |
-| `unselect` | `Boolean` | Defines if Pickpoint will be automatically disabled after each click. Set it true to automatically disable, false otherwise (write `unselect=` or `unselect=false` to keep the tool active for several clicks). |
-| `value` | `Object` | Value stored in `inputs.id[ID]`: the PointAttributeManager of the tool, the object that keeps the selected features. Read it with `getAttributes(mapIndex)`, `searchAttribute(...)`, `getPointPos()`, `getLastEvent()`, and change it with `removeAll()`,… |
-
-Full descriptions, defaults and examples: [PickPoint in the API reference](/api/#category_PickPoint).
-
-## Timeline — Timeline tool
-
-Display a spatial scenarios changes in a timeline.
-
-| Name | Type | Description |
-|---|---|---|
-| `fieldLabel` | `String` | Defines a label for the Timeline. It will be shown at the left of the button to hide the tiemline, by default. |
-| `getCurrentLayerStyle` | `function() : String` | Returns the WMS style currently applied to the layer (`layer.params.STYLES`), or an empty string for the default style. |
-| `getDesiredVisibility` | `function() : Boolean` | Returns the visibility the timeline has, or will have when its layer becomes visible: `true` may be returned while the panel is actually hidden because the layer is hidden. |
-| `getMainThumb` | `function() : Ext.slider.Thumb` | Returns the main (middle) thumb of the slider — the one that selects the current step; its `value` is the 0-based step index. The outer thumbs (`thumbs[0]`, `thumbs[2]`) bound the animation range. |
-| `getMaxThumbValue` | `function() : Number` | Returns the position of the right (max) thumb: the last step index the animation reaches. |
-| `getMinThumbValue` | `function() : Number` | Returns the position of the left (min) thumb: the step index the animation restarts from. |
-| `getStyleFromValue` | `function(value) : String\|Object\|undefined` | Returns the style of a step key or, when the key has no style of its own, the style of the nearest previous key (numeric keys are compared as numbers, text keys by position in `steps`). @param value {String\|Number} A step key. |
-| `getTimeline` | `function() : GeoExt.TimelinePanel` | Returns the timeline panel driven by this button. The markup `id` identifies the button, so this is the way to reach the panel methods (`getValue`, `updateMainThumbValue`, `startAnimationStep`, `setSteps`...). |
-| `getValue` | `function() : String` | Returns the key of the step currently selected by the main thumb (the same value the layer receives in `inputs.id[ID]`). |
-| `getValueFromStyle` | `function(style) : Number` | Returns the step key whose style is the given one (the last match when several steps share a style), or the first step key when the style is empty or unknown. The key is returned through `parseInt`, so it is meaningful for numeric keys only (text keys give… |
-| `hidden` | `Boolean` | Set true to hide the "Show/Hide timeline" button rendered in the layer description (the standard Ext `hidden` config, so `Ext.getCmp(id).show()` reveals it). The timeline panel itself is still created and its initial visibility follows `renderHidden`; use it… |
-| `hideLabel` | `Boolean` | Defines if the label of the timeline should be displayed. Set true to hide the label, false to show it. |
-| `id` | `String` | Defines the id to identify the object. It is the key used in `inputs.id[ID]` and the id of the show/hide button component: `Ext.getCmp(id)` returns the button and `Ext.getCmp(id).getTimeline()` the timeline panel (see the methods listed in this group). |
-| `nextAnimationStep` | `function()` | Advances the timeline one step (main thumb + 1), applying the style of the new step to the layer and firing `change`; does nothing when the main thumb is already at the max thumb. Useful for a custom "next" button. |
-| `nextStepInterval` | `Number` | Defines the duration of the interval between steps of the timeline in milliseconds. |
-| `onPlayToggle` | `function` | Defines the callback function called when the play/stop button is toggled, BEFORE the animation starts or stops. It must return a truthy value: returning `false`/nothing cancels the start/stop (use it as a veto, e.g. while data is loading). `pressed` is true… |
-| `playing` | `Boolean` | `true` while the animation is running (between play and stop/end). Read it on the panel (`Ext.getCmp(id).getTimeline().playing`) to know whether to call `startAnimationStep()` or `stopAnimation()`. |
-| `preloadTiles` | `Boolean` | Defines if the timeline should preload the tiles of the next steps to get smoother transitions. Set it true to preload, false otherwise. |
-| `renderHidden` | `Boolean` | Defines the timeline initial visibility. Set it true to start with the timeline hidden, false otherwise. |
-| `setCurrentLayerStyle` | `function(style)` | Applies a style to the layer the way a step does: a style name, or a `{style, name}` object that also switches the WMS layer name (the object form of a `steps` entry). For a composed layer the first inner layer is updated and the legend is rebuilt. The slider… |
-| `setDesiredVisibility` | `function(visible) : GeoExt.TimelinePanel` | Shows or hides the timeline panel while keeping it consistent with the layer: when the layer is hidden the panel stays hidden and the requested state is remembered, to be applied as soon as the layer becomes visible. Prefer it over `show()`/`hide()`; the… |
-| `setMaxThumbValue` | `function(value)` | Moves the right (max) thumb, limiting the animation to the steps up to that index (no animation, no `change` event). @param value {Number} 0-based step index for the max thumb. |
-| `setMinThumbValue` | `function(value)` | Moves the left (min) thumb, making the animation start from that step index (no animation, no `change` event). @param value {Number} 0-based step index for the min thumb. |
-| `setSteps` | `function(steps)` | Replaces the steps of the timeline and redraws it (labels, slider range and current step). Unlike the markup `steps` parameter this takes the already-built object: keys are the step labels, values the style name or a `{style, name}` object. Use it to change… |
-| `startAnimationStep` | `function()` | Starts (or resumes) the animation from the current step: each step is shown for `nextStepInterval` milliseconds after the layer finished loading it, up to the max thumb, where the animation stops by itself. When the main thumb is already at the max thumb it… |
-| `steps` | `Array.<Array.<(String\|Object)>>` | Defines the timeline change steps. |
-| `stopAnimation` | `function()` | Stops the running animation (cancels the pending step timer, releases the play button and hides the slider tip). The current step is kept. Safe to call when nothing is playing. |
-| `toggleTimelineVisibility` | `function(forceState)` | Shows or hides the timeline panel from code — what clicking the button does. Without an argument the current (desired) visibility is inverted. The panel only appears while the layer is visible; the requested state is remembered otherwise (see… |
-| `updateLayer` | `function(value)` | Applies to the layer the style of a step key, without moving the slider. When the key has no step of its own the style of the nearest previous numeric key is used (steps `{2010: "s1", 2015: "s2"}` and value 2014 keep/apply "s1"); nothing happens when that… |
-| `updateMainThumbValue` | `function(value)` | Moves the main thumb to a step index (0-based position in `steps`), applying that step's style to the layer and firing `change` — the programmatic way to select a step. Without an argument it re-syncs the thumb with the layer's current style using… |
-| `value` | `String` | Value stored in `inputs.id[ID]` (and `inputs[i]`): the key of the current step — the first element of the selected `steps` entry (e.g. `"1990"` or `"January"`), as a string. It changes whenever the main thumb moves (drag, click or animation) and the layer… |
-
-Full descriptions, defaults and examples: [Timeline in the API reference](/api/#category_Timeline).
-
-## LiveComposedSplit — Live composed split tool
-
-Compare two styles of a Composed layer with a live split-screen slider on the map. The layer must be a Composed layer (typically the same WMS layer twice in `name` with two `styles`). Put the tool in `descriptionHtml`, open the query panel, choose left/right styles, then press Compare to show a draggable vertical divider. Required parameters: displayNames, layerNames (same order and length).…
-
-| Name | Type | Description |
-|---|---|---|
-| `applySelectedStyles` | `function()` | Pushes the two selected styles to the composed layer (`changeLayers` with the left style on child 0 and the right style on child 1) and makes both children visible. Called when Compare is pressed; after calling it yourself use `refreshActiveSplit()` so the… |
-| `baseName` | `String` | WMS layer name used with each style (e.g. CSR:precip_monthly_average). Defaults to layer.params.LAYERS when omitted. |
-| `cls` | `String` | Extra CSS class for the Compare toggle button (replaces the default `clickable`; the class `live-composed-split-compare` is always added). |
-| `composedLayerName` | `String` | Name of the Composed layer to split. If omitted, the first OpenLayers.Layer.Composed on the map is used. |
-| `destroySplitControl` | `function()` | Removes the split divider control from the map for good (it is recreated on the next Compare press). The panel calls it when its layer is removed; call it to force a clean state. It does not restore the single-style view — press the Compare button off… |
-| `displayNames` | `String` | Comma-separated labels shown in the left/right combo boxes (required). |
-| `id` | `String` | Id of the Compare button (wrapper id is id + "_container"). |
-| `isComparisonActive` | `function() : Boolean` | Tells whether the split comparison is currently shown on the map (Compare pressed and the divider active). Get the panel with `Ext.getCmp(id + '_container')`, where `id` is the markup id. |
-| `layerNames` | `String` | Comma-separated WMS style names aligned with displayNames (required). When Compare is pressed, the composed layer switches to the selected pair. |
-| `layout` | `String` | Presentation inside the layer query panel. compact (default): stacked fields that fit the ~300px layer card. inline: horizontal row (legacy Left / Right / Compare on one line). |
-| `leftDefault` | `String` | Initial left combo value; must be one of displayNames. |
-| `refreshActiveSplit` | `function()` | Re-applies the selected styles and re-clips the split after the composed layer's children were replaced (e.g. by your own `changeLayers` call), keeping the divider position. Does nothing while the comparison is not active. |
-| `rightDefault` | `String` | Initial right combo value; must be one of displayNames (and different from left). |
-| `setComparisonEditingEnabled` | `function(enabled)` | Enables or disables the right-side combo and the swap button. The panel calls it itself (only the left combo is editable while idle; both unlock when comparing); call it to lock the choice while data loads. @param enabled {Boolean} `true` to allow changing… |
-| `swapSides` | `function()` | Exchanges the left and right styles (combos and map) and re-clips the split, keeping the divider where it is. Does nothing while the comparison is not active — what the swap button does. |
-| `text` | `String` | Label on the Compare toggle button (before the split is active). |
-
-Full descriptions, defaults and examples: [LiveComposedSplit in the API reference](/api/#category_LiveComposedSplit).
-
-## InputManager — InputManager tool
-
-Tool to store local variables to be used in others functions callbacks. PS: DOM elements cannot be used in 'expression' context, because them cannot be sent to WebWorkers (javascript language limitation). Usage: '{{inputmanager}}'
-
-| Name | Type | Description |
-|---|---|---|
-| `forceRecalc` | `function()` | Force a legend map recalculation. |
-| `getValue` | `function(key) : *` | Get the stored value by his property name, if it does not exists returns null. @param key {String} Stored property name. |
-| `id` | `String` | Defines the id of the input; it is the key used to reach the manager in `inputs.id[ID]` (required, the tool renders nothing visible). |
-| `setDefaultValues` | `function(obj, local)` | Set default values to the stored elements, these values are used before any other value is defined and never update or replace another stored values. PS: Auxiliary function to make easy wrinting the script (typically called in `onInputsReady` or at the start… |
-| `setValues` | `function(obj, cancelUpdate, local)` | Stores object properties for later usage. PS: If has name property collision the older is replaced. PS: Values go to one of two buckets of the manager: `global` (the default — serialized and sent to `expression`, so it must hold plain JSON-compatible data) or… |
-| `value` | `Object` | Value stored in `inputs.id[ID]`: the manager object itself, with `getValue(key)`, `setValues(obj, cancelUpdate, local)`, `setDefaultValues(obj, local)` and `forceRecalc()` (listed in this group) and the `global` bucket where the stored properties live… |
-
-Full descriptions, defaults and examples: [InputManager in the API reference](/api/#category_InputManager).
-
-## FileField — FileField tool
-
-Tool that allows handle and local files. PS: This object cannot be sent to 'expression'. Usage: {{filefield\|fieldLabel=loadshp\|id=loadshp\|_onChange=function(){alert('changed')}}}
-
-| Name | Type | Description |
-|---|---|---|
-| `eventNames` | `Array.<string>` | Defines the list of events by name. Use this property to define callback functions to any of the following events. |
-| `fieldLabel` | `String` | Defines the label shown at the left of the file input (Ext `fieldLabel`). `hideLabel=true` removes the label and its reserved space; other `Ext.form.Field` configs are passed through unchanged. |
-| `hideLabel` | `Boolean` | Set true to hide the label element and the space reserved for it. |
-| `id` | `String` | Defines the id of the input; it is the key used in `inputs.id[ID]` and the id of the Ext field (`Ext.getCmp(id)`), so it must be unique in the page. |
-| `ignoreUpdate` | `Boolean` | Defines if it should ignore the widget change event. If it's false, it dispatches the update event at every file selection. |
-| `inputType` | `String` | The HTML input type. It is always forced to `file` by the tool, so a value written in the markup is ignored (documented only to explain why it cannot be changed). |
-| `value` | `function` | Value stored in `inputs.id[ID]`: not the file itself but a getter function. Call it — `inputs.id[ID]()` — to obtain the selected `File` (the first entry of the DOM `files` list) or `undefined` when nothing is selected. It is a function so the value can never… |
-
-Full descriptions, defaults and examples: [FileField in the API reference](/api/#category_FileField).
-
-## SummedArea — Summed Area tool
-
-Create an input of summation in any arbitrary area. CallBack parameters (context {OpenLayers.Layer}, layersValues {Array[Number]}, inputs {[Object]}, feature {Geometry}) runOnClick {Function}  Callback called exactly after sum the map region., PS: 'layersValues' return the sum of each internal layer and an adittional value which is the sum of all pixels of resulting layer.
-
-| Name | Type | Description |
-|---|---|---|
-| `description` | `function(name, config, layer, parameters) : Ext.Container` | Creates an input of summatory in any arbitrary area. CallBack parameters (context {OpenLayers.Layer}, layersValues {Array[Number]}, inputs {[Object]}, feature {Geometry}) runOnClick {Function} Callback called exactly after sum the map region., PS:… |
-| `getSummedLayerValues` | `function(layer, feature) : Array` | Sums, for each inner layer of the composed map, the values of the rendered cells that fall inside a polygon (values decoded from the tile colours through the layer legend, null cells skipped). This is what `runOnClick` receives as `layersValues`; call it from… |
-| `iconCls` | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. |
-| `id` | `String` | Defines the id of the tool: the key used in `inputs.id[ID]` and the id of the container component (`Ext.getCmp(id)`; the switch itself is `Ext.getCmp(id).items.get(0)`). Generated when omitted. |
-| `labelBefore` | `Boolean` | Set true to render the `text` label before (left of) the toggle switch instead of after it. |
-| `notify` | `Boolean` | Set false to suppress the notification shown when the tool is activated. |
-| `runOnClick` | `function` | Defines the callback run when the user finishes drawing the polygon (double-click closes it), with the values already summed. Called as `runOnClick(layersValues, inputs, feature)` with `this` = the layer: `layersValues` is the array described in… |
-| `text` | `String` | Defines the text shown next to the toggle switch. |
-| `unselect` | `Boolean` | Only changes the activation message (`true`: one selection expected, `false`: several); the tool always deactivates itself after a polygon is summed. |
-| `value` | `Array.<Number>` | Value stored in `inputs.id[ID]`: an array meant to hold the last `layersValues` (one sum per inner layer, see `getSummedLayerValues`). In the current implementation the tool does not copy the sums into it after drawing — it stays empty — so read the results… |
-
-Full descriptions, defaults and examples: [SummedArea in the API reference](/api/#category_SummedArea).
-
-## Window — Floating Window tool
-
-Tool that allows to show contents in an interactive floating window. It can only be shown when the layer is visible.
-
-| Name | Type | Description |
-|---|---|---|
-| `btnID` | `String` | Defines the id of the button that controls the window visibility. |
-| `getButton` | `function() : Ext.Button` | Returns the show/hide toggle `Ext.Button` (id `btnID`), e.g. to `toggle(true)`, `setText()` or `hide()` it. |
-| `getContainer` | `function() : Ext.Container` | Returns the content container (`Ext.Container`, id `id`) inside the window. Use `update(html)` to replace its HTML, or `add()`/`doLayout()` to place Ext components in it. |
-| `getIds` | `function() : Array.<String>` | Returns the ids of the three components created by the tool, in the order `[windowID, id (content div), btnID]`. |
-| `getWindow` | `function() : Ext.Window` | Returns the floating `Ext.Window` (use it for `show()`, `hide()`, `setTitle()`, `setSize()`, `setPosition()`...). Prefer `getButton().toggle()` to change visibility so the button stays in sync. |
-| `height` | `number` | Defines the floating window initial height. |
-| `html` | `String` | Defines the initial HTML content of the window's container div. Because the parser treats everything after `html=` as the value, the content may contain `=` characters; it cannot contain `\|` or `}}`. For content built at runtime, write into the container… |
-| `id` | `String` | Defines an id for the div contained in the floating window (where the content can be drawn). |
-| `ignoreVisibility` | `Boolean` | Defines if the window should ignore the layer visibility state. By default, the window visibility state is the same as the layer's. Set true to ignore the layer visibility state, false otherwise. PS: The 'ignoreVisibility' is not compatible with the… |
-| `items` | `Array` | Not supported: the tool always creates its own single content container (the div identified by `id`), so any `items` written in the markup are discarded. Put content in with `html=`, or render into the container from code (`Ext.getCmp(id)` /… |
-| `onBeforeHide` | `function` | Defines a callback function to be called before hiding the floating window. @param layer {Object} Scope of the layer @param data {Array} [window, button, windowConfig] window: Window object; button: Button created; windowConfig: Window object configuration |
-| `resize` | `function` | Defines the callback function to be called when the floating window is resized. |
-| `startVisible` | `Boolean` | Defines if the window should start visible or not. Set true if it should, false otherwise. |
-| `text` | `string` | Defines the window button text. |
-| `title` | `String` | Defines the floating window's title. |
-| `toggle` | `function(pressed)` | Shows or hides the floating window from code by pressing/releasing its toggle button — the same as the user clicking it, so `onBeforeHide` still runs. Call it on the button: `inputs.id[ID].getButton().toggle(state)` or `Ext.getCmp(btnID).toggle(state)`.… |
-| `underButtons` | `Boolean` | Defines where the floating window will be positioned in relation to the buttons panel. Set true to position the window under the right buttons panel, false otherwise. |
-| `value` | `Object` | Value stored in `inputs.id[btnID]` - under the show/hide button's id, not the markup `id`, so set `btnID` to read it (without one the key is an automatic id): a small handle object with the methods `getIds()`, `getWindow()`, `getButton()` and `getContainer()`… |
-| `width` | `number` | Defines the floating window initial width. |
-| `windowID` | `String` | Defines the window id. |
-| `x` | `Number` | Defines the initial absolute X position of the window, in pixels from the left edge of the page. A negative value counts from the right edge instead: the window's right side is placed at `viewportWidth + x` (e.g. `x=-10` leaves a 10px margin on the right).… |
-| `y` | `Number` | Defines the initial absolute Y position of the window, in pixels from the top of the page. A negative value counts from the bottom edge instead: the window's bottom side is placed at `viewportHeight + y` (e.g. `y=-20` leaves a 20px margin at the bottom). PS:… |
-
-Full descriptions, defaults and examples: [Window in the API reference](/api/#category_Window).
-
-## Checkbox — Checkbox tool
-
-A checkbox that calls a function of the layer when toggled. It is not registered as an input: read its state inside the handler. Usage: {{checkbox\|text=Show details\|handler=onToggleDetails}}
-
-| Name | Type | Description |
-|---|---|---|
-| `checked` | `Boolean` | Set true to start checked. `handler` is not run for the initial state. |
-| `fieldLabel` | `String` | Defines a label at the left of the whole field (Ext `fieldLabel`), in addition to the `text` shown next to the switch. `hideLabel=true` removes it and its reserved space. |
-| `forceUpdateLayer` | `function()` | Fires the `forceupdatelayer` event of the widget. For the map-interaction tools registered as inputs (summedarea, areaintegral) this is the event the layer listens to, so calling it marks the input as changed and recalculates the layer with the values… |
-| `handler` | `function` | Defines the callback run whenever the checkbox is checked or unchecked (by the user or by `toggle()`). Called as `handler(checkbox, checked)` with `this` = the layer. The value is resolved in this order: a key of the layer `functions` object, then a global… |
-| `iconCls` | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. |
-| `id` | `String` | Defines the id of the checkbox component (`Ext.getCmp(id)`), e.g. to call `toggle()` or `setBoxLabel()` from a button. Generated when omitted. |
-| `inputValue` | `String` | Defines the DOM `value` attribute of the underlying `<input type="checkbox">` (useful inside an HTML form). |
-| `labelBefore` | `Boolean` | Set true to render the `text` before (left of) the toggle switch instead of after it. |
-| `notify` | `Boolean` | Accepted for parity with the map-picking switches (pickpoint, hoverpixel...), where it controls the activation notification. A plain checkbox shows no notification, so the value has no effect here. |
-| `setBoxLabel` | `function(boxLabel)` | Changes the text shown next to the checkbox (the markup `text` parameter) after it was rendered. Available on every checkbox-style tool (checkbox, pickpoint, hoverpixel, summedarea, areaintegral); get the component with `Ext.getCmp(id)`. @param boxLabel… |
-| `text` | `String` | Defines the text shown next to the toggle switch (the checkbox `boxLabel`). |
-| `toggle` | `function(forceState)` | Checks or unchecks the checkbox from code, running its `handler` as if the user had clicked it. Without an argument the current state is inverted. Get the component with `Ext.getCmp(id)`. @param forceState {Boolean} `true` to check, `false` to uncheck; omit… |
-| `unselect` | `Boolean` | Accepted for parity with the map-picking switches, where it selects the activation message. A plain checkbox never unchecks itself, so the value has no effect here. |
-
-Full descriptions, defaults and examples: [Checkbox in the API reference](/api/#category_Checkbox).
-
-## ZoomLevel — Zoom level input
-
-A hidden input whose value is the current map zoom level; the layer recalculates whenever the zoom changes. Usage: {{zoomlevel\|id=zoom}} then inputs.id['zoom'] in beforeCalc/expression
-
-| Name | Type | Description |
-|---|---|---|
-| `id` | `String` | Defines the id of the input; it is the key used to read the zoom level in `inputs.id[ID]` (required, the tool renders nothing visible). |
-| `value` | `Number` | Value stored in `inputs.id[ID]` (and `inputs[i]`) for `beforeCalc`/`expression`: the current map zoom level as a number. It is refreshed on the map `moveend` event and only triggers a recalculation when the zoom actually changed (panning is ignored). |
-
-Full descriptions, defaults and examples: [ZoomLevel in the API reference](/api/#category_ZoomLevel).
-
-## AreaIntegral — Area integral tool
-
-Two clicks on the map define a rectangle; the tool sums the map values inside it using summed-area (integral) maps, so it only works with maps published with the 'integral' operation. Callback parameters (layersValues {Array[Number]}, inputs {Array}, boundingBox {Array[Number]} in EPSG:4326, pixel {x,y}, lastInfo {first, second}) Usage: {{areaintegral\|runOnClick=onAreaSummed}}
-
-| Name | Type | Description |
-|---|---|---|
-| `getLayerValues` | `function(mousePoint, layer) : Array.<Number>\|null` | Reads the composed map at one screen position: one value per inner layer (decoded from the tile colours through the legend, null cells read as 0) plus one extra entry with the layer `expression` result for those values. The tool samples the four corners of… |
-| `iconCls` | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. |
-| `id` | `String` | Defines the id of the tool: the key used in `inputs.id[ID]` and the id of the container component (`Ext.getCmp(id)`; the switch itself is `Ext.getCmp(id).items.get(0)`). Generated when omitted. |
-| `labelBefore` | `Boolean` | Set true to render the `text` label before (left of) the toggle switch instead of after it. |
-| `notify` | `Boolean` | Set false to suppress the notification shown when the tool is activated. |
-| `runOnClick` | `function` | Defines the callback run after the second click closes the rectangle, with the sums computed. Called as `runOnClick(layersValues, inputs, boundingBox, pixel, lastInfo)` with `this` = the layer: `layersValues` has one summed value per inner layer (see… |
-| `text` | `String` | Defines the text shown next to the toggle switch. |
-| `unselect` | `Boolean` | Only changes the activation message (`true`: one selection expected, `false`: several); the tool always deactivates itself after the second click. |
-| `value` | `Array.<Number>` | Value stored in `inputs.id[ID]`: the `layersValues` array of the tool — one summed value per inner layer of the composed map for the last rectangle (empty before the first one). The array is updated in place after the second click, so… |
-
-Full descriptions, defaults and examples: [AreaIntegral in the API reference](/api/#category_AreaIntegral).
-
-## MarkupSyntax — Markup syntax (all tools)
+## MarkupSyntax — Markup rules for every widget
 
 Rules shared by every tool written inside descriptionHtml as {{tool\|param=value\|param2=value2}}: how parameters are parsed, the values they accept and the special parameters (getid, function, on_&lt;event&gt;, isnumeric, cls, key=false, nested a=b=c, escaped \= ) available to all tools. Function-valued parameters (handler, runOnClick, runOnHover, onSelect, ...) are resolved in this order: a key…
 
 | Name | Type | Description |
 |---|---|---|
-| `cls` | `String` | `cls=<class>` adds CSS classes to the created element. Unlike other keys, repeating it concatenates the values (with no separator — start the second one with a space, or list all classes in a single `cls`). |
-| `defaultParsing` | `String\|Number` | How a plain `param=value` is converted before reaching the tool: a value that looks like a number (`10`, `-4.5`, `1e3`) becomes a JavaScript number, an empty value (`param=`) becomes the empty string (falsy), and anything else stays a string — tools that need… |
-| `escapedEquals` | `String` | Write `\=` to put a literal `=` inside a value; a bare `=` would start a nested key (see `nestedKeys`). Needed above all in URLs with query strings. Inside a JavaScript string remember to double the backslash (`'\\='`). The value of `html=` is exempt:… |
-| `falseValue` | `Boolean` | `param=false` is rewritten to `param=` (an empty, falsy value) before parsing, because the literal text `"false"` would otherwise be a truthy string. Use it to switch off a boolean parameter whose default is true (`unselect=false`, `notify=false`,… |
-| `function` | `function` | `function=<body>` stores a function whose body is the given text (`function () { <body> }`), evaluated with no `try/catch` and no lookup in the layer `functions`. Use the nested form `param=function=<body>` to assign it to a parameter (a top-level `function=`… |
-| `getid` | `Object` | `getid=ID` gives access to an element created EARLIER in the same description (by any tag with that `id`). At the top level (`\|getid=slider1\|`) the element is stored in the tool config under `getid`; the common use is to attach a listener to it with… |
-| `html` | `String` | `html=` is the one key whose value is taken verbatim up to the next `\|`: `=` characters inside it are kept and no nesting happens. Used by `label` and `window`. |
-| `isnumeric` | `Boolean` | `\|isnumeric\|` (or `isnumeric=true`) installs a validator that only accepts numeric text — the field is marked invalid with the localized "must be a number" message otherwise. Meant for `textfield`. Note that the input value is still delivered as a string;… |
-| `nestedKeys` | `Object` | `a=b=c` creates a nested object: the tool receives `{a: {b: c}}`. The innermost `key=value` is parsed with the same rules as a top-level one, so the special keys work at any depth — `plugins=tip=...` builds a slider tip plugin, `scope=getid=ID` assigns an… |
-| `on_event` | `function` | `on_<event>=<code>` adds a listener for an Ext event (`change`, `select`, `afteredit`, `toggle`...) on an element referenced with `getid` — the form is `getid=ID\|getid=on_<event>=<code>`; it cannot be used on the tag's own element. `<code>` is either a full… |
-| `tip` | `Object` | `tip=<format>` builds an `Ext.slider.Tip` whose text is `String.format(format, thumbValue, value of thumb 0, value of thumb 1...)`, so `{0}` is the dragged thumb value. It must be assigned to a slider's `plugins` with the nested form `plugins=tip=<format>`; a… |
+| [`cls`](/api/#MarkupSyntax.cls) | `String` | `cls=<class>` adds CSS classes to the created element. Unlike other keys, repeating it concatenates the values (with no separator — start the second one with a space, or list all classes in a single `cls`). |
+| [`defaultParsing`](/api/#MarkupSyntax.defaultParsing) | `String\|Number` | How a plain `param=value` is converted before reaching the tool: a value that looks like a number (`10`, `-4.5`, `1e3`) becomes a JavaScript number, an empty value (`param=`) becomes the empty string (falsy), and anything else stays a string — tools that need… |
+| [`escapedEquals`](/api/#MarkupSyntax.escapedEquals) | `String` | Write `\=` to put a literal `=` inside a value; a bare `=` would start a nested key (see `nestedKeys`). Needed above all in URLs with query strings. Inside a JavaScript string remember to double the backslash (`'\\='`). The value of `html=` is exempt:… |
+| [`falseValue`](/api/#MarkupSyntax.falseValue) | `Boolean` | `param=false` is rewritten to `param=` (an empty, falsy value) before parsing, because the literal text `"false"` would otherwise be a truthy string. Use it to switch off a boolean parameter whose default is true (`unselect=false`, `notify=false`,… |
+| [`function`](/api/#MarkupSyntax.function) | `function` | `function=<body>` stores a function whose body is the given text (`function () { <body> }`), evaluated with no `try/catch` and no lookup in the layer `functions`. Use the nested form `param=function=<body>` to assign it to a parameter (a top-level `function=`… |
+| [`getid`](/api/#MarkupSyntax.getid) | `Object` | `getid=ID` gives access to an element created EARLIER in the same description (by any tag with that `id`). At the top level (`\|getid=slider1\|`) the element is stored in the tool config under `getid`; the common use is to attach a listener to it with… |
+| [`html`](/api/#MarkupSyntax.html) | `String` | `html=` is the one key whose value is taken verbatim up to the next `\|`: `=` characters inside it are kept and no nesting happens. Used by `label` and `window`. |
+| [`isnumeric`](/api/#MarkupSyntax.isnumeric) | `Boolean` | `\|isnumeric\|` (or `isnumeric=true`) installs a validator that only accepts numeric text — the field is marked invalid with the localized "must be a number" message otherwise. Meant for `textfield`. Note that the input value is still delivered as a string;… |
+| [`nestedKeys`](/api/#MarkupSyntax.nestedKeys) | `Object` | `a=b=c` creates a nested object: the tool receives `{a: {b: c}}`. The innermost `key=value` is parsed with the same rules as a top-level one, so the special keys work at any depth — `plugins=tip=...` builds a slider tip plugin, `scope=getid=ID` assigns an… |
+| [`on_event`](/api/#MarkupSyntax.on_event) | `function` | `on_<event>=<code>` adds a listener for an Ext event (`change`, `select`, `afteredit`, `toggle`...) on an element referenced with `getid` — the form is `getid=ID\|getid=on_<event>=<code>`; it cannot be used on the tag's own element. `<code>` is either a full… |
+| [`tip`](/api/#MarkupSyntax.tip) | `Object` | `tip=<format>` builds an `Ext.slider.Tip` whose text is `String.format(format, thumbValue, value of thumb 0, value of thumb 1...)`, so `{0}` is the dragged thumb value. It must be assigned to a slider's `plugins` with the nested form `plugins=tip=<format>`; a… |
 
 Full descriptions, defaults and examples: [MarkupSyntax in the API reference](/api/#category_MarkupSyntax).
+
+## HTML — Free HTML
+
+Any HTML is possible to be added to the layer description.
+
+| Name | Type | Description |
+|---|---|---|
+| [`content`](/api/#HTML.content) | `String` | Free HTML inside a layer's `descriptionHtml`: everything that is not a `{{tag}}` is passed through to the panel untouched, so a description can carry headings, images, links, tables and the container elements a chart or a custom control needs. Widgets and… |
+
+Full descriptions, defaults and examples: [HTML in the API reference](/api/#category_HTML).
+
+## AreaIntegral — areaintegral · sum inside a rectangle (input)
+
+Two clicks on the map define a rectangle; the tool sums the map values inside it using summed-area (integral) maps, so it only works with maps published with the 'integral' operation. Callback parameters (layersValues {Array[Number]}, inputs {Array}, boundingBox {Array[Number]} in EPSG:4326, pixel {x,y}, lastInfo {first, second}) Usage: {{areaintegral\|runOnClick=onAreaSummed}}
+
+| Name | Type | Description |
+|---|---|---|
+| [`getLayerValues`](/api/#AreaIntegral.getLayerValues) | `function(mousePoint, layer) : Array.<Number>\|null` | Reads the composed map at one screen position: one value per inner layer (decoded from the tile colours through the legend, null cells read as 0) plus one extra entry with the layer `expression` result for those values. The tool samples the four corners of… |
+| [`iconCls`](/api/#AreaIntegral.iconCls) | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. |
+| [`id`](/api/#AreaIntegral.id) | `String` | Defines the id of the tool: the key used in `inputs.id[ID]` and the id of the container component (`Ext.getCmp(id)`; the switch itself is `Ext.getCmp(id).items.get(0)`). Generated when omitted. |
+| [`labelBefore`](/api/#AreaIntegral.labelBefore) | `Boolean` | Set true to render the `text` label before (left of) the toggle switch instead of after it. |
+| [`notify`](/api/#AreaIntegral.notify) | `Boolean` | Set false to suppress the notification shown when the tool is activated. |
+| [`runOnClick`](/api/#AreaIntegral.runOnClick) | `function` | Defines the callback run after the second click closes the rectangle, with the sums computed. Called as `runOnClick(layersValues, inputs, boundingBox, pixel, lastInfo)` with `this` = the layer: `layersValues` has one summed value per inner layer (see… |
+| [`text`](/api/#AreaIntegral.text) | `String` | Defines the text shown next to the toggle switch. |
+| [`unselect`](/api/#AreaIntegral.unselect) | `Boolean` | Only changes the activation message (`true`: one selection expected, `false`: several); the tool always deactivates itself after the second click. |
+| [`value`](/api/#AreaIntegral.value) | `Array.<Number>` | Value stored in `inputs.id[ID]`: the `layersValues` array of the tool — one summed value per inner layer of the composed map for the last rectangle (empty before the first one). The array is updated in place after the second click, so… |
+
+Full descriptions, defaults and examples: [AreaIntegral in the API reference](/api/#category_AreaIntegral).
+
+## Button — button · push or toggle button
+
+Create a simple button to user interact with the map.
+
+| Name | Type | Description |
+|---|---|---|
+| [`enableToggle`](/api/#Button.enableToggle) | `Boolean` | Defines the button type as toggle. Set true to use as toggle, false otherwise. PS: When its true the callback is 'toggleHandler', otherwise the callback is 'handler'. |
+| [`fieldLabel`](/api/#Button.fieldLabel) | `String` | Defines the button label. |
+| [`handler`](/api/#Button.handler) | `function` | Defines the callback function on button click event. This should be used when the enableToggle property is false. `this` inside the callback is the layer. The value is resolved in this order: (1) a key of the layer `functions` object with that name; (2) a… |
+| [`hidden`](/api/#Button.hidden) | `Boolean` | Set true to create the button hidden (Ext `hidden` config); show it later with `Ext.getCmp(id).show()`. This is one example of the pass-through: every other `Ext.Button` config (`iconCls`, `tooltip`, `cls`, `width`, `disabled`, `scale`...) written in the… |
+| [`id`](/api/#Button.id) | `String` | Defines the id to identify the object. |
+| [`pressed`](/api/#Button.pressed) | `Boolean` | Defines the button initial state. Set it true to start pressed (only if enableToggle = true), false otherwise. |
+| [`text`](/api/#Button.text) | `String` | Defines the button text. |
+| [`toggle`](/api/#Button.toggle) | `function` | Alias of `toggleHandler`: a function given as `toggle=` is moved to `toggleHandler` (unless one is already defined), so the Ext `toggle()` method of the button is never overwritten. Prefer `toggleHandler`. |
+| [`toggleHandler`](/api/#Button.toggleHandler) | `function` | Defines the callback function on button toggle event. This should be used when the enableToggle property is true. `this` inside the callback is the layer. The value is resolved in this order: (1) a key of the layer `functions` object with that name; (2) a… |
+
+Full descriptions, defaults and examples: [Button in the API reference](/api/#category_Button).
+
+## Checkbox — checkbox · on/off, calls a function
+
+A checkbox that calls a function of the layer when toggled. It is not registered as an input: read its state inside the handler. Usage: {{checkbox\|text=Show details\|handler=onToggleDetails}}
+
+| Name | Type | Description |
+|---|---|---|
+| [`checked`](/api/#Checkbox.checked) | `Boolean` | Set true to start checked. `handler` is not run for the initial state. |
+| [`fieldLabel`](/api/#Checkbox.fieldLabel) | `String` | Defines a label at the left of the whole field (Ext `fieldLabel`), in addition to the `text` shown next to the switch. `hideLabel=true` removes it and its reserved space. |
+| [`forceUpdateLayer`](/api/#Checkbox.forceUpdateLayer) | `function()` | Fires the `forceupdatelayer` event of the widget. For the map-interaction tools registered as inputs (summedarea, areaintegral) this is the event the layer listens to, so calling it marks the input as changed and recalculates the layer with the values… |
+| [`handler`](/api/#Checkbox.handler) | `function` | Defines the callback run whenever the checkbox is checked or unchecked (by the user or by `toggle()`). Called as `handler(checkbox, checked)` with `this` = the layer. The value is resolved in this order: a key of the layer `functions` object, then a global… |
+| [`iconCls`](/api/#Checkbox.iconCls) | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. |
+| [`id`](/api/#Checkbox.id) | `String` | Defines the id of the checkbox component (`Ext.getCmp(id)`), e.g. to call `toggle()` or `setBoxLabel()` from a button. Generated when omitted. |
+| [`inputValue`](/api/#Checkbox.inputValue) | `String` | Defines the DOM `value` attribute of the underlying `<input type="checkbox">` (useful inside an HTML form). |
+| [`labelBefore`](/api/#Checkbox.labelBefore) | `Boolean` | Set true to render the `text` before (left of) the toggle switch instead of after it. |
+| [`notify`](/api/#Checkbox.notify) | `Boolean` | Accepted for parity with the map-picking switches (pickpoint, hoverpixel...), where it controls the activation notification. A plain checkbox shows no notification, so the value has no effect here. |
+| [`setBoxLabel`](/api/#Checkbox.setBoxLabel) | `function(boxLabel)` | Changes the text shown next to the checkbox (the markup `text` parameter) after it was rendered. Available on every checkbox-style tool (checkbox, pickpoint, hoverpixel, summedarea, areaintegral); get the component with `Ext.getCmp(id)`. @param boxLabel… |
+| [`text`](/api/#Checkbox.text) | `String` | Defines the text shown next to the toggle switch (the checkbox `boxLabel`). |
+| [`toggle`](/api/#Checkbox.toggle) | `function(forceState)` | Checks or unchecks the checkbox from code, running its `handler` as if the user had clicked it. Without an argument the current state is inverted. Get the component with `Ext.getCmp(id)`. @param forceState {Boolean} `true` to check, `false` to uncheck; omit… |
+| [`unselect`](/api/#Checkbox.unselect) | `Boolean` | Accepted for parity with the map-picking switches, where it selects the activation message. A plain checkbox never unchecks itself, so the value has no effect here. |
+
+Full descriptions, defaults and examples: [Checkbox in the API reference](/api/#category_Checkbox).
+
+## Combobox — combobox · pick from a list (input)
+
+It creates an input of ComboBox tool where the value is selectable from a list. Usage: '{{combobox}}' or <a href='/elements/combobox-widget/'>examples</a>.
+
+| Name | Type | Description |
+|---|---|---|
+| [`data`](/api/#Combobox.data) | `Array.<Array.<String>>` | Defines the data that will be displayed in the Combobox. |
+| [`editable`](/api/#Combobox.editable) | `Boolean` | Determines if the Combobox is editable. That is, if it allows the user to type inside the input field. Set it true to allow it, false otherwise. |
+| [`fieldLabel`](/api/#Combobox.fieldLabel) | `String` | Defines a label for the Combobox. It will be shown at the left of the Combobox, by default. |
+| [`getValue`](/api/#Combobox.getValue) | `function() : String` | Returns the currently selected value (the text of the chosen `data` entry). Call it on the component (`Ext.getCmp(id)` or a `getid=` reference); `inputs.id[ID]` already holds the same value. |
+| [`hideLabel`](/api/#Combobox.hideLabel) | `Boolean` | Defines if the label of the Combobox should be displayed. Set true to hide the label, false to show it. |
+| [`id`](/api/#Combobox.id) | `String` | Defines the id to identify the object. |
+| [`labelStyle`](/api/#Combobox.labelStyle) | `String` | Defines the style of the label. You can use CSS to style the label element. |
+| [`onSelect`](/api/#Combobox.onSelect) | `function` | Defines a callback run when the user picks an entry. It receives the Ext `select` event arguments `(combo, record, index)` — read the chosen text with `record.get('value')` — and `this` is the layer. The value is resolved as a key of the layer `functions`… |
+| [`setValue`](/api/#Combobox.setValue) | `function(value)` | Selects an entry from code. Pass one of the `data` values; it does not fire `select`, so call `forceRecalc()` on an InputManager (or fire the event) when the layer must be recalculated. @param value {String} One of the values listed in `data`. |
+| [`value`](/api/#Combobox.value) | `String` | Value stored in `inputs.id[ID]` (and `inputs[i]`): the selected entry of `data` as a string (the first entry is selected initially). The layer recalculates on the combobox `select` event (user choice). |
+| [`width`](/api/#Combobox.width) | `Number` | Defines the width of the combobox in pixels. |
+
+Full descriptions, defaults and examples: [Combobox in the API reference](/api/#category_Combobox).
+
+## FileField — filefield · open a local file (input)
+
+Tool that allows handle and local files. PS: This object cannot be sent to 'expression'. Usage: {{filefield\|fieldLabel=loadshp\|id=loadshp\|_onChange=function(){alert('changed')}}}
+
+| Name | Type | Description |
+|---|---|---|
+| [`eventNames`](/api/#FileField.eventNames) | `Array.<string>` | Defines the list of events by name. Use this property to define callback functions to any of the following events. |
+| [`fieldLabel`](/api/#FileField.fieldLabel) | `String` | Defines the label shown at the left of the file input (Ext `fieldLabel`). `hideLabel=true` removes the label and its reserved space; other `Ext.form.Field` configs are passed through unchanged. |
+| [`hideLabel`](/api/#FileField.hideLabel) | `Boolean` | Set true to hide the label element and the space reserved for it. |
+| [`id`](/api/#FileField.id) | `String` | Defines the id of the input; it is the key used in `inputs.id[ID]` and the id of the Ext field (`Ext.getCmp(id)`), so it must be unique in the page. |
+| [`ignoreUpdate`](/api/#FileField.ignoreUpdate) | `Boolean` | Defines if it should ignore the widget change event. If it's false, it dispatches the update event at every file selection. |
+| [`inputType`](/api/#FileField.inputType) | `String` | The HTML input type. It is always forced to `file` by the tool, so a value written in the markup is ignored (documented only to explain why it cannot be changed). |
+| [`value`](/api/#FileField.value) | `function` | Value stored in `inputs.id[ID]`: not the file itself but a getter function. Call it — `inputs.id[ID]()` — to obtain the selected `File` (the first entry of the DOM `files` list) or `undefined` when nothing is selected. It is a function so the value can never… |
+
+Full descriptions, defaults and examples: [FileField in the API reference](/api/#category_FileField).
+
+## Hoverpixel — hoverpixel · value under the mouse (input)
+
+Create a tool to instantly inspect pixel under mouse. The value of the map can also be used as input for another functions. Usage: {{hoverpixel}}
+
+| Name | Type | Description |
+|---|---|---|
+| [`checked`](/api/#Hoverpixel.checked) | `Boolean` | Defines if the hoverPixel should start enabled. Set true to start enabled, false otherwise. |
+| [`fieldLabel`](/api/#Hoverpixel.fieldLabel) | `String` | Define the text that will be displayed at the left of the toggler |
+| [`getLayerValues`](/api/#Hoverpixel.getLayerValues) | `function(evt, layer) : Array.<Number>\|null` | Reads the values of the composed map under a mouse event: one value per inner layer (from the legend colours of the rendered tiles) plus one extra entry with the result of the layer `expression` for those values. This is the `layerVals` argument of… |
+| [`hideLabel`](/api/#Hoverpixel.hideLabel) | `Boolean` | Defines if the label of the HoverPixel should be displayed. Set true to hide the label, false to show it. |
+| [`iconCls`](/api/#Hoverpixel.iconCls) | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. |
+| [`id`](/api/#Hoverpixel.id) | `String` | Defines the id to identify the object. |
+| [`labelBefore`](/api/#Hoverpixel.labelBefore) | `Boolean` | Set true to render the `text` label before (left of) the toggle switch instead of after it. |
+| [`labelStyle`](/api/#Hoverpixel.labelStyle) | `String` | Defines the style of the label at the HoverPixel toggler. You can use CSS to style the label element. |
+| [`notify`](/api/#Hoverpixel.notify) | `Boolean` | Set false to suppress the notification shown when the tool is activated ("click on the map..."). |
+| [`runOnClick`](/api/#Hoverpixel.runOnClick) | `function` | Defines a callback when the user clicks on the map. It passes the following parameters for the callback function: handleOnClick(layerVals, inputs, coordinates, clickEvent, lastCoordinates) @param layerVals {Array} Array with the values of the maps at the… |
+| [`runOnClickOutside`](/api/#Hoverpixel.runOnClickOutside) | `function` | True to run the callback function even when clicking outside of the layer, False to disable. (Default False) |
+| [`runOnHover`](/api/#Hoverpixel.runOnHover) | `function` | Defines a callback when the user hovers the map. It passes the following parameters for the callback function: handleOnClick(layerVals, inputs, coordinates, clickEvent, lastCoordinates) @param layerVals {Array} Array with the values of the maps at the pixel… |
+| [`runOnHoverOutside`](/api/#Hoverpixel.runOnHoverOutside) | `function` | True to run the callback function even when hovering outside of the layer, False to disable. (Default False) |
+| [`text`](/api/#Hoverpixel.text) | `String` | Define the text that will be displayed at the right of the toggler |
+| [`unselect`](/api/#Hoverpixel.unselect) | `Boolean` | Only changes the activation message: with the default `true` it says a single point is expected, with `false` several. The hoverpixel is never deactivated automatically after a click. |
+| [`value`](/api/#Hoverpixel.value) | `Object` | Value stored in `inputs.id[ID]`: the `lastInfo` object `{click, hover}` with the coordinates (`{lon, lat}` in EPSG:4326, or `null` before the first event) of the last click and of the last mouse move while the tool is active. The object is updated in place,… |
+
+Full descriptions, defaults and examples: [Hoverpixel in the API reference](/api/#category_Hoverpixel).
+
+## InputManager — inputmanager · values kept for your functions (input)
+
+Tool to store local variables to be used in others functions callbacks. PS: DOM elements cannot be used in 'expression' context, because them cannot be sent to WebWorkers (javascript language limitation). Usage: '{{inputmanager}}'
+
+| Name | Type | Description |
+|---|---|---|
+| [`forceRecalc`](/api/#InputManager.forceRecalc) | `function()` | Force a legend map recalculation. |
+| [`getValue`](/api/#InputManager.getValue) | `function(key) : *` | Get the stored value by his property name, if it does not exists returns null. @param key {String} Stored property name. |
+| [`id`](/api/#InputManager.id) | `String` | Defines the id of the input; it is the key used to reach the manager in `inputs.id[ID]` (required, the tool renders nothing visible). |
+| [`setDefaultValues`](/api/#InputManager.setDefaultValues) | `function(obj, local)` | Set default values to the stored elements, these values are used before any other value is defined and never update or replace another stored values. PS: Auxiliary function to make easy wrinting the script (typically called in `onInputsReady` or at the start… |
+| [`setValues`](/api/#InputManager.setValues) | `function(obj, cancelUpdate, local)` | Stores object properties for later usage. PS: If has name property collision the older is replaced. PS: Values go to one of two buckets of the manager: `global` (the default — serialized and sent to `expression`, so it must hold plain JSON-compatible data) or… |
+| [`value`](/api/#InputManager.value) | `Object` | Value stored in `inputs.id[ID]`: the manager object itself, with `getValue(key)`, `setValues(obj, cancelUpdate, local)`, `setDefaultValues(obj, local)` and `forceRecalc()` (listed in this group) and the `global` bucket where the stored properties live… |
+
+Full descriptions, defaults and examples: [InputManager in the API reference](/api/#category_InputManager).
+
+## Label — label · text
+
+Create a simple label element to display some text. Usage: {{label\|}}
+
+| Name | Type | Description |
+|---|---|---|
+| [`cls`](/api/#Label.cls) | `String` | Extra CSS class(es) added to the `<label>` element. |
+| [`forId`](/api/#Label.forId) | `String` | Defines the id of the form field the label is for (rendered as the `for` attribute of the `<label>`), so clicking the label focuses that field. |
+| [`html`](/api/#Label.html) | `String` | Defines the content of the label as raw HTML (not escaped). Everything after `html=` up to the next `\|` is the value, so it may contain `=` characters. `text` wins when both are given. |
+| [`id`](/api/#Label.id) | `String` | Defines the id of the label component (`Ext.getCmp(id)`), needed to change its text from code or to reference it with `getid=` in another tag. Generated when omitted. |
+| [`style`](/api/#Label.style) | `String` | Inline CSS applied to the `<label>` element. Any other `Ext.form.Label`/`Ext.Component` config (`hidden`, `width`...) is passed through unchanged. |
+| [`text`](/api/#Label.text) | `String` | Defines the text of the label. It is HTML-escaped, so use `html` when markup is needed. Update it later with `Ext.getCmp(id).setText(text)` (typically from an `on_change=` listener of a slider or textfield through `getid=`). |
+
+Full descriptions, defaults and examples: [Label in the API reference](/api/#category_Label).
+
+## LegendHtml — legendhtml · legend of the calculated map
+
+Create a tool with the map legends at any place of the query description. Usage: '{{legendhtml}}'
+
+| Name | Type | Description |
+|---|---|---|
+| [`autoWidth`](/api/#LegendHtml.autoWidth) | `Boolean` | Set true (default) to let the legend panel take the width of its container; set false to give it a fixed `width`. |
+| [`filterLayers`](/api/#LegendHtml.filterLayers) | `Array.<Number>` | Defines an array of indexes of layers to be included in map legend (from 0 to quantity of layers). If not defined, all layer legends are shown by default. Otherwise, only the listed indexes are included. Ex: A composed layer with three maps: name:… |
+| [`id`](/api/#LegendHtml.id) | `String` | Defines the id of the legend panel component (`Ext.getCmp(id)`), e.g. to `show()`/`hide()` it or to find the legend entries inside it. Generated when omitted. Other `GeoExt.WMSLegend`/`Ext.Panel` configs (`cls`, `style`, `hidden`, `useScaleParameter`,… |
+| [`legendId`](/api/#LegendHtml.legendId) | `String` | Defines the legend container id. You can use this id to toggle each legend filter individually. |
+| [`preventClick`](/api/#LegendHtml.preventClick) | `Boolean` | Defines if the user can filter the maps categories by clicking on the legend. Set it true to ignore the legend click, false otherwise. |
+| [`reverseLegend`](/api/#LegendHtml.reverseLegend) | `Boolean` | Defines if it should sort the legend on the decreasing order. Set it true to use the decreasing order, false otherwise. |
+| [`useScaleParameter`](/api/#LegendHtml.useScaleParameter) | `Boolean` | Set true to request a new legend image from the server whenever the map scale changes (GeoServer `SCALE` parameter), for styles that depend on the scale. Off by default: the legend is generated once and reused, which is faster and keeps the click-to-filter… |
+
+Full descriptions, defaults and examples: [LegendHtml in the API reference](/api/#category_LegendHtml).
+
+## LiveComposedSplit — livecomposedsplit · split-screen comparison
+
+Compare two styles of a Composed layer with a live split-screen slider on the map. The layer must be a Composed layer (typically the same WMS layer twice in `name` with two `styles`). Put the tool in `descriptionHtml`, open the query panel, choose left/right styles, then press Compare to show a draggable vertical divider. Required parameters: displayNames, layerNames (same order and length).…
+
+| Name | Type | Description |
+|---|---|---|
+| [`applySelectedStyles`](/api/#LiveComposedSplit.applySelectedStyles) | `function()` | Pushes the two selected styles to the composed layer (`changeLayers` with the left style on child 0 and the right style on child 1) and makes both children visible. Called when Compare is pressed; after calling it yourself use `refreshActiveSplit()` so the… |
+| [`baseName`](/api/#LiveComposedSplit.baseName) | `String` | WMS layer name used with each style (e.g. CSR:precip_monthly_average). Defaults to layer.params.LAYERS when omitted. |
+| [`cls`](/api/#LiveComposedSplit.cls) | `String` | Extra CSS class for the Compare toggle button (replaces the default `clickable`; the class `live-composed-split-compare` is always added). |
+| [`composedLayerName`](/api/#LiveComposedSplit.composedLayerName) | `String` | Name of the Composed layer to split. If omitted, the first OpenLayers.Layer.Composed on the map is used. |
+| [`destroySplitControl`](/api/#LiveComposedSplit.destroySplitControl) | `function()` | Removes the split divider control from the map for good (it is recreated on the next Compare press). The panel calls it when its layer is removed; call it to force a clean state. It does not restore the single-style view — press the Compare button off… |
+| [`displayNames`](/api/#LiveComposedSplit.displayNames) | `String` | Comma-separated labels shown in the left/right combo boxes (required). |
+| [`id`](/api/#LiveComposedSplit.id) | `String` | Id of the Compare button (wrapper id is id + "_container"). |
+| [`isComparisonActive`](/api/#LiveComposedSplit.isComparisonActive) | `function() : Boolean` | Tells whether the split comparison is currently shown on the map (Compare pressed and the divider active). Get the panel with `Ext.getCmp(id + '_container')`, where `id` is the markup id. |
+| [`layerNames`](/api/#LiveComposedSplit.layerNames) | `String` | Comma-separated WMS style names aligned with displayNames (required). When Compare is pressed, the composed layer switches to the selected pair. |
+| [`layout`](/api/#LiveComposedSplit.layout) | `String` | Presentation inside the layer query panel. compact (default): stacked fields that fit the ~300px layer card. inline: horizontal row (legacy Left / Right / Compare on one line). |
+| [`leftDefault`](/api/#LiveComposedSplit.leftDefault) | `String` | Initial left combo value; must be one of displayNames. |
+| [`refreshActiveSplit`](/api/#LiveComposedSplit.refreshActiveSplit) | `function()` | Re-applies the selected styles and re-clips the split after the composed layer's children were replaced (e.g. by your own `changeLayers` call), keeping the divider position. Does nothing while the comparison is not active. |
+| [`rightDefault`](/api/#LiveComposedSplit.rightDefault) | `String` | Initial right combo value; must be one of displayNames (and different from left). |
+| [`setComparisonEditingEnabled`](/api/#LiveComposedSplit.setComparisonEditingEnabled) | `function(enabled)` | Enables or disables the right-side combo and the swap button. The panel calls it itself (only the left combo is editable while idle; both unlock when comparing); call it to lock the choice while data loads. @param enabled {Boolean} `true` to allow changing… |
+| [`swapSides`](/api/#LiveComposedSplit.swapSides) | `function()` | Exchanges the left and right styles (combos and map) and re-clips the split, keeping the divider where it is. Does nothing while the comparison is not active — what the swap button does. |
+| [`text`](/api/#LiveComposedSplit.text) | `String` | Label on the Compare toggle button (before the split is active). |
+
+Full descriptions, defaults and examples: [LiveComposedSplit in the API reference](/api/#category_LiveComposedSplit).
+
+## LoadCsv — loadcsv · load a CSV table (input)
+
+Describes the API to read and manipulate ExtjsUtils.CSV.CsvTable files from URL.
+
+| Name | Type | Description |
+|---|---|---|
+| [`columnNameToInd`](/api/#LoadCsv.columnNameToInd) | `function(columnName) : Number` | Get the index of a column with the 'columnName' name. @param columnName {String} Column name to search for. |
+| [`columnNamesToIndexes`](/api/#LoadCsv.columnNamesToIndexes) | `function(columnNames) : Array.<Number>` | Resolves column names to column indexes: every string entry is looked up in the header (`-1` when absent) and every numeric entry is kept as it is. A single value is accepted in place of the array. This is what `getLines`/`createIndexes` do with their… |
+| [`cors`](/api/#LoadCsv.cors) | `Boolean` | Downloads the CSV through the Mappia CORS proxy; use it for servers that do not send CORS headers. |
+| [`createIndexes`](/api/#LoadCsv.createIndexes) | `function(columns)` | Create indexes for faster search. PS: Indexes are used to faster results on "getLines" calls, apply only when all [columns] are indexes. @param columns {Array} (Optional) Array of indexes/names of the filtered columns. |
+| [`getColunsInd`](/api/#LoadCsv.getColunsInd) | `function() : Array.<String>` | Returns a copy of the header row — the column names, in order — so query code can discover columns instead of hard-coding indexes. The name is a historical typo of `getColumnsInd`, kept for compatibility (the platform and many queries call it by this… |
+| [`getLineCount`](/api/#LoadCsv.getLineCount) | `function() : Number` | Number of data lines in the table (the header line is not counted). |
+| [`getLines`](/api/#LoadCsv.getLines) | `function(columns, values, includeHeader) :…` | Returns the lines (arrays of cell strings) whose cells in `columns` equal the corresponding entries of `values`. Columns may be given by index or by header name; to filter on several columns give one value per column, e.g. `getLines([1, "Year"], ["Park A",… |
+| [`getValue`](/api/#LoadCsv.getValue) | `function(column, line, includeHeader) : String` | Get a value by the matrix index and column. @param column {Number} Column index (First index is 0). @param line {Number} Line index (First index is 0). @param includeHeader {boolean} True to include the header line in the matrix index, False to ignore. |
+| [`id`](/api/#LoadCsv.id) | `String` | Defines the id of the input; it is the key used to read the table in `inputs.id[ID]` (required, the tool renders nothing visible). |
+| [`removeEmptyLines`](/api/#LoadCsv.removeEmptyLines) | `boolean` | Ignore the empty lines, removing them from the parsed CSV. True to remove the empty lines from the CSV. |
+| [`setValue`](/api/#LoadCsv.setValue) | `function(column, line, value)` | Change a cell value by its cell index. @param column {Numeric} Column index. @param line {Numeric} Line index to change (ignore the header information when it exists). @param value {*} New value to replace the older value. |
+| [`trim`](/api/#LoadCsv.trim) | `Boolean` | Requests that cell values be trimmed of surrounding whitespace. The flag is accepted and forwarded to the CSV parser, but the current parser ignores it (cells are stored as written, quotes removed), so trim values yourself when needed. Kept for compatibility… |
+| [`url`](/api/#LoadCsv.url) | `String` | Defines the URL of the CSV file to download (required). Relative URLs are resolved against the Mappia host, so backend endpoints such as `/wmtp/calc/...` work; escape `=` inside query strings as `\=`. The layer waits for the download before calculating. |
+| [`value`](/api/#LoadCsv.value) | `ExtjsUtils.CSV.CsvTable` | Value stored in `inputs.id[ID]`: an `ExtjsUtils.CSV.CsvTable` wrapping the parsed file (first row = header). Read it with the CsvTable methods listed in this group (`getLines`, `getValue`, `columnNameToInd`, `createIndexes`, `getLineCount`...). It is… |
+
+Full descriptions, defaults and examples: [LoadCsv in the API reference](/api/#category_LoadCsv).
+
+## LoadJson — loadjson · load JSON (input)
+
+Tool to load a remote JSON and use it with map, this object can store string, values and functions. Usage: {{loadjson}}
+
+| Name | Type | Description |
+|---|---|---|
+| [`cors`](/api/#LoadJson.cors) | `Boolean` | Loads the JSON through the Mappia CORS proxy (for servers without CORS headers). |
+| [`id`](/api/#LoadJson.id) | `String` | Defines an id for the stored info on layerInputs. |
+| [`url`](/api/#LoadJson.url) | `String` | Defines the url to load the json from. |
+| [`value`](/api/#LoadJson.value) | `Object\|Array` | Value stored in `inputs.id[ID]`: the parsed JSON (`JSON.parse` of the response body — an object or an array; an empty response gives `[]`). It is `undefined` until the download finishes: the layer waits for the resource and recalculates on its `waitend`… |
+
+Full descriptions, defaults and examples: [LoadJson in the API reference](/api/#category_LoadJson).
+
+## OpacitySlider — opacityslider · layer opacity
+
+Create a slider to change the map opacity. Usage: '{{opacityslider}}'
+
+| Name | Type | Description |
+|---|---|---|
+| [`aggressive`](/api/#OpacitySlider.aggressive) | `Boolean` | Set true to apply the opacity while the thumb is being dragged instead of only when it is released. |
+| [`changeVisibility`](/api/#OpacitySlider.changeVisibility) | `Boolean` | Set true to let the slider also control the layer visibility: the layer is hidden when the slider reaches `minValue` and shown again when it leaves it. The layer must be visible when the slider is created. |
+| [`complementaryLayer`](/api/#OpacitySlider.complementaryLayer) | `OpenLayers.Layer` | A second layer that is hidden when the slider reaches `maxValue` (GeoExt option to fade between two layers). GeoExt expects a layer object here, which the markup cannot express (a string is not resolved to a layer), so this option is only usable from code;… |
+| [`id`](/api/#OpacitySlider.id) | `String` | Defines the id of the slider component (`Ext.getCmp(id)`), e.g. to read `getValue()` or to `hide()` it. Generated when omitted. Every parameter of the tool is passed to `GeoExt.LayerOpacitySlider` / `Ext.slider.SingleSlider` unchanged (`width`, `cls`,… |
+| [`inverse`](/api/#OpacitySlider.inverse) | `Boolean` | Set true to make the slider work with transparency instead of opacity (100 = fully transparent). |
+| [`maxValue`](/api/#OpacitySlider.maxValue) | `Number` | Defines the maximum value of the slider (opacity percent at the right end). |
+| [`minValue`](/api/#OpacitySlider.minValue) | `Number` | Defines the minimum value of the slider (opacity percent at the left end). |
+| [`value`](/api/#OpacitySlider.value) | `Number` | Defines the initial slider value (opacity in percent). It is only used when the layer has no opacity yet (`opacity` not set on the layer): otherwise the slider starts at the layer's current opacity. |
+
+Full descriptions, defaults and examples: [OpacitySlider in the API reference](/api/#category_OpacitySlider).
+
+## PickPoint — pickpoint · pick a point on the map (input)
+
+Creates an input that allows users to interact with the real cell or feature value at any position. The returned values are from the original mal to the selected point, in case of RASTER is returned a cell value, in case of shapefile the geometry is returned too. Usage: {{pickpoint}}
+
+| Name | Type | Description |
+|---|---|---|
+| [`checked`](/api/#PickPoint.checked) | `Boolean` | Defines if Pickpoint should start selected. Set it true to start it enabled, false otherwise. |
+| [`fieldLabel`](/api/#PickPoint.fieldLabel) | `String` | Sets the label for the 'pickpoint' button widget. |
+| [`geometryColor`](/api/#PickPoint.geometryColor) | `String` | If defined sets a color to use when drawing a geometry by this tool. Otherwise a random color will be used at each interaction. |
+| [`getAttributes`](/api/#PickPoint.getAttributes) | `function(mapIndex) : Array.<Object>` | Returns the attributes of every selected point for one of the layers of the composed map: one object per selection (in click order) holding the feature `data` of that layer, or `{}` when the click hit nothing on it (e.g. a raster). This is the usual way to… |
+| [`getLastEvent`](/api/#PickPoint.getLastEvent) | `function() : OpenLayers.Event\|null` | Returns the map click event handled by the last selection (its `type` is set to `add` or `remove`), or `null` before the first click. Use `evt.xy` for the pixel and `ExtjsUtils.COORDINATE.getLatLong(evt)` for the coordinate. |
+| [`getPointPos`](/api/#PickPoint.getPointPos) | `function() : Array.<Number>` | Returns the geographic position of the last clicked point (the marker), in the map's desired projection (normally EPSG:4326 — longitude, latitude). |
+| [`iconCls`](/api/#PickPoint.iconCls) | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. `labelBefore=true` places the text before the switch, and `inputValue` sets the DOM `value` of the checkbox input (both passed through to the checkbox). |
+| [`id`](/api/#PickPoint.id) | `String` | Defines the id of the tool (required). It is the key used in `inputs.id[ID]` and the id of the checkbox component (`Ext.getCmp(id)`), so it must be unique in the page. |
+| [`inputValue`](/api/#PickPoint.inputValue) | `String` | Defines the DOM `value` attribute of the underlying checkbox input (useful when the tool is inside an HTML form). It does not affect what `inputs.id[ID]` holds. |
+| [`label`](/api/#PickPoint.label) | `String` | Defines a text template drawn on the map next to each selected feature. `${attr}` placeholders are replaced by the attribute values of the clicked feature (vector layers only; a raster cell has no attributes). Without it no label is drawn. |
+| [`labelBefore`](/api/#PickPoint.labelBefore) | `Boolean` | Set true to render the `text` label before (left of) the toggle switch instead of after it. |
+| [`lat`](/api/#PickPoint.lat) | `Number` | Defines the initial latitude (EPSG:4326, decimal degrees) of the marker shown when the tool is activated, before any click. Use it with `lon`; default 0. |
+| [`lon`](/api/#PickPoint.lon) | `Number` | Defines the initial longitude (EPSG:4326, decimal degrees) of the marker shown when the tool is activated, before any click. Use it with `lat` to start on a point of interest; default 0. |
+| [`markLayerInd`](/api/#PickPoint.markLayerInd) | `Number` | Defines by layer index which one to draw its geometry when a click event happens. (0-indexed) |
+| [`movePoint`](/api/#PickPoint.movePoint) | `function(evt)` | Moves the marker of the last click to the position of a map mouse event. The tool calls it on every click; call it yourself only to relocate the marker from a synthetic event. @param evt {OpenLayers.Event} Map mouse event carrying the pixel position in… |
+| [`notify`](/api/#PickPoint.notify) | `Boolean` | Set false to prevent the notify messages from appear (the "click on the map..." notification shown when the tool is activated). |
+| [`onMark`](/api/#PickPoint.onMark) | `function` | Callback function called after clicking on a feature with this 'pickpoint' widget, once the feature info of every layer of the composed map has been received. `this` is the pickpoint checkbox (or `scope`), so `this.value` is the PointAttributeManager. The… |
+| [`onefeature`](/api/#PickPoint.onefeature) | `boolean` | Defines if PickPoint should keep only the last feature selected. Set it true to keep only the last one, false otherwise. |
+| [`pointVisibility`](/api/#PickPoint.pointVisibility) | `Boolean` | Defines if Pickpoint should show where the last click was. Set it true to show, false otherwise. |
+| [`removeAll`](/api/#PickPoint.removeAll) | `function()` | Clears the whole selection: every selected feature is removed from the map and from the list returned by `getAttributes`. Typical use: a "Clear" button handler, followed by a recalculation. |
+| [`removeAttribute`](/api/#PickPoint.removeAttribute) | `function(index)` | Removes one selection (by its position in the `getAttributes` list) from the map and from the selection list. An invalid index changes nothing. @param index {Number} 0-based index of the selection to remove (same order as `getAttributes`). |
+| [`runOnClick`](/api/#PickPoint.runOnClick) | `function` | Alias of `onMark`, kept so the pickpoint accepts the same callback name as the other map tools (hoverpixel, summedarea, areaintegral). When both are written, `onMark` wins. See {@link PickPoint.onMark} for the callback signature. |
+| [`runOnHover`](/api/#PickPoint.runOnHover) | `function` | Defines a callback function to run when clicking at the map. Defines a callBack with following parameters function(mouseEvt, coordinates) --mouseEvt: {MouseEvent} Mouse hover event. --coordinates: {Openlayers.LatLon} Coordinate of the cursor over the map. PS:… |
+| [`runOnHoverOutside`](/api/#PickPoint.runOnHoverOutside) | `function` | True to run the callback function even when hovering outside of the layer, False to disable. (Default False) |
+| [`scope`](/api/#PickPoint.scope) | `Object` | Defines the object used as `this` inside the `onMark`/`runOnClick` callback. By default it is the pickpoint checkbox component (so `this.value` is the PointAttributeManager). From the markup it can only reference an element created earlier in the same… |
+| [`searchAttribute`](/api/#PickPoint.searchAttribute) | `function(mapIndex, propName, value) : Object\|null` | Finds, among the selected features of one layer, the first whose attribute `propName` equals `value` and returns its attributes. Useful to check whether a given feature is already selected. @param mapIndex {Number} 0-based index of the layer inside the… |
+| [`setFeatureVisibility`](/api/#PickPoint.setFeatureVisibility) | `function(state, feature)` | Adds a feature to, or removes it from, the auxiliary vector layer where the tool draws its selections. Lets a callback draw extra geometries (an `OpenLayers.Feature.Vector`) with the selection, or hide one of the selected features without forgetting it.… |
+| [`setPointVisibility`](/api/#PickPoint.setPointVisibility) | `function(state)` | Shows or hides the marker drawn at the last clicked position (the same marker controlled by the `pointVisibility` parameter). @param state {Boolean} `true` to show the marker, `false` to hide it. |
+| [`text`](/api/#PickPoint.text) | `String` | Defines the text shown next to the toggle. When omitted the label shows the coordinate of the last click, `(lat, lon)`, and is updated at every click. |
+| [`toggle`](/api/#PickPoint.toggle) | `function(forceState)` | Activates or deactivates the pick mode from code (same as clicking the switch): the map cursor, the click listeners and the marker follow the new state. Call it on the checkbox component (`Ext.getCmp(id)`). Without an argument the state is inverted. @param… |
+| [`togglePoint`](/api/#PickPoint.togglePoint) | `function(pointFeatures, evt) : Object` | Adds a set of features (one array per layer of the composed map, as returned by GetFeatureInfo) to the selection, or removes it when the same features were already selected. With `onefeature=true` the previous selection is cleared first. The tool calls it… |
+| [`unselect`](/api/#PickPoint.unselect) | `Boolean` | Defines if Pickpoint will be automatically disabled after each click. Set it true to automatically disable, false otherwise (write `unselect=` or `unselect=false` to keep the tool active for several clicks). |
+| [`value`](/api/#PickPoint.value) | `Object` | Value stored in `inputs.id[ID]`: the PointAttributeManager of the tool, the object that keeps the selected features. Read it with `getAttributes(mapIndex)`, `searchAttribute(...)`, `getPointPos()`, `getLastEvent()`, and change it with `removeAll()`,… |
+
+Full descriptions, defaults and examples: [PickPoint in the API reference](/api/#category_PickPoint).
+
+## Slider — slider · number or range (input)
+
+Tool that allows users to create a slider that the user can drag and change its value as map input.
+
+| Name | Type | Description |
+|---|---|---|
+| [`backgroundColors`](/api/#Slider.backgroundColors) | `Array.<String>` | Array of colors of background slider values, to define background slider color based in slider value. The values are defined from most to minimum with two properties each: - color: {String} CSS color definition for the current interval. i.e.… |
+| [`cls`](/api/#Slider.cls) | `String` | Extra CSS class(es) added to the slider element (appended to the default `clickable`). |
+| [`disabled`](/api/#Slider.disabled) | `Boolean` | Set true to render the slider disabled (Ext `disabled`); enable it later with `Ext.getCmp(id).enable()`. |
+| [`fieldLabel`](/api/#Slider.fieldLabel) | `String` | Defines the label shown at the left of the slider (Ext `fieldLabel`). |
+| [`getValue`](/api/#Slider.getValue) | `function() : Number` | Returns the current value of a single-thumb slider. Call it on the component (`Ext.getCmp(id)` or a `getid=` reference), not on `inputs.id[ID]`, which already holds the plain value. |
+| [`getValues`](/api/#Slider.getValues) | `function() : Array.<Number>` | Returns the value of every thumb; use it for range sliders created with `values=[lo, hi]`. |
+| [`gradient`](/api/#Slider.gradient) | `Boolean` | Set true to blend the `backgroundColors` into a continuous gradient along the filled part of the slider (each colour fading into the next from its `startValue`). With the default `false` each interval is a solid colour, with a short blend only around the… |
+| [`hideLabel`](/api/#Slider.hideLabel) | `Boolean` | Set true to hide the label and the space reserved for it (Ext `hideLabel`). |
+| [`id`](/api/#Slider.id) | `String` | Defines the id to identify the object. |
+| [`increment`](/api/#Slider.increment) | `Number` | Defines the step of each increment or decrement in the actual value of the slider when being dragged. |
+| [`maxValue`](/api/#Slider.maxValue) | `Number` | Defines the maximum value of the slider. |
+| [`minValue`](/api/#Slider.minValue) | `Number` | Defines the minimum value of the slider. |
+| [`setValue`](/api/#Slider.setValue) | `function(value, animate)` | Sets the slider value from code. Firing the `change` event (the default) also updates `inputs.id[ID]` and recalculates the layer. For a range slider pass the thumb index first: `setValue(index, value)`. @param value {Number} New value (clamped to… |
+| [`thumbStyle`](/api/#Slider.thumbStyle) | `String` | Defines extra CSS class(es) added to the slider thumb (the draggable handle), to restyle it. |
+| [`value`](/api/#Slider.value) | `Number` | Defines the initial value of the slider (default 100). At runtime the same value is what `inputs.id[ID]` (and `inputs[i]`) holds in `beforeCalc`/`expression`: a number, or an array `[lower, upper]` when the `values` range form is used. The layer recalculates… |
+| [`values`](/api/#Slider.values) | `Array.<Number>` | Defines the slider interval limits. If defined, the slider will be displayed as a range slider. It's return at the 'inputs' parameter will be a array of two values. |
+| [`width`](/api/#Slider.width) | `Number` | Defines the slider width in pixels. Any other `Ext.slider.SingleSlider` config (`cls`, `fieldLabel`, `hideLabel`, `disabled`, `style`, `keyIncrement`...) is also passed through unchanged. |
+
+Full descriptions, defaults and examples: [Slider in the API reference](/api/#category_Slider).
+
+## SummedArea — summedarea · sum inside a drawn area (input)
+
+Create an input of summation in any arbitrary area. CallBack parameters (context {OpenLayers.Layer}, layersValues {Array[Number]}, inputs {[Object]}, feature {Geometry}) runOnClick {Function}  Callback called exactly after sum the map region., PS: 'layersValues' return the sum of each internal layer and an adittional value which is the sum of all pixels of resulting layer.
+
+| Name | Type | Description |
+|---|---|---|
+| [`description`](/api/#SummedArea.description) | `function(name, config, layer, parameters) : Ext.Container` | Creates an input of summatory in any arbitrary area. CallBack parameters (context {OpenLayers.Layer}, layersValues {Array[Number]}, inputs {[Object]}, feature {Geometry}) runOnClick {Function} Callback called exactly after sum the map region., PS:… |
+| [`getSummedLayerValues`](/api/#SummedArea.getSummedLayerValues) | `function(layer, feature) : Array` | Sums, for each inner layer of the composed map, the values of the rendered cells that fall inside a polygon (values decoded from the tile colours through the layer legend, null cells skipped). This is what `runOnClick` receives as `layersValues`; call it from… |
+| [`iconCls`](/api/#SummedArea.iconCls) | `String` | Defines the CSS class of the toggle switch icon; replace the default to restyle the switch. |
+| [`id`](/api/#SummedArea.id) | `String` | Defines the id of the tool: the key used in `inputs.id[ID]` and the id of the container component (`Ext.getCmp(id)`; the switch itself is `Ext.getCmp(id).items.get(0)`). Generated when omitted. |
+| [`labelBefore`](/api/#SummedArea.labelBefore) | `Boolean` | Set true to render the `text` label before (left of) the toggle switch instead of after it. |
+| [`notify`](/api/#SummedArea.notify) | `Boolean` | Set false to suppress the notification shown when the tool is activated. |
+| [`runOnClick`](/api/#SummedArea.runOnClick) | `function` | Defines the callback run when the user finishes drawing the polygon (double-click closes it), with the values already summed. Called as `runOnClick(layersValues, inputs, feature)` with `this` = the layer: `layersValues` is the array described in… |
+| [`text`](/api/#SummedArea.text) | `String` | Defines the text shown next to the toggle switch. |
+| [`unselect`](/api/#SummedArea.unselect) | `Boolean` | Only changes the activation message (`true`: one selection expected, `false`: several); the tool always deactivates itself after a polygon is summed. |
+| [`value`](/api/#SummedArea.value) | `Array.<Number>` | Value stored in `inputs.id[ID]`: an array meant to hold the last `layersValues` (one sum per inner layer, see `getSummedLayerValues`). In the current implementation the tool does not copy the sums into it after drawing — it stays empty — so read the results… |
+
+Full descriptions, defaults and examples: [SummedArea in the API reference](/api/#category_SummedArea).
+
+## Textfield — textfield · text box (input)
+
+Tool that allows the user to input a single line of text. Usage: '{{textfield}}'
+
+| Name | Type | Description |
+|---|---|---|
+| [`afteredit`](/api/#Textfield.afteredit) | `Event` | Event fired once the field loses focus (blur) and its text differs from the value it had when editing started; the listener receives the TextField. Unlike `keyup` it fires a single time per edit, so use it for expensive reactions. Attach it with… |
+| [`fieldLabel`](/api/#Textfield.fieldLabel) | `String` | Defines the TextField label. |
+| [`getRawValue`](/api/#Textfield.getRawValue) | `function() : String` | Returns the text currently in the field, unprocessed (this is what `inputs.id[ID]` holds). Call it on the component (`Ext.getCmp(id)`). |
+| [`hideLabel`](/api/#Textfield.hideLabel) | `Boolean` | Defines if it should completely hide the label element (label and separator) of the TextField. That is, if this property is set to true, the label will be hidden. Otherwise, the label will be shown by default. PS: Since the label will be shown by default,… |
+| [`id`](/api/#Textfield.id) | `String` | Defines the id to identify the object. |
+| [`isnumeric`](/api/#Textfield.isnumeric) | `boolean` | Defines the TextField content as numeric only. |
+| [`setRawValue`](/api/#Textfield.setRawValue) | `function(value)` | Replaces the text of the field from code. It does not fire `keyup`, so call `forceRecalc()` on an InputManager (or fire the event) when the layer must be recalculated with the new text. @param value {String} New text for the field. |
+| [`style`](/api/#Textfield.style) | `String` | Defines the TextField style properties. You can use CSS style rules to customize it. |
+| [`value`](/api/#Textfield.value) | `String` | Defines the initial value to the TextField content. At runtime `inputs.id[ID]` (and `inputs[i]`) holds the current text exactly as typed (`getRawValue()`, always a string — convert it with `parseFloat` when `isnumeric` is used). The layer recalculates on… |
+
+Full descriptions, defaults and examples: [Textfield in the API reference](/api/#category_Textfield).
+
+## Timeline — timeline · scenarios over time (input)
+
+Display a spatial scenarios changes in a timeline.
+
+| Name | Type | Description |
+|---|---|---|
+| [`fieldLabel`](/api/#Timeline.fieldLabel) | `String` | Defines a label for the Timeline. It will be shown at the left of the button to hide the tiemline, by default. |
+| [`getCurrentLayerStyle`](/api/#Timeline.getCurrentLayerStyle) | `function() : String` | Returns the WMS style currently applied to the layer (`layer.params.STYLES`), or an empty string for the default style. |
+| [`getDesiredVisibility`](/api/#Timeline.getDesiredVisibility) | `function() : Boolean` | Returns the visibility the timeline has, or will have when its layer becomes visible: `true` may be returned while the panel is actually hidden because the layer is hidden. |
+| [`getMainThumb`](/api/#Timeline.getMainThumb) | `function() : Ext.slider.Thumb` | Returns the main (middle) thumb of the slider — the one that selects the current step; its `value` is the 0-based step index. The outer thumbs (`thumbs[0]`, `thumbs[2]`) bound the animation range. |
+| [`getMaxThumbValue`](/api/#Timeline.getMaxThumbValue) | `function() : Number` | Returns the position of the right (max) thumb: the last step index the animation reaches. |
+| [`getMinThumbValue`](/api/#Timeline.getMinThumbValue) | `function() : Number` | Returns the position of the left (min) thumb: the step index the animation restarts from. |
+| [`getStyleFromValue`](/api/#Timeline.getStyleFromValue) | `function(value) : String\|Object\|undefined` | Returns the style of a step key or, when the key has no style of its own, the style of the nearest previous key (numeric keys are compared as numbers, text keys by position in `steps`). @param value {String\|Number} A step key. |
+| [`getTimeline`](/api/#Timeline.getTimeline) | `function() : GeoExt.TimelinePanel` | Returns the timeline panel driven by this button. The markup `id` identifies the button, so this is the way to reach the panel methods (`getValue`, `updateMainThumbValue`, `startAnimationStep`, `setSteps`...). |
+| [`getValue`](/api/#Timeline.getValue) | `function() : String` | Returns the key of the step currently selected by the main thumb (the same value the layer receives in `inputs.id[ID]`). |
+| [`getValueFromStyle`](/api/#Timeline.getValueFromStyle) | `function(style) : Number` | Returns the step key whose style is the given one (the last match when several steps share a style), or the first step key when the style is empty or unknown. The key is returned through `parseInt`, so it is meaningful for numeric keys only (text keys give… |
+| [`hidden`](/api/#Timeline.hidden) | `Boolean` | Set true to hide the "Show/Hide timeline" button rendered in the layer description (the standard Ext `hidden` config, so `Ext.getCmp(id).show()` reveals it). The timeline panel itself is still created and its initial visibility follows `renderHidden`; use it… |
+| [`hideLabel`](/api/#Timeline.hideLabel) | `Boolean` | Defines if the label of the timeline should be displayed. Set true to hide the label, false to show it. |
+| [`id`](/api/#Timeline.id) | `String` | Defines the id to identify the object. It is the key used in `inputs.id[ID]` and the id of the show/hide button component: `Ext.getCmp(id)` returns the button and `Ext.getCmp(id).getTimeline()` the timeline panel (see the methods listed in this group). |
+| [`nextAnimationStep`](/api/#Timeline.nextAnimationStep) | `function()` | Advances the timeline one step (main thumb + 1), applying the style of the new step to the layer and firing `change`; does nothing when the main thumb is already at the max thumb. Useful for a custom "next" button. |
+| [`nextStepInterval`](/api/#Timeline.nextStepInterval) | `Number` | Defines the duration of the interval between steps of the timeline in milliseconds. |
+| [`onPlayToggle`](/api/#Timeline.onPlayToggle) | `function` | Defines the callback function called when the play/stop button is toggled, BEFORE the animation starts or stops. It must return a truthy value: returning `false`/nothing cancels the start/stop (use it as a veto, e.g. while data is loading). `pressed` is true… |
+| [`playing`](/api/#Timeline.playing) | `Boolean` | `true` while the animation is running (between play and stop/end). Read it on the panel (`Ext.getCmp(id).getTimeline().playing`) to know whether to call `startAnimationStep()` or `stopAnimation()`. |
+| [`preloadTiles`](/api/#Timeline.preloadTiles) | `Boolean` | Defines if the timeline should preload the tiles of the next steps to get smoother transitions. Set it true to preload, false otherwise. |
+| [`renderHidden`](/api/#Timeline.renderHidden) | `Boolean` | Defines the timeline initial visibility. Set it true to start with the timeline hidden, false otherwise. |
+| [`setCurrentLayerStyle`](/api/#Timeline.setCurrentLayerStyle) | `function(style)` | Applies a style to the layer the way a step does: a style name, or a `{style, name}` object that also switches the WMS layer name (the object form of a `steps` entry). For a composed layer the first inner layer is updated and the legend is rebuilt. The slider… |
+| [`setDesiredVisibility`](/api/#Timeline.setDesiredVisibility) | `function(visible) : GeoExt.TimelinePanel` | Shows or hides the timeline panel while keeping it consistent with the layer: when the layer is hidden the panel stays hidden and the requested state is remembered, to be applied as soon as the layer becomes visible. Prefer it over `show()`/`hide()`; the… |
+| [`setMaxThumbValue`](/api/#Timeline.setMaxThumbValue) | `function(value)` | Moves the right (max) thumb, limiting the animation to the steps up to that index (no animation, no `change` event). @param value {Number} 0-based step index for the max thumb. |
+| [`setMinThumbValue`](/api/#Timeline.setMinThumbValue) | `function(value)` | Moves the left (min) thumb, making the animation start from that step index (no animation, no `change` event). @param value {Number} 0-based step index for the min thumb. |
+| [`setSteps`](/api/#Timeline.setSteps) | `function(steps)` | Replaces the steps of the timeline and redraws it (labels, slider range and current step). Unlike the markup `steps` parameter this takes the already-built object: keys are the step labels, values the style name or a `{style, name}` object. Use it to change… |
+| [`startAnimationStep`](/api/#Timeline.startAnimationStep) | `function()` | Starts (or resumes) the animation from the current step: each step is shown for `nextStepInterval` milliseconds after the layer finished loading it, up to the max thumb, where the animation stops by itself. When the main thumb is already at the max thumb it… |
+| [`steps`](/api/#Timeline.steps) | `Array.<Array.<(String\|Object)>>` | Defines the timeline change steps. |
+| [`stopAnimation`](/api/#Timeline.stopAnimation) | `function()` | Stops the running animation (cancels the pending step timer, releases the play button and hides the slider tip). The current step is kept. Safe to call when nothing is playing. |
+| [`toggleTimelineVisibility`](/api/#Timeline.toggleTimelineVisibility) | `function(forceState)` | Shows or hides the timeline panel from code — what clicking the button does. Without an argument the current (desired) visibility is inverted. The panel only appears while the layer is visible; the requested state is remembered otherwise (see… |
+| [`updateLayer`](/api/#Timeline.updateLayer) | `function(value)` | Applies to the layer the style of a step key, without moving the slider. When the key has no step of its own the style of the nearest previous numeric key is used (steps `{2010: "s1", 2015: "s2"}` and value 2014 keep/apply "s1"); nothing happens when that… |
+| [`updateMainThumbValue`](/api/#Timeline.updateMainThumbValue) | `function(value)` | Moves the main thumb to a step index (0-based position in `steps`), applying that step's style to the layer and firing `change` — the programmatic way to select a step. Without an argument it re-syncs the thumb with the layer's current style using… |
+| [`value`](/api/#Timeline.value) | `String` | Value stored in `inputs.id[ID]` (and `inputs[i]`): the key of the current step — the first element of the selected `steps` entry (e.g. `"1990"` or `"January"`), as a string. It changes whenever the main thumb moves (drag, click or animation) and the layer… |
+
+Full descriptions, defaults and examples: [Timeline in the API reference](/api/#category_Timeline).
+
+## Window — window · floating window (input)
+
+Tool that allows to show contents in an interactive floating window. It can only be shown when the layer is visible.
+
+| Name | Type | Description |
+|---|---|---|
+| [`btnID`](/api/#Window.btnID) | `String` | Defines the id of the button that controls the window visibility. |
+| [`getButton`](/api/#Window.getButton) | `function() : Ext.Button` | Returns the show/hide toggle `Ext.Button` (id `btnID`), e.g. to `toggle(true)`, `setText()` or `hide()` it. |
+| [`getContainer`](/api/#Window.getContainer) | `function() : Ext.Container` | Returns the content container (`Ext.Container`, id `id`) inside the window. Use `update(html)` to replace its HTML, or `add()`/`doLayout()` to place Ext components in it. |
+| [`getIds`](/api/#Window.getIds) | `function() : Array.<String>` | Returns the ids of the three components created by the tool, in the order `[windowID, id (content div), btnID]`. |
+| [`getWindow`](/api/#Window.getWindow) | `function() : Ext.Window` | Returns the floating `Ext.Window` (use it for `show()`, `hide()`, `setTitle()`, `setSize()`, `setPosition()`...). Prefer `getButton().toggle()` to change visibility so the button stays in sync. |
+| [`height`](/api/#Window.height) | `number` | Defines the floating window initial height. |
+| [`html`](/api/#Window.html) | `String` | Defines the initial HTML content of the window's container div. Because the parser treats everything after `html=` as the value, the content may contain `=` characters; it cannot contain `\|` or `}}`. For content built at runtime, write into the container… |
+| [`id`](/api/#Window.id) | `String` | Defines an id for the div contained in the floating window (where the content can be drawn). |
+| [`ignoreVisibility`](/api/#Window.ignoreVisibility) | `Boolean` | Defines if the window should ignore the layer visibility state. By default, the window visibility state is the same as the layer's. Set true to ignore the layer visibility state, false otherwise. PS: The 'ignoreVisibility' is not compatible with the… |
+| [`items`](/api/#Window.items) | `Array` | Not supported: the tool always creates its own single content container (the div identified by `id`), so any `items` written in the markup are discarded. Put content in with `html=`, or render into the container from code (`Ext.getCmp(id)` /… |
+| [`onBeforeHide`](/api/#Window.onBeforeHide) | `function` | Defines a callback function to be called before hiding the floating window. @param layer {Object} Scope of the layer @param data {Array} [window, button, windowConfig] window: Window object; button: Button created; windowConfig: Window object configuration |
+| [`resize`](/api/#Window.resize) | `function` | Defines the callback function to be called when the floating window is resized. |
+| [`startVisible`](/api/#Window.startVisible) | `Boolean` | Defines if the window should start visible or not. Set true if it should, false otherwise. |
+| [`text`](/api/#Window.text) | `string` | Defines the window button text. |
+| [`title`](/api/#Window.title) | `String` | Defines the floating window's title. |
+| [`toggle`](/api/#Window.toggle) | `function(pressed)` | Shows or hides the floating window from code by pressing/releasing its toggle button — the same as the user clicking it, so `onBeforeHide` still runs. Call it on the button: `inputs.id[ID].getButton().toggle(state)` or `Ext.getCmp(btnID).toggle(state)`.… |
+| [`underButtons`](/api/#Window.underButtons) | `Boolean` | Defines where the floating window will be positioned in relation to the buttons panel. Set true to position the window under the right buttons panel, false otherwise. |
+| [`value`](/api/#Window.value) | `Object` | Value stored in `inputs.id[btnID]` - under the show/hide button's id, not the markup `id`, so set `btnID` to read it (without one the key is an automatic id): a small handle object with the methods `getIds()`, `getWindow()`, `getButton()` and `getContainer()`… |
+| [`width`](/api/#Window.width) | `number` | Defines the floating window initial width. |
+| [`windowID`](/api/#Window.windowID) | `String` | Defines the window id. |
+| [`x`](/api/#Window.x) | `Number` | Defines the initial absolute X position of the window, in pixels from the left edge of the page. A negative value counts from the right edge instead: the window's right side is placed at `viewportWidth + x` (e.g. `x=-10` leaves a 10px margin on the right).… |
+| [`y`](/api/#Window.y) | `Number` | Defines the initial absolute Y position of the window, in pixels from the top of the page. A negative value counts from the bottom edge instead: the window's bottom side is placed at `viewportHeight + y` (e.g. `y=-20` leaves a 20px margin at the bottom). PS:… |
+
+Full descriptions, defaults and examples: [Window in the API reference](/api/#category_Window).
+
+## ZoomLevel — zoomlevel · current zoom (input)
+
+A hidden input whose value is the current map zoom level; the layer recalculates whenever the zoom changes. Usage: {{zoomlevel\|id=zoom}} then inputs.id['zoom'] in beforeCalc/expression
+
+| Name | Type | Description |
+|---|---|---|
+| [`id`](/api/#ZoomLevel.id) | `String` | Defines the id of the input; it is the key used to read the zoom level in `inputs.id[ID]` (required, the tool renders nothing visible). |
+| [`value`](/api/#ZoomLevel.value) | `Number` | Value stored in `inputs.id[ID]` (and `inputs[i]`) for `beforeCalc`/`expression`: the current map zoom level as a number. It is refreshed on the map `moveend` event and only triggers a recalculation when the zoom actually changed (panning is ignored). |
+
+Full descriptions, defaults and examples: [ZoomLevel in the API reference](/api/#category_ZoomLevel).

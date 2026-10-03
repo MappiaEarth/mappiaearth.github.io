@@ -24,7 +24,14 @@ layout: compress
     .reference__content table { display: table; width: 100%; font-size: 15px; }
     .reference__content td, .reference__content th { vertical-align: top; }
     .reference__content pre { overflow-x: auto; }
-    .reference__keys .label { margin: 0 6px 6px 0; display: inline-block; }
+    .reference__keys { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+    .reference__keys li { margin: 0; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fafbfc; }
+    .reference__key-group { font-weight: 600; }
+    .reference__key-id { margin-left: 6px; font-size: 12px; color: #6b7280; background: none; padding: 0; }
+    .reference__key-members { display: block; margin-top: 5px; }
+    .reference__key-members code { display: inline-block; margin: 0 6px 4px 0; padding: 1px 7px; font-size: 13px; color: #1f2937;
+      background: #eef2f7; border: 1px solid #e2e8f0; border-radius: 5px; }
+    .reference__key-members a:hover code { border-color: #277cea; color: #277cea; }
     .reference__pager { display: flex; justify-content: space-between; gap: 20px; margin-top: 48px;
       padding-top: 16px; border-top: 1px solid #e5e7eb; }
     .reference__pager .reference__next { margin-left: auto; text-align: right; }
@@ -96,12 +103,42 @@ layout: compress
                 Every property and function named here is listed, with its type, default and
                 example, in the generated <a href="{{ '/api/' | relative_url }}">API reference</a>:
               </p>
-              <p class="reference__keys">
-                {% for key in page.api_keys %}
-                  {% assign group = key | split: "." | first %}
-                  <a class="label" href="{{ '/api/#category_' | append: group | relative_url }}"><code>{{ key }}</code></a>
+              {% comment %}
+                One row per API group, in the order the chapter names them: the group's display name
+                (a link to its section of /api/), its key, and the members this chapter names (each
+                a link to its entry, #Group.key).
+                (It used the theme's .label - white text with a shadow, for hero pictures - which
+                read as smudged capitals on the page.)
+              {% endcomment %}
+              {% assign keyGroups = "" | split: "" %}
+              {% for key in page.api_keys %}
+                {% assign g = key | split: "." | first %}
+                {% unless keyGroups contains g %}{% assign keyGroups = keyGroups | push: g %}{% endunless %}
+              {% endfor %}
+              <ul class="reference__keys">
+                {% for g in keyGroups %}
+                  {% assign gname = g %}
+                  {% for section in site.data.api %}
+                    {% if section[1][g] %}
+                      {% assign ginfo = section[1][g] | where: "key", "_information" | first %}
+                      {% if ginfo and ginfo.name %}{% assign gname = ginfo.name %}{% endif %}
+                    {% endif %}
+                  {% endfor %}
+                  {% assign members = "" | split: "" %}
+                  {% for key in page.api_keys %}
+                    {% assign kg = key | split: "." | first %}
+                    {% if kg == g and key != g %}{% assign members = members | push: key %}{% endif %}
+                  {% endfor %}
+                  <li>
+                    <a class="reference__key-group" href="{{ '/api/#category_' | append: g | relative_url }}">{{ gname | xml_escape }}</a>
+                    <code class="reference__key-id">{{ g }}</code>
+                    {% comment %} A member's api_key is "Group.key", which is its anchor on /api/. {% endcomment %}
+                    {% if members.size > 0 %}
+                      <span class="reference__key-members">{% for key in members %}<a href="{{ '/api/#' | append: key | relative_url }}"><code>{{ key | remove_first: g | remove_first: "." }}</code></a>{% endfor %}</span>
+                    {% endif %}
+                  </li>
                 {% endfor %}
-              </p>
+              </ul>
             {% endif %}
 
             {% comment %} Previous / next inside the whole reading order. {% endcomment %}

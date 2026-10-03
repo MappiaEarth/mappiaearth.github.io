@@ -41,10 +41,11 @@ layout: compress
         {% else %}
           {% assign categories = page.categories %}
         {% endif %}
-        {% comment %} Only a real api.json group has a target in /api/; other tags stay plain labels. {% endcomment %}
+        {% comment %} A group or the key of exactly one entry has a target in /api/ (_data/api_anchors.json); other tags stay plain labels. {% endcomment %}
         {% for category in categories %}
-          {% if site.data.api_groups contains category %}
-            <a class="label" href="{{site.baseurl}}/api/#category_{{category}}">{{category}}</a>
+          {% assign apiWord = category | downcase %}{% assign apiAnchor = site.data.api_anchors[apiWord] %}
+          {% if apiAnchor %}
+            <a class="label" href="{{site.baseurl}}/api/#{{ apiAnchor }}">{{category}}</a>
           {% else %}
             <span class="label label--plain">{{category}}</span>
           {% endif %}

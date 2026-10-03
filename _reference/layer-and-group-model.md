@@ -17,7 +17,7 @@ api_keys:
   - XYZLayer
   - SourceConfig
   - ConfigLayer.operation
-  - ConfigLayer.type
+  - FileLayer.type
   - LayersProperties.source
   - RawMaps.operations
   - paramsButtonConfigProperties
@@ -53,14 +53,21 @@ Two properties decide how everything else is read:
 
 | `source` | What it is | The properties that matter | Property group in the API reference |
 |---|---|---|---|
-| *(absent)* or `"local"` | One published map, drawn as WMS tiles | `styles`, `extents`, `minscale` / `maxscale`, `maxZoom` | `LayersProperties`, `ConfigLayer` |
-| `"calculate"` | Several maps read together; your `expression` produces a new map from their pixels | `name` (list), `operation`, `expression`, `beforeCalc`, `legendColor`, `insideOpacity`, `categorical` | `LayersProperties`, `LayersFunctions`, `LayerInternal` |
+| *(absent)* or `"local"` | One published map, drawn as WMS tiles | `styles`, `extents`, `minscale` / `maxscale`, `startLegendOpen`, `hideStyleChooser` | `LayersProperties`, `ConfigLayer` |
+| `"calculate"` | Several maps read together; your `expression` produces a new map from their pixels | `name` (list), `operation`, `expression`, `beforeCalc`, `legendColor`, `insideOpacity`, `categorical`, `maxZoom`, `otherNames` | `LayersProperties`, `ConfigLayer`, `LayersFunctions`, `LayerInternal` |
 | `"file"` | Vector features from a file, an inline object or your own loader — with `type` choosing which | `type`, `url`, `json`, `loadData`, `styleMap`, `onClick`, `onHover`, `cluster` | `FileLayer`, `VectorLayer` |
 | `"xyz"` | A tile service addressed by z/x/y | `url`, `name` | `XYZLayer` |
 | `"osm"`, `"google"`, `"arcgisrest"` | A ready-made basemap | `name` selects the variant (for example `mapnik`, `SATELLITE`) | `LayersProperties` |
 
 A layer registered through `addRemoteWMSServer` behaves as a catalogue layer; the
 registration says where its server is and whether it needs a proxy.
+
+Only calculated, file and tile (xyz) layers have a **panel** in the layer list:
+`descriptionHtml` (text and widgets), `paramsButtonConfig` (row buttons) and
+`exclusiveGroupDetails` are ignored on published maps, basemaps and servers added with
+`addRemoteWMSServer`, while `startLegendOpen` and `hideStyleChooser` work on published maps only.
+`maxZoom` set in the query is read only by calculated layers; a published map takes it from
+its catalogue entry.
 
 ### 2.1 `type`, for file layers
 
@@ -75,9 +82,12 @@ registration says where its server is and whether it needs a proxy.
 | `geojsonurl` | GeoJSON fetched from `url` |
 | `empty` | No features; the query adds them later |
 
-Vector data without a declared CRS is assumed to be in the platform's default projection.
-Declare `crs` in the GeoJSON, or `fromProj` on the layer, whenever the data is in anything
-else — a silent misalignment is the usual symptom.
+A GeoJSON without a declared CRS is guessed from its first coordinate: EPSG:4326 when it
+looks like longitude/latitude, otherwise EPSG:3857. CSV and lists of plain objects use the
+query's `ExtjsUtils.CONFIGURATION.setOptions({ defaultFromProj })`, then the link's
+`defaultFromProj`, then the map projection. Declare `crs` in the GeoJSON, or `fromProj` on
+the layer, whenever the data is in anything else (UTM, for example) — a silent misalignment
+is the usual symptom.
 
 ### 2.2 `operation`, for calculated layers
 
@@ -111,7 +121,10 @@ console reports `Operation X is not defined for layer Y` and the layer produces 
 
 ## 3. Groups
 
-A group is a definition with `viewTitle` and `elements`:
+Groups come in two kinds, and nest. A top-level group with **`title`** and `elements` becomes an
+entry of the **top menu**, which lists all its layers for the reader to turn on (`GroupProperties.title`).
+A group with **`viewTitle`** and `elements` becomes a **heading in the layer panel**, above the
+layers of it that are on:
 
 ```javascript
 [
@@ -133,8 +146,9 @@ A group is a definition with `viewTitle` and `elements`:
 | `viewTitle` | The group's row in the layer panel; groups may nest by nesting `elements` |
 | `elements` | The layers, or further groups, inside it |
 | `defaultProperties` | Applied to every descendant that does not set the property itself |
-| `openGroup` | The group starts expanded (also available per layer, where it expands the layer's ancestors) |
-| `color`, `viewColor` | The colour of the group row and of its layers' rows |
+| `openGroup` | The `viewTitle` heading starts expanded (also available per layer, where it expands the layer's headings) |
+| `color` | The colour of the group's `viewTitle` heading; on a top-level group, also of its top-menu entry and of the rows of all its layers. A `color` written on a layer is replaced by its groups' colours |
+| `viewColor` | Accepted on a group, but it has no visible effect today |
 | `onClickViewGroup`, `onToggleViewGroup` | Called when the group row is clicked or toggled, with `this` = the node. These need a real group: attached to a layer that is not inside a `viewTitle`, they never fire |
 | `global` | Declares query globals while this group is interpreted |
 
@@ -147,30 +161,32 @@ group path. Order inside a group is declaration order unless `priority` reorders
 | Slot | Meaning |
 |---|---|
 | `group: "background"` | The layer is a basemap: it goes under everything and joins the background picker instead of the layer list |
-| `group: "<name>"` | A flat grouping label for layers that do not use `viewTitle` |
-| `paramsButtonConfig` | Extra buttons on the layer's row — query, download, tooltip and toggle buttons; a bare object is treated as one entry of type `query` |
-| `descriptionHtml` | The layer's panel content: free HTML plus the widget markup of [the widget markup language](/reference/markup-widgets/) |
+| `group: "<any other value>"` | Ignored: only `"background"` is read. To let one of several layers be visible at a time, use `toggleGroup` |
+| `paramsButtonConfig` | Extra buttons on the layer's row — query, download, tooltip and toggle buttons; a bare object is treated as one entry of type `query`. Calculated, file and tile layers only |
+| `descriptionHtml` | The layer's panel content: free HTML plus the widget markup of [the widget markup language](/reference/markup-widgets/). Calculated, file and tile layers only |
 
 ## 5. Presentation properties, in one place
 
 These do not change what the layer computes, only how it appears. All are documented
-individually in the [API reference](/api/) under `LayersProperties` and `ConfigLayer`:
+individually in the [API reference](/api/) under `LayersProperties` and `ConfigLayer`.
+Unless noted, they apply to every kind of layer:
 
-- **In the panel**: `title`, `description`, `thumbUrl`, `legendTitle`, `startLegendOpen`,
-  `startListed`, `hideListing`, `hideMetadata`, `hideLegendButton`, `hideStyleChooser`,
-  `showRemoveBtn`, `useLayerTooltip`, `customLayerClass`, `verticalMenu`.
-- **On the map**: `visibility`, `opacity`, `insideOpacity`, `maxExtent`, `minscale`,
-  `maxscale`, `maxZoom`, `attribution`, `hideTilePlaceholder`.
+- **In the panel**: `title`, `startListed`, `hideListing`, `hideMetadata`,
+  `hideLegendButton`, `showRemoveBtn`, `useLayerTooltip`, `customLayerClass`, `verticalMenu`;
+  `startLegendOpen` and `hideStyleChooser` (published maps only); `description` (file and
+  tile layers only); `thumbUrl` (published maps and tile layers only); `legendTitle`
+  (calculated layers only).
+- **On the map**: `visibility`, `opacity`; `minscale`, `maxscale` and `hideTilePlaceholder`
+  (published maps and calculated layers); `insideOpacity` and `maxZoom` (calculated layers
+  only). The map's extent and attribution come from its catalogue entry, not from the query:
+  limit the area with `extents`.
 - **In the legend of a calculated layer**: `categorical`, `categoricalPalette`,
-  `maxQntEntries`, `showLoadingModal`.
+  `maxQntEntries`, `showLoadingModal` (also on file layers).
 
 ## 6. How to find a property
 
-1. The [API reference](/api/) is generated from the platform source: it is the list that
-   cannot be out of date. Filter by name; the group tells you which kind of layer it
-   applies to.
-2. This page tells you which group to look in.
-3. If a property appears in an old query and does nothing, check
-   [pitfalls and properties that do nothing](/reference/pitfalls/) before trusting it — a handful of
-   keys have been copied between queries for years without ever being read.
+[Where to find it](/reference/where-to-look/) shows, for anything you want to change, where it is
+written (in a layer, in a group, before the layer list or in the map's link) and which part of
+the [API reference](/api/) lists it. If a property appears in an old query and does nothing,
+check [pitfalls and properties that do nothing](/reference/pitfalls/) before trusting it.
 {% endraw %}

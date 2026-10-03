@@ -1,0 +1,46 @@
+{% comment %}
+  One api.json entry, as a closed <details>: the row (key, type, default, kind, a # link to
+  itself and the first sentence) is always visible; the body (description, parameters,
+  returns, examples, see also) is in the HTML too - Ctrl+F, crawlers and readers without JS
+  get every word - but takes no layout until the entry is opened (api-ref.css).
+
+  include.entry  the entry of _data/api.json (with the fields of MappiaExplorer
+                 api-site-fields.js: id, summaryHtml, descriptionHtml, params, returnsHtml,
+                 exampleBlocks, writtenAs, kind)
+  include.group  its group key; the entry's anchor is #<group>.<key>
+  include.base   "" on /api/; "/api/" elsewhere, so links to other entries leave the page
+
+  Ids, classes and data-* attributes are the contract of assets/js/api-ref.js; the
+  property* / left-anchor classes of main.css are deliberately not used.
+{% endcomment %}
+{%- assign e = include.entry -%}
+{%- assign anchor = include.group | append: "." | append: e.key -%}
+{%- capture to_api %} href="{{ include.base }}#{% endcapture -%}
+<details class="api-entry" id="{{ anchor }}" data-group="{{ include.group }}" data-key="{{ e.key }}"{% if e.writtenAs %} data-alias="{{ e.writtenAs | xml_escape }}"{% endif %}>
+<summary class="api-entry__head"><h4 class="api-entry__title"><code class="api-entry__key">{{ e.key | xml_escape }}</code></h4>
+<code class="api-entry__type">{{ e.type | xml_escape }}</code>
+{%- if e.default %}<code class="api-entry__default">= {{ e.default | xml_escape }}</code>{% endif -%}
+{%- if e.required %}<span class="api-entry__required">required</span>{% endif -%}
+{%- if e.kind %}<span class="api-entry__kind">{{ e.kind }}</span>{% endif -%}
+<a class="api-entry__self" href="#{{ anchor }}" tabindex="-1" aria-label="Link to {{ anchor }}" title="Link to this entry">#</a>
+<span class="api-entry__summary">{% if e.summaryHtml %}{{ e.summaryHtml }}{% else %}{{ e.description | split: "@param" | first | truncate: 170 | xml_escape }}{% endif %}</span></summary>
+<div class="api-entry__body">
+{%- if e.writtenAs %}<p class="api-entry__alias">Written as <code>{{ e.writtenAs | xml_escape }}</code></p>{% endif -%}
+{%- if e.descriptionHtml -%}
+<div class="api-entry__desc">{% if include.base != "" %}{{ e.descriptionHtml | replace: ' href="#', to_api }}{% else %}{{ e.descriptionHtml }}{% endif %}</div>
+{%- else -%}
+<div class="api-entry__desc api-entry__desc--plain">{{ e.description | xml_escape }}</div>
+{%- endif -%}
+{%- if e.params -%}
+<dl class="api-entry__params">{% for p in e.params %}<dt>{{ p.name | xml_escape }}{% if p.type != "" %} <i>{{ p.type | xml_escape }}</i>{% endif %}</dt><dd>{% if include.base != "" %}{{ p.html | replace: ' href="#', to_api }}{% else %}{{ p.html }}{% endif %}</dd>{% endfor %}</dl>
+{%- endif -%}
+{%- if e.returnsHtml %}<p class="api-entry__returns"><b>Returns</b> {% if include.base != "" %}{{ e.returnsHtml | replace: ' href="#', to_api }}{% else %}{{ e.returnsHtml }}{% endif %}</p>
+{%- elsif e.returnDescription %}<p class="api-entry__returns"><b>Returns</b> {{ e.returnDescription | xml_escape }}</p>{% endif -%}
+{%- if e.exampleBlocks -%}
+{%- for x in e.exampleBlocks %}<pre class="api-example" data-lang="{{ x.lang }}"><code>{{ x.text | xml_escape }}</code></pre>{% endfor -%}
+{%- else -%}
+{%- for x in e.examples %}<pre class="api-example" data-lang="js"><code>{{ x | replace: "&lt;", "<" | replace: "&gt;", ">" | replace: "&quot;", '"' | replace: "&amp;", "&" | xml_escape }}</code></pre>{% endfor -%}
+{%- endif -%}
+{%- if e.seeHtml %}<p class="api-entry__see"><b>See also</b> {% for s in e.seeHtml %}{% if include.base != "" %}{{ s | replace: ' href="#', to_api }}{% else %}{{ s }}{% endif %}{% unless forloop.last %} &middot; {% endunless %}{% endfor %}</p>{% endif -%}
+</div>
+</details>

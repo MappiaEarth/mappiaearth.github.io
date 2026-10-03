@@ -1,7 +1,12 @@
 ---
+layout: tutorial
+docs_nav: true
 title: Layers and their properties
 step: 2
 permalink: /tutorial/layers/
+wizard:
+  step: second-layer
+  covers_try: true
 summary: "Several maps in one query, each a layer with its own title, opacity and starting state."
 learn:
   - "How several layers make one map."
@@ -13,6 +18,7 @@ try:
   - "Add a fourth layer, `{ name: \"CSR:geologia\", title: \"Geology\", visibility: true, opacity: 0.6 }`, after the others."
 more:
   - { title: "Layer and group property catalogue", url: "/reference/property-catalogue/", why: "every property a layer accepts" }
+  - { title: "Where to find it", url: "/reference/where-to-look/", why: "which part of the API to open" }
   - { title: "The layer and group model", url: "/reference/layer-and-group-model/", why: "presentation properties, in one place" }
 ---
 A map is usually several maps on top of each other - the relief, the borders, a theme. In a
@@ -32,12 +38,15 @@ query, each one is a **layer**: one entry of the list, between `{ }`, separated 
 
 The reader decides too. The **top menu** lists every layer with a switch - layers that are not in
 a group are under *Maps* (step 6 makes groups) - and the **panel** on the left lists the layers
-that are on, each with an eye button to hide it.
+switched on there, each with an eye button that hides it without taking it off the panel.
 
 ### And the rest
 
-A layer accepts many more properties - a description and a thumbnail for the layer list, the
-zoom levels where it shows, which of its styles to use (`styles`), the buttons of its row. You
-do not need them to start; they are all listed, with their type and an example, in the
-[property catalogue](/reference/property-catalogue/) and the [API reference](/api/).
+A layer accepts many more properties - a thumbnail for the layer list (`thumbUrl`), the scale
+range where it is drawn (`minscale`, `maxscale`), which of its styles to use (`styles`). You do
+not need them to start. Some belong to one kind of layer only: the calculated, file and tile
+layers of steps 4 and 5 also get a panel of their own, with text, controls and row buttons,
+which a published map like these does not have. Every property is listed, with its type and an
+example, in the [property catalogue](/reference/property-catalogue/) and the
+[API reference](/api/).
 {% endraw %}

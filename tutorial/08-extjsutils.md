@@ -1,4 +1,6 @@
 ---
+layout: tutorial
+docs_nav: true
 title: The ExtjsUtils toolbox
 step: 8
 permalink: /tutorial/extjsutils/
@@ -13,6 +15,7 @@ try:
   - "Log the map's zoom after choosing a region: `ExtjsUtils.JS.getMap().getZoom()`."
 more:
   - { title: "API reference", url: "/api/", why: "every helper, with its parameters and an example" }
+  - { title: "Where to find it", url: "/reference/where-to-look/", why: "which part of the API to open" }
   - { title: "Notifications and choices", url: "/elements/notifications/" }
 ---
 The functions in your query reach the platform through **`ExtjsUtils`**, a toolbox of helpers
@@ -49,6 +52,9 @@ var box = new OpenLayers.Bounds(-48, -18, -34, -1)            // west, south, ea
 map.zoomToExtent(box);
 ```
 
-Every helper, with its parameters and an example, is in the [API reference](/api/) - grouped the
-same way (`QUERY`, `Alertify`, `Layer`...).
+Every helper, with its parameters and an example, is in the [API reference](/api/).
+`ExtjsUtils.QUERY` and `ExtjsUtils.CONFIGURATION` are under *Query setup*, because they are
+mostly called before the list; the others are under *ExtjsUtils helpers*, by name -
+*ALERTIFY*, *LAYER*, *JS*... A layer's own settings are not helpers: they are its properties
+(step 2).
 {% endraw %}

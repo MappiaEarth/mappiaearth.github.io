@@ -1,115 +1,40 @@
 {% comment %}
   Renders the api.json entries of specific GROUPS (Slider, LoadCsv, PickPoint, ...) on a page
-  that documents one feature.
-
-  api.html renders whole SECTIONS of api.json and is what /api/ uses. The element and raw-map
-  pages instead declare the groups they are about:
+  that documents one feature. api.html renders whole SECTIONS and is what /api/ uses; the
+  element and raw-map pages instead declare the groups they are about:
 
       api:
         - key: Slider
         - key: Label
+          tags: [text, html]      # optional: only these member keys
+          exclude: [cls]          # optional: member keys to hide
 
-  Before this include existed those declarations rendered nothing at all: api.html iterates
-  its input as section names, so a list of {key: <group>} hashes produced no output. The
-  markup below deliberately mirrors api.html's, so both paths look and behave the same
-  (DocUtils.API toggles, #category_<group> anchors that the category labels link to).
-
-  Input: include.api or page.api - a list of hashes with `key`, and optionally
-  `tags` (show only these member keys) or `exclude` (member keys to hide).
+  Each group goes through api-group.html, the same markup as /api/ (entry anchors
+  #<Group>.<key>, #category_<group>); links in its texts to other entries go to /api/.
+  assets/js/api-ref.js opens an entry named by the address and adds the copy buttons.
 {% endcomment %}
-{% assign requested = include.api | default: page.api %}
-{% if requested and requested.size > 0 %}
-  {% assign apiConfig = page.apiConfig | default: nil %}
-  <div class="api-groups">
-    <h2 id="api">Reference: every parameter</h2>
-    <p class="api-groups__lead">
-      Generated from the platform source. The full, searchable list is in the
-      <a href="{{ '/api/' | relative_url }}">API reference</a>; the raw data is
-      <a href="{{ '/assets/api.json' | relative_url }}">api.json</a>.
-    </p>
-
-    {% for wanted in requested %}
-      {% assign groupName = wanted.key %}
-      {% comment %} api.json is section -> group -> entries, so find the section holding it. {% endcomment %}
-      {% assign groupEntries = nil %}
-      {% for section in site.data.api %}
-        {% if section[1][groupName] %}
-          {% assign groupEntries = section[1][groupName] %}
-        {% endif %}
-      {% endfor %}
-
-      {% if groupEntries %}
-        {% assign informationData = groupEntries | where: "key", "_information" | first %}
-        {% assign tags = "" | split: "" %}
-        {% for tag in groupEntries %}
-          {% unless tag.key contains "_" %}
-            {% if wanted.exclude and wanted.exclude contains tag.key %}
-              {% comment %} excluded by the page {% endcomment %}
-            {% elsif wanted.tags and wanted.tags.size > 0 %}
-              {% comment %} the page lists exactly the members it is about {% endcomment %}
-              {% if wanted.tags contains tag.key %}
-                {% assign tags = tags | push: tag %}
-              {% endif %}
-            {% else %}
-              {% assign tags = tags | push: tag %}
-            {% endif %}
-          {% endunless %}
-        {% endfor %}
-
-        <div class="property-category {% if apiConfig and apiConfig.startPropertiesOpen %}open{% endif %}"
-          id="category_{{ groupName }}">
-          <div class="property-category__metadata {% if apiConfig and apiConfig.startPropertiesOpen %}open{% endif %}">
-            <a class="left-anchor" onclick="DocUtils.API.toggleCategoryOpen(this)">
-              <span class="arrow">&nbsp;</span>
-            </a>
-            <span class="property-category__metadata__name" onclick="DocUtils.API.toggleCategoryOpen(this)">{{ informationData.name | default: groupName | xml_escape }}</span>
-            {% if informationData.description %}
-              <div class="property-category__metadata__description">{{ informationData.description | newline_to_br }}</div>
-            {% endif %}
-            {% if informationData.completeAPI %}
-              <div class="property-category__metadata__completeAPI">{{ informationData.completeAPI | newline_to_br }}</div>
-            {% endif %}
-            {% if informationData.example %}
-              <pre class="property-category__metadata__example"><code>{{ informationData.example | xml_escape }}</code></pre>
-            {% endif %}
-          </div>
-          <div class="properties-container">
-            {% for tag in tags %}
-              <div class="property">
-                <a class="left-anchor" onclick="DocUtils.API.togglePropertyOpen(this)">
-                  <span class="arrow">&nbsp;</span>
-                </a>
-                <h3 class="property__title">
-                  <span>
-                    <span class="property-key" onclick="DocUtils.API.togglePropertyOpen(this)">{{ tag.key | xml_escape }}</span>:
-                    <span class="property_type">{{ tag.type | xml_escape }}</span>
-                  </span>
-                  {% if tag.required %}<span class="property-required">required</span>{% endif %}
-                </h3>
-                <pre class="element-description">
-                  <p>{{ tag.description | xml_escape }}</p>
-                </pre>
-                <div class="property__expanded">
-                  {% for see in tag.see %}
-                    <pre class="element-description">{{- see | markdownify -}}</pre>
-                  {% endfor %}
-                  {% for example in tag.examples %}
-                    <div style="margin-bottom: 5px;"><b>Example:</b></div>
-                    {% highlight js %}{{ example }}{% endhighlight %}
-                  {% endfor %}
-                  {% if tag.default %}
-                    <span>Defaults to <code>{{ tag.default | xml_escape }}</code></span>
-                  {% endif %}
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        </div>
-      {% endif %}
-    {% endfor %}
-  </div>
-
-  <script defer>
-    {% include apitooltip.js %}
-  </script>
-{% endif %}
+{%- assign requested = include.api | default: page.api -%}
+{%- if requested and requested.size > 0 -%}
+  {%- assign partial = false -%}
+  {%- for wanted in requested %}{% if wanted.tags or wanted.exclude %}{% assign partial = true %}{% endif %}{% endfor %}
+<div class="api-groups api-ref api-ref--embedded">
+<h2 id="api">{% if partial %}Reference: the parameters used here{% else %}Reference: every parameter{% endif %}</h2>
+<p class="api-groups__lead">Generated from the platform source. Every entry, searchable, is in the <a href="{{ '/api/' | relative_url }}">API reference</a>; the raw data is <a href="{{ '/assets/api.json' | relative_url }}">api.json</a>. Open an entry for its description, parameters and example; <b>#</b> links to it.</p>
+  {%- for wanted in requested -%}
+    {%- assign groupName = wanted.key -%}
+    {%- comment %} api.json is section -> group -> entries, so find the section holding it. {% endcomment -%}
+    {%- assign groupEntries = nil -%}
+    {%- assign groupSection = nil -%}
+    {%- for section in site.data.api -%}
+      {%- if section[1][groupName] -%}
+        {%- assign groupEntries = section[1][groupName] -%}
+        {%- assign groupSection = section[0] -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if groupEntries -%}
+      {%- include api-group.html section=groupSection group=groupName entries=groupEntries base="/api/" on_api=false tags=wanted.tags exclude=wanted.exclude -%}
+    {%- endif -%}
+  {%- endfor %}
+</div>
+<script src="{{ '/assets/js/api-ref.js' | relative_url }}" defer></script>
+{%- endif -%}

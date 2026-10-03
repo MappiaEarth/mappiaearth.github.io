@@ -3,7 +3,7 @@
 > The mistakes that make a query fail silently, the keys that have been copied between queries for years without ever being read, and the handful of parameters the platform accepts but does not honour.
 
 Mappia reference, section "Practical guidance". Page: https://mappia.earth/reference/pitfalls/
-Generated API entries: GroupProperties.openGroup, GroupFunctions.onClickViewGroup, URLOptions, LoadCsv.trim, SummedArea, Hoverpixel, LayersProperties.maxQntEntries, ConfigLayer.type, QUERY.setQueryGlobalProperties (https://mappia.earth/assets/api.json)
+Generated API entries: GroupProperties.openGroup, GroupFunctions.onClickViewGroup, URLOptions, LoadCsv.trim, SummedArea, Hoverpixel, LayersProperties.maxQntEntries, FileLayer.type, QUERY.setQueryGlobalProperties (https://mappia.earth/assets/api.json)
 
 A query almost never fails loudly. It shows a map with one layer missing, or a panel with no
 widget, or a legend that never appears — and the cause is usually one of the items below.

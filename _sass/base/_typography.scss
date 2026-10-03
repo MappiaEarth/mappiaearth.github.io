@@ -14,6 +14,18 @@ body {
   background-color: $reverse;
 }
 
+// Code keeps its own colours when selected (white on dark wiped out the syntax colours), on a
+// light blue. currentcolor, not inherit: selection colours inherit from the parent's selection,
+// so only currentcolor gives each token its own colour back. pre/code themselves too, for the
+// text that sits directly in them.
+pre::selection,
+pre ::selection,
+code::selection,
+code ::selection {
+  color: currentcolor;
+  background-color: #b3d4fc;
+}
+
 // Reboot
 p {
   margin-top: 0;

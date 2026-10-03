@@ -1,4 +1,6 @@
 ---
+layout: tutorial
+docs_nav: true
 title: Source types
 step: 4
 permalink: /tutorial/source-types/
@@ -13,6 +15,7 @@ try:
   - "In the calculated layer, change `1000` to `500` in the expression and in the legend title."
 more:
   - { title: "The layer and group model - the kinds of layer", url: "/reference/layer-and-group-model/" }
+  - { title: "Where to find it", url: "/reference/where-to-look/", why: "which part of the API to open" }
   - { title: "File layers", url: "/elements/file-source-layer/", why: "GeoJSON, CSV and your own loader" }
   - { title: "XYZ layers", url: "/elements/xyz-layer/" }
   - { title: "Expression", url: "/elements/expression-function/", why: "calculated layers in depth" }
@@ -24,10 +27,10 @@ from a file of features or drawn from a tile service. The property **`source`** 
 
 | `source` | What the layer is | What else it needs |
 |---|---|---|
-| *(none)* | A published map of the catalogue, drawn by the map server | `name` |
+| *(none)* | A published map of the catalogue, drawn by the map server (the same as `"local"`) | `name` |
 | a server's key | A published map of a registered server (step 3) | `name` |
 | `"calculate"` | A new map, computed in the browser from the values of the maps in `name` | `expression` (step 5) |
-| `"file"` | Features (points, lines, areas) from GeoJSON, a CSV or JSON list, or your own code | `type`, and `json` or `url` |
+| `"file"` | Features (points, lines, areas) from GeoJSON, a CSV or JSON list, or your own code | `json` written in the query, or `type` and a `url` |
 | `"xyz"` | Tiles from a tile service, addressed by zoom, column and row | `url` with `${z}`, `${x}`, `${y}` |
 | `"osm"`, `"google"`, `"arcgisrest"` | A ready-made basemap | `name` (for example `mapnik`) |
 {% endraw %}
@@ -43,6 +46,8 @@ All of them in one map:
   and `${y}` for every tile it needs.
 - **The calculated layer** reads the elevation map pixel by pixel and keeps only what is higher
   than 1000 m - with a legend of its own. Step 5 is about these.
+- **Calculated, file and tile layers have a panel**: text, controls and row buttons under their
+  row in the layer list (`descriptionHtml`, `paramsButtonConfig`). A published map has none.
 - **The file layer** holds its features right in the query (`type: "json"`), in longitude and
   latitude (`fromProj: "EPSG:4326"`). Its style can write an attribute on the map: `"${name}"`.
   With `type: "geojsonurl"` or `"csv"` and a `url`, the features come from a file instead.

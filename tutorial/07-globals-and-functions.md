@@ -1,4 +1,6 @@
 ---
+layout: tutorial
+docs_nav: true
 title: The && chain, globals and functions
 step: 7
 permalink: /tutorial/globals-and-functions/
@@ -40,6 +42,9 @@ another query removes them.
 - **`CAPITAL`** is a shared value; **`goToCapital`** a shared function that uses it.
 - **`runNow`** is the one name the platform calls by itself: once, when the query is applied,
   after the globals are in place - here, to greet the reader.
+- **The buttons need a panel**, and only calculated, file and tile layers have one (step 5). So
+  the states are a calculated layer with no `expression`: it shows the map as it is, with a
+  panel for the buttons.
 - **Buttons name the function they call**: `{{button|handler=goToCapital}}`. The platform looks
   for the name first in the layer's own **`functions`** - where `this` is the layer, as in
   `sayTitle` - and then among the globals.
@@ -48,4 +53,19 @@ another query removes them.
 
 Globals cannot reuse a name the page already has (`map`, `app`, `Ext`...): pick names of your
 own.
+
+### Settings for the whole query
+
+The same `&&` chain carries the settings of the whole query, with
+**`ExtjsUtils.CONFIGURATION.setOptions`**. For example, when the map is embedded in another
+page, `keepOnLeave: false` stops the mouse wheel from zooming the map once the pointer has left
+it, until the reader clicks the map again - so scrolling the page does not zoom the map:
+
+```javascript
+ExtjsUtils.CONFIGURATION.setOptions({ keepOnLeave: false }) && [ /* the layers */ ];
+```
+
+A layer's own settings stay in the layer (step 2), and a link can add its own (step 9).
+[Where to find it](/reference/where-to-look/) shows the three places, and which one wins when a
+setting exists in two.
 {% endraw %}
